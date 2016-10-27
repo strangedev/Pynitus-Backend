@@ -1,0 +1,42 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+  <table class="table table-striped">
+    <tr>
+      <th><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> In Queue</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+
+    <table class="table table-hover" id="artistTable">
+      <tr>
+        <th>Track</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th></th>
+      </tr>
+      {% for track, album, artist in trackAndAlbumAndArtistNames %}
+      <tr>
+        <td>{{track}}</td>
+        <td>
+          <form action="artist" method="get">
+            <button class="btn btn-default" name="artist" type="submit" value="{{artist}}">view {{artist}}</button>
+          </form>
+        </td>
+        <td>
+          <form action="album" method="get">
+            <input type="hidden" value="{{artist}}" name="artist"/>
+            <button class="btn btn-default" name="album" type="submit" value="{{album}}">view {{album}}</button>
+          </form>
+        </td>
+        <td>
+          <form action="removeFromQueue" method="get">
+            <input type="hidden" value="{{artist}}" name="artist"/>
+            <input type="hidden" value="{{album}}" name="album"/>
+            <button class="btn btn-danger" name="track" type="submit" value="{{track}}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> remove</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+{% endblock %}

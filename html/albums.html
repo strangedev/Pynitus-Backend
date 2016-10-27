@@ -1,0 +1,33 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+    <table class="table table-hover" id="artistTable">
+      <tr>
+        <th>Album</th>
+        <th>Artist</th>
+        <th>Tracks</th>
+        <th></th>
+      </tr>
+      {% for album, artist in albumAndArtistNames %}
+      <tr>
+        <td>{{album}}</td>
+        <td>
+          <form action="artist" method="get">
+            <button class="btn btn-default" name="artist" type="submit" value="{{artist}}">view {{artist}}</button>
+          </form>
+        </td>
+        <td>
+          <form action="album" method="get">
+            <input type="hidden" value="{{artist}}" name="artist"/>
+            <button class="btn btn-default" name="album" type="submit" value="{{album}}">view {{album}}</button>
+          </form>
+        </td>
+        <td>
+          <form action="deleteAlbum" method="get">
+            <input type="hidden" value="{{artist}}" name="artist"/>
+            <button class="btn btn-danger" name="album" type="submit" value="{{album}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> remove</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+{% endblock %}

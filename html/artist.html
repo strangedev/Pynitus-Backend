@@ -1,0 +1,88 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+  <table class="table table-striped" id="playerTable">
+    <tr>
+      <th><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{artistName}}</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+
+  <table class="table table-striped">
+    <tr>
+      <th><span class="glyphicon glyphicon-cd" aria-hidden="true"></span> Albums</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+
+  <table class="table table-hover">
+    <tr>
+      <th>Title</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+    {% for albumTitle in albumTitles %}
+    <tr>
+      <td>{{albumTitle}}</div></td>
+      <td>
+      </td>
+      <td>
+        <form action="album" method="get">
+          <input type="hidden" value="{{artistName}}" name="artist"/>
+          <button class="btn btn-default" name="album" type="submit" value="{{albumTitle}}">view {{albumTitle}}</button>
+        </form>
+      </td>
+      <td>
+        <form action="addAlbumToQueue" method="get">
+          <input type="hidden" value="{{artistName}}" name="artist"/>
+          <button class="btn btn-info disabled" name="album" type="submit" value="{{albumTitle}}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> enqueue {{albumTitle}}</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <table class="table table-striped" id="playerTable">
+    <tr>
+      <th><span class="glyphicon glyphicon-music" aria-hidden="true"></span> Tracks</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+
+  <table class="table table-hover" id="tracksTable">
+    <tr>
+      <th>Title</th>
+      <th></th>
+      <th>Album</th>
+      <th></th>
+    </tr>
+    {% for trackTitle, albumTitle in trackAndAlbumTitles %}
+    <tr>
+      <td>{{trackTitle}}</td>
+      <td>
+        <form action="track" method="get">
+          <input type="hidden" value="{{artistName}}" name="artist"/>
+          <input type="hidden" value="{{albumTitle}}" name="album"/>
+          <button class="btn btn-default" name="track" type="submit" value="{{trackTitle}}">view {{trackTitle}}</button>
+        </form>
+      </td>
+      <td>
+        <form action="album" method="get">
+          <input type="hidden" value="{{artistName}}" name="artist"/>
+          <button class="btn btn-default" name="album" type="submit" value="{{albumTitle}}">view {{albumTitle}}</button>
+        </form>
+      </td>
+      <td>
+        <form action="addToQueue" method="get">
+          <input type="hidden" value="{{artistName}}" name="artist"/>
+          <input type="hidden" value="{{albumTitle}}" name="album"/>
+          <button class="btn btn-info" name="track" type="submit" value="{{trackTitle}}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> enqueue</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

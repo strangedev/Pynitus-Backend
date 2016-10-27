@@ -1,0 +1,24 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+  <table class="table table-striped">
+    <tr>
+      <th><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Add a new Track</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+
+  <table class="table table-responsive">
+    {% for trackType, trackDesc in trackTypesAndDescs %}
+    <tr>
+      <td>{{trackType}}</td>
+      <td>{{trackDesc}}</td>
+      <td>
+        <form action="addByType" method="get">
+          <button type="submit" class="btn btn-success" name="trackType" value="{{trackType}}">Add {{trackType}}</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

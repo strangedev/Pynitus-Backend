@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Pynitus</title>
+
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32">
+
+      <!--link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <meta name="msapplication-TileColor" content="#ffffff">
+      <meta name="msapplication-TileImage" content="/mstile-144x144.png"-->
+  </head>
+
+  <body bgcolor="#1a1a1a">
+
+    <table class="table">
+      <tr>
+        <th>
+          <a href="queue">
+            <button type="button" class="btn btn-primary">
+              <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue
+            </button>
+          </a>
+        </th>
+        <th>
+          <a href="artists">
+            <button type="button" class="btn btn-primary">
+              <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Artists
+            </button>
+          </a>
+        </th>
+        <th>
+          <a href="albums">
+            <button type="button" class="btn btn-primary">
+              <span class="glyphicon glyphicon-cd" aria-hidden="true"></span> Albums
+            </button>
+          </a>
+        </th>
+        <th>
+          <a href="tracks">
+            <button type="button" class="btn btn-primary">
+              <span class="glyphicon glyphicon-music" aria-hidden="true"></span> Tracks
+            </button>
+          </a>
+        </th>
+        <th>
+          <a href="add">
+            <button type="button" class="btn btn-success">
+              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload
+            </button>
+          </a>
+        </th>
+        <th>
+          <a href="artists">
+            <button type="button" class="btn btn-success">
+              <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh
+            </button>
+          </a>
+        </th>
+      </tr>
+    </table>
+
+    <table class="table table-striped">
+      <tr>
+        <th><span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> Now playing</th>
+        <th> <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> {{voteCount}} / {{votesRequired}}</th>
+        <th></th>
+      </tr>
+      <tr>
+        <td>
+          {% if playbackQueue.playing %}
+            {{playbackQueue.currentTrack.title}} - {{playbackQueue.currentTrack.artistName}}
+          {% else %}
+            Play more music!
+          {% endif %}
+        </td>
+        <td>
+          <a href="voteSkip">
+            <button type="button" class="btn btn-warning {% if not playing%}disabled{% endif %}"><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> vote to skip</button>
+          </a>
+        </td>
+        <td>
+          {% if playing %}
+            <a href="stopPlaying">
+              <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span> stop playback</button>
+            </a>
+          {% else %}
+            <a href="startPlaying">
+              <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> start playback</button>
+            </a>
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+
+    <br/>
+    <br/>
+
+    {% block content %}{% endblock %}
+
+  </body>
+</html>
