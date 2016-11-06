@@ -9,7 +9,7 @@ import RESTHandler
 
 def __main__(args):
 	
-	musicLibrary = MusicLibrary.MusicLibrary("/home/strange/Music")
+	musicLibrary = MusicLibrary.MusicLibrary("THEMDIR")
 	playbackQueue = PlaybackQueue.PlaybackQueue()
 	trackFactory = TrackFactory.TrackFactory()
 	restHandler = RESTHandler.RESTHandler(playbackQueue, musicLibrary, trackFactory)

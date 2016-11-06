@@ -14,11 +14,11 @@ import Album
 UARGH
 """
 userAndPass = {
-    "fsinf": "kenwood",
+    "THEUSER": "THEPASSWD",
     }
 
 adminUserAndPass = {
-    "fsadmin": "snugglebutt"
+    "THEADMINNAME": "THEADMINPASSWD"
 }
 
 
@@ -75,52 +75,52 @@ cherrypyConf = {
 
     "/css/bootstrap.min.css": {
         "tools.staticfile.on": True,
-        "tools.staticfile.filename": "/home/strange/workspace_python/PiJukebox/css/bootstrap.min.css"
+        "tools.staticfile.filename": "THEWDIR/css/bootstrap.min.css"
     },
 
     "/fonts/glyphicons-halflings-regular.eot": {
         "tools.staticfile.on": True,
-        "tools.staticfile.filename": "/home/strange/workspace_python/PiJukebox/fonts/glyphicons-halflings-regular.eot"
+        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.eot"
     },
 
     "/fonts/glyphicons-halflings-regular.svg": {
         "tools.staticfile.on": True,
-        "tools.staticfile.filename": "/home/strange/workspace_python/PiJukebox/fonts/glyphicons-halflings-regular.svg"
+        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.svg"
     },
 
     "/fonts/glyphicons-halflings-regular.ttf": {
         "tools.staticfile.on": True,
-        "tools.staticfile.filename": "/home/strange/workspace_python/PiJukebox/fonts/glyphicons-halflings-regular.ttf"
+        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.ttf"
     },
 
     "/fonts/glyphicons-halflings-regular.woff": {
         "tools.staticfile.on": True,
-        "tools.staticfile.filename": "/home/strange/workspace_python/PiJukebox/fonts/glyphicons-halflings-regular.woff"
+        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.woff"
     },
 
     "/fonts/glyphicons-halflings-regular.woff2": {
         "tools.staticfile.on": True,
-        "tools.staticfile.filename": "/home/strange/workspace_python/PiJukebox/fonts/glyphicons-halflings-regular.woff2"
+        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.woff2"
     },
 
     '/favicon.ico':
         {
                 'tools.staticfile.on': True,
-                'tools.staticfile.filename': '/home/strange/workspace_python/PiJukebox/img/pynitus_32x32.ico'
+                'tools.staticfile.filename': 'THEWDIR/img/pynitus_32x32.ico'
         },
 
     '/favicon.png':
         {
                 'tools.staticfile.on': True,
-                'tools.staticfile.filename': '/home/strange/workspace_python/PiJukebox/img/pynitus_32x32.png'
+                'tools.staticfile.filename': 'THEWDIR/img/pynitus_32x32.png'
         }
 
 }
 
-cherrypy.config.update({'server.socket_port': 8080,
+cherrypy.config.update({'server.socket_port': THEPORT,
                         'log.access_file': './access.log',
                         'log.error_file': './error.log',
-                        'server.socket_host': '172.22.168.196'
+                        'server.socket_host': 'THEIPADDR'
                         })
 
 
@@ -131,7 +131,7 @@ class RESTHandler(object):
         self.musicLibrary = musicLibrary
         self.trackFactory = trackFactory
         self.HTMLBuilder = HTMLBuilder.HTMLBuilder(
-                "/home/strange/workspace_python/PiJukebox/html"
+                "THEWDIR/html"
                 )
         self.voteHandler = VoteHandler.VoteHandler(self.playbackQueue.playNext)
 
@@ -221,7 +221,7 @@ class RESTHandler(object):
                             .availableTrackTypes[trackType]\
                             .uploadHandler
 
-        cherrypy.session['uploadHandler'] = uploadHandler("/home/strange/Music")
+        cherrypy.session['uploadHandler'] = uploadHandler("THEMDIR")
 
         return self.HTMLBuilder.buildUploadPage(
             self.voteHandler,
@@ -314,7 +314,7 @@ class RESTHandler(object):
 
         return self.index()
 
-musicLibrary = MusicLibrary.MusicLibrary("/home/strange/Music")
+musicLibrary = MusicLibrary.MusicLibrary("THEMDIR")
 playbackQueue = PlaybackQueue.PlaybackQueue()
 trackFactory = TrackFactory.TrackFactory()
 
