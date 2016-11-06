@@ -30,10 +30,10 @@ read -n 1 -p $"\e[1;32m
 Do static configuration? (Y/n)\e[0m " do_static_configuration
 if [[ $do_static_configuration =~ ^(y|Y)$ ]]
 then
-    sed -i "s/THEWDIR/$1/g" *.py
-    sed -i "s/THEMDIR/$2/g" *.py
-    sed -i "s/THEIPADDR/$3/g" *.py
-    sed -i "s/THEPORT/$4/g" *.py
+    sed -i 's@THEWDIR@'"$1"'@g' *.py
+    sed -i 's@THEMDIR@'"$2"'@g' *.py
+    sed -i 's@THEIPADDR@'"$3"'@g' *.py
+    sed -i 's@THEPORT@'"$4"'@g' *.py
 fi
 
 echo ":: Starting user configuration"
@@ -60,10 +60,10 @@ then
     echo -n "Enter the user's password: "
     read userpasswd
 
-    sed -i "s/THEUSER/$username/g" *.py
-    sed -i "s/THEPASSWD/$userpasswd/g" *.py
-    sed -i "s/THEADMINNAME/$admin/g" *.py
-    sed -i "s/THEADMINPASSWD/$adminpasswd/g" *.py
+    sed -i 's@THEUSER@'"$username"'@g' *.py
+    sed -i 's@THEPASSWD@'"$userpasswd"'@g' *.py
+    sed -i 's@THEADMINNAME@'"$admin"'@g' *.py
+    sed -i 's@THEADMINPASSWD@'"$adminpasswd"'@g' *.py
 fi
 
 echo ":: Done configuring Pynitus"
