@@ -48,8 +48,8 @@ read -n 1 do_static_configuration
 echo -e ""
 if [[ $do_static_configuration =~ ^(y|Y)$ ]]
 then
-    sed -i 's@THEWDIR@'"$1"'@g' *.py
-    sed -i 's@THEMDIR@'"$2"'@g' *.py
+    sed -i 's@THEWDIR@'"${1%/}"'@g' *.py
+    sed -i 's@THEMDIR@'"${2%/}"'@g' *.py
     sed -i 's@THEIPADDR@'"$3"'@g' *.py
     sed -i 's@THEPORT@'"$4"'@g' *.py
 fi
