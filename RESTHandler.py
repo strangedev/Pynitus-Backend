@@ -269,7 +269,7 @@ class RESTHandler(object):
 
         self.__setForCurrentSession(
             'uploadHandler',
-            uploadHandler(config.get("musicDirectory"))
+            uploadHandler(self.config.get("musicDirectory"))
             )
 
         return self.HTMLBuilder.buildUploadPage(
