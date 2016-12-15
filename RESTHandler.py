@@ -262,7 +262,7 @@ class RESTHandler(object):
                             .uploadHandler
 
         cherrypy.session['uploadHandler'] = uploadHandler(
-            "/home/strange/Music")
+            config.get("musicDirectory"))
 
         return self.HTMLBuilder.buildUploadPage(
             self.voteHandler,
