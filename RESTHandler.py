@@ -265,11 +265,11 @@ class RESTHandler(object):
         uploadHandler = self.musicLibrary\
                             .trackFactory\
                             .availableTrackTypes[trackType]\
-                            .uploadHandler
+                            .uploadHandler(self.config.get("musicDirectory"))
 
         self.__setForCurrentSession(
             'uploadHandler',
-            uploadHandler(self.config.get("musicDirectory"))
+            uploadHandler
             )
 
         return self.HTMLBuilder.buildUploadPage(
