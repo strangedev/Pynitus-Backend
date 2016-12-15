@@ -3,7 +3,9 @@ import threading
 
 class PlaybackQueue(object):
 
-    def __init__(self):
+    def __init__(self, onFinishedCallback=None, onStoppedCallback=None):
+        self.onFinishedCallback = onFinishedCallback
+        self.onStoppedCallback = onStoppedCallback
         self.queue = []
         self.played = []
         self.playing = False
@@ -76,8 +78,12 @@ class PlaybackQueue(object):
         self.playbackSemaphore.release()
 
     def onFinished(self):
+        if self.onFinishedCallback:
+            self.onFinishedCallback()
+
         if self.playing:
             self.playNext()
 
     def onStopped(self):
-        pass
+        if self.onStoppedCallback:
+            self.onStoppedCallback()

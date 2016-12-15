@@ -8,9 +8,14 @@
     <title>Pynitus</title>
 
     <!-- Bootstrap -->
-    <link href="../css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="./css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" />
+    <!--[if lt IE 9]>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.ie.min.css" />
+    <![endif]-->
 
       <!--link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
       <meta name="msapplication-TileColor" content="#ffffff">
@@ -18,13 +23,103 @@
   </head>
 
   <body bgcolor="#1a1a1a">
+    <div class="container">
 
-    <table class="table">
+      <table class="table bg-primary">
+        <tr>
+          <th>
+            <a href="queue">
+              <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue
+              </button>
+            </a>
+          </th>
+          <th>
+            <a href="artists">
+              <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Artists
+              </button>
+            </a>
+          </th>
+          <th>
+            <a href="albums">
+              <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-cd" aria-hidden="true"></span> Albums
+              </button>
+            </a>
+          </th>
+          <th>
+            <a href="tracks">
+              <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-music" aria-hidden="true"></span> Tracks
+              </button>
+            </a>
+          </th>
+          <th>
+            <a href="add">
+              <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload
+              </button>
+            </a>
+          </th>
+          <th>
+            <a href="artists">
+              <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh
+              </button>
+            </a>
+          </th>
+        </tr>
+      </table>
+
+      <div class="well well-lg">
+        <table class="table table-striped">
+          <tr>
+            <th class=""><span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> Now playing</th>
+            <th class=""> <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> {{voteCount}} / {{votesRequired}}</th>
+            <th class=""></th>
+          </tr>
+          <tr>
+            <td>
+              {% if playbackQueue.playing %}
+                {{playbackQueue.currentTrack.title}} - {{playbackQueue.currentTrack.artistName}}
+              {% else %}
+                Play more music!
+              {% endif %}
+            </td>
+            <td>
+              <a href="voteSkip">
+                <button type="button" class="btn btn-warning {% if not playing%}disabled{% endif %}"><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> vote to skip</button>
+              </a>
+            </td>
+            <td>
+              {% if playing %}
+                <a href="stopPlaying">
+                  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span> stop playback</button>
+                </a>
+              {% else %}
+                <a href="startPlaying">
+                  <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> start playback</button>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <br/>
+      <br/>
+
+      <div class=" well well-lg">
+        {% block content %}{% endblock %}
+      </div>
+
+    <!--table class="table bg-primary">
       <tr>
         <th>
           <a href="queue">
             <button type="button" class="btn btn-primary">
-              <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue
+              <span class="glyphicon icon-github" aria-hidden="true"></span> Fork me on Github!
             </button>
           </a>
         </th>
@@ -64,45 +159,10 @@
           </a>
         </th>
       </tr>
-    </table>
+    </table-->
 
-    <table class="table table-striped">
-      <tr>
-        <th><span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> Now playing</th>
-        <th> <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> {{voteCount}} / {{votesRequired}}</th>
-        <th></th>
-      </tr>
-      <tr>
-        <td>
-          {% if playbackQueue.playing %}
-            {{playbackQueue.currentTrack.title}} - {{playbackQueue.currentTrack.artistName}}
-          {% else %}
-            Play more music!
-          {% endif %}
-        </td>
-        <td>
-          <a href="voteSkip">
-            <button type="button" class="btn btn-warning {% if not playing%}disabled{% endif %}"><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> vote to skip</button>
-          </a>
-        </td>
-        <td>
-          {% if playing %}
-            <a href="stopPlaying">
-              <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span> stop playback</button>
-            </a>
-          {% else %}
-            <a href="startPlaying">
-              <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> start playback</button>
-            </a>
-          {% endif %}
-        </td>
-      </tr>
-    </table>
-
-    <br/>
-    <br/>
-
-    {% block content %}{% endblock %}
+    </div>
+    <a class="github-fork-ribbon right-bottom fixed" href="https://github.com/strangedev/Pynitus" title="Fork me on GitHub">Fork me on GitHub</a>
 
   </body>
 </html>

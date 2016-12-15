@@ -123,6 +123,9 @@ class RESTHandler(object):
              'server.socket_host': self.config.get("hostAddress")}
         )
 
+        self.playbackQueue.onFinishedCallback = self.voteHandler.newVoting
+        self.playbackQueue.onStoppedCallback = self.voteHandler.newVoting
+
     def __run(self):
         cherrypy.quickstart(
             self,
