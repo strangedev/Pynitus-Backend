@@ -67,6 +67,9 @@ class PlaybackQueue(object):
     def getQueued(self):
         return self.queue
 
+    def getQueueLength(self):
+        return len(self.queue)
+
     def removeFromQueueByIndex(self, i):
         self.playbackSemaphore.acquire()
         del self.queue[i]

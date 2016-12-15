@@ -10,6 +10,7 @@ import PlaybackQueue
 import HTMLBuilder
 import VoteHandler
 import SessionHandler
+import FloodProtection
 import Album
 
 
@@ -30,7 +31,11 @@ class RESTHandler(object):
             self.config,
             self.sessionHandler,
             self.playbackQueue.playNext
-            )
+        )
+        self.floodProtection = FloodProtection.FloodProtection(
+            self.config,
+            self.sessionHandler
+        )
 
         self.__configure()
         self.__run()
@@ -164,7 +169,7 @@ class RESTHandler(object):
                 return \
                     self.__getCurrentSession().get("lastpage")(
                         *self.__getCurrentSession().get('lastpageArgs')
-                        )
+                    )
             else:
                 return self.__getCurrentSession().get("lastpage")()
 
@@ -177,12 +182,13 @@ class RESTHandler(object):
         self.sessionHandler.activity(self.__getClientIp())
 
     def __setLastPage(self, page, args):
-        self.sessionHandler.setAttribute(self.__getClientIp(), "lastpage", page)
+        self.sessionHandler.setAttribute(
+            self.__getClientIp(), "lastpage", page)
         self.sessionHandler.setAttribute(
             self.__getClientIp(),
             "lastpageArgs",
             args
-            )
+        )
 
     @cherrypy.expose
     def index(self):
@@ -273,7 +279,7 @@ class RESTHandler(object):
         self.__setForCurrentSession(
             'uploadHandler',
             uploadHandler
-            )
+        )
 
         return self.HTMLBuilder.buildUploadPage(
             self.voteHandler,
@@ -317,6 +323,11 @@ class RESTHandler(object):
     @cherrypy.expose
     def addToQueue(self, artist=None, album=None, track=None):
         self.__refreshSession()
+        if not self.floodProtection.actionPermitted(self.__getClientIp()):
+            print("Flood protection")
+            return self.__returnToLastPage()
+
+        self.floodProtection.action(self.__getClientIp())
         theTrack = self.musicLibrary.artists[
             artist].albums[album].tracks[track]
         self.playbackQueue.addToQueue(theTrack)

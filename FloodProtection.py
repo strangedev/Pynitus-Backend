@@ -1,5 +1,12 @@
-import math
-import time
+import datetime
+
+
+class ActionRecord(object):
+
+    def __init__(self, ipAddr):
+        self.ipAddr = ipAddr
+        self.actionCount = 0
+        self.lastAction = datetime.datetime.now()
 
 
 class FloodProtection(object):
@@ -8,33 +15,31 @@ class FloodProtection(object):
         self.config = config
         self.sessionHandler = sessionHandler
 
-        self.users = dict({})
-        self.usersVoted = []
-        self.requiredVotePercentage = config.get("actionsPerMinute")
-        self.votes = 0
-        self.voteSuccessfullCallback = voteSuccessfullCallback
+        self.userActions = dict({})
+        self.maxActions = config.get("actionsPerMinute")
 
-    def getActiveUsers(self):
-        return self.sessionHandler.getCount()
+    def actionsLeft(self, ipAddr):
+        return self.maxActions - self.userActions[ipAddr].actionCount
 
-    def newVoting(self):
-        self.usersVoted = []
-        self.votes = 0
+    def actionPermitted(self, ipAddr):
+        self.__cleanup()
+        self.__registerIfNotExists(ipAddr)
 
-    def getRequiredVotes(self):
-        return math.ceil(self.requiredVotePercentage * self.getActiveUsers())
+        return self.userActions[ipAddr].actionCount < self.maxActions
 
-    def voteSuccessfull(self):
-        return self.votes >= self.getRequiredVotes()
+    def action(self, ipAddr):
+        self.__registerIfNotExists(ipAddr)
 
-    def vote(self, ipAddr):
+        self.userActions[ipAddr].actionCount += 1
+        self.userActions[ipAddr].lastAction = datetime.datetime.now()
 
-        if not self.sessionHandler.exists(ipAddr):
-            return
+    def __cleanup(self):
+        currentTime = datetime.datetime.now()
 
-        if ipAddr not in self.usersVoted:
-            self.usersVoted.append(ipAddr)
-            self.votes += 1
-            if self.voteSuccessfull():
-                self.newVoting()
-                self.voteSuccessfullCallback()
+        for actionRecord in self.userActions.values():
+            if (currentTime - actionRecord.lastAction).seconds > 60:
+                actionRecord.actionCount = 0
+
+    def __registerIfNotExists(self, ipAddr):
+        if ipAddr not in self.userActions.keys():
+            self.userActions[ipAddr] = ActionRecord(ipAddr)

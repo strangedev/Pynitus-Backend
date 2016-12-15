@@ -30,7 +30,7 @@
           <th>
             <a href="queue">
               <button type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue &nbsp;<span class="badge">{{playbackQueue.getQueueLength()}}</span>
               </button>
             </a>
           </th>
@@ -76,7 +76,7 @@
         <table class="table table-striped">
           <tr>
             <th class=""><span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> Now playing</th>
-            <th class=""> <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> {{voteCount}} / {{votesRequired}}</th>
+            <th class=""> <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> {{voteCount}} / {{votesRequired}} votes required to skip</th>
             <th class=""></th>
           </tr>
           <tr>
