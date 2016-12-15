@@ -200,6 +200,8 @@ class RESTHandler(object):
         self.__refreshSession()
         self.__setLastPage(self.artists, None)
         return self.HTMLBuilder.buildArtistsPage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary
@@ -211,6 +213,8 @@ class RESTHandler(object):
         self.__setLastPage(self.artist, [artist])
 
         return self.HTMLBuilder.buildArtistPage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary,
@@ -223,6 +227,8 @@ class RESTHandler(object):
         self.__setLastPage(self.albums, None)
 
         return self.HTMLBuilder.buildAlbumsPage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary
@@ -234,6 +240,8 @@ class RESTHandler(object):
         self.__setLastPage(self.album, [artist, album])
 
         return self.HTMLBuilder.buildAlbumPage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary,
@@ -247,6 +255,8 @@ class RESTHandler(object):
         self.__setLastPage(self.tracks, None)
 
         return self.HTMLBuilder.buildTracksPage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary
@@ -263,6 +273,8 @@ class RESTHandler(object):
         self.__setLastPage(self.add, None)
 
         return self.HTMLBuilder.buildAddPage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary.trackFactory
@@ -282,6 +294,8 @@ class RESTHandler(object):
         )
 
         return self.HTMLBuilder.buildUploadPage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue,
             uploadHandler.getUploadAttributes()
@@ -348,6 +362,8 @@ class RESTHandler(object):
         self.__setLastPage(self.queue, None)
 
         return self.HTMLBuilder.buildQueuePage(
+            self.__getClientIp(),
+            self.floodProtection,
             self.voteHandler,
             self.playbackQueue
         )

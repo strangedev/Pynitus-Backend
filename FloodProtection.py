@@ -19,6 +19,7 @@ class FloodProtection(object):
         self.maxActions = config.get("actionsPerMinute")
 
     def actionsLeft(self, ipAddr):
+        self.__registerIfNotExists(ipAddr)
         return self.maxActions - self.userActions[ipAddr].actionCount
 
     def actionPermitted(self, ipAddr):

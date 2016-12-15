@@ -14,11 +14,13 @@ class HTMLBuilder(object):
             loader=jinja2.FileSystemLoader(self.templatePath)
         )
 
-    def buildArtistsPage(self, voteHandler, playbackQueue, musicLibrary):
+    def buildArtistsPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, musicLibrary):
 
         template = self.environment.get_template("artists.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
@@ -27,11 +29,13 @@ class HTMLBuilder(object):
                 [artist.name for artist in musicLibrary.getArtists()])
         )
 
-    def buildAlbumsPage(self, voteHandler, playbackQueue, musicLibrary):
+    def buildAlbumsPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, musicLibrary):
 
         template = self.environment.get_template("albums.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
@@ -40,11 +44,13 @@ class HTMLBuilder(object):
                 [(album.title, album.artistName) for album in musicLibrary.getAlbums()])
         )
 
-    def buildTracksPage(self, voteHandler, playbackQueue, musicLibrary):
+    def buildTracksPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, musicLibrary):
 
         template = self.environment.get_template("tracks.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
@@ -53,11 +59,13 @@ class HTMLBuilder(object):
                 [(track.title, track.albumTitle, track.artistName) for track in musicLibrary.getTracks()])
         )
 
-    def buildQueuePage(self, voteHandler, playbackQueue):
+    def buildQueuePage(self, ipAddr, floodProtection, voteHandler, playbackQueue):
 
         template = self.environment.get_template("queue.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
@@ -66,11 +74,13 @@ class HTMLBuilder(object):
                 (track.title, track.albumTitle, track.artistName) for track in playbackQueue.getQueued()]
         )
 
-    def buildArtistPage(self, voteHandler, playbackQueue, musicLibrary, artist):
+    def buildArtistPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, musicLibrary, artist):
 
         template = self.environment.get_template("artist.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
@@ -82,11 +92,13 @@ class HTMLBuilder(object):
             artistName=artist
         )
 
-    def buildAlbumPage(self, voteHandler, playbackQueue, musicLibrary, artist, album):
+    def buildAlbumPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, musicLibrary, artist, album):
 
         template = self.environment.get_template("album.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
@@ -97,14 +109,16 @@ class HTMLBuilder(object):
                 [track.title for track in musicLibrary.getTracksForAlbumOfArtist(artist, album)])
         )
 
-    def buildTrackPage(self, voteHandler, playbackQueue, track):
+    def buildTrackPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, track):
         pass
 
-    def buildAddPage(self, voteHandler, playbackQueue, trackfactory):
+    def buildAddPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, trackfactory):
 
         template = self.environment.get_template("add.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
@@ -113,11 +127,13 @@ class HTMLBuilder(object):
                                       trackType].description) for trackType in trackfactory.availableTrackTypes])
         )
 
-    def buildUploadPage(self, voteHandler, playbackQueue, attributes):
+    def buildUploadPage(self, ipAddr, floodProtection, voteHandler, playbackQueue, attributes):
 
         template = self.environment.get_template("upload.html")
 
         return template.render(
+            actionsLeft=floodProtection.actionsLeft(ipAddr),
+            maxActions=floodProtection.maxActions,
             playbackQueue=playbackQueue,
             voteCount=voteHandler.votes,
             votesRequired=voteHandler.getRequiredVotes(),
