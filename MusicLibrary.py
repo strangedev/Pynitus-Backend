@@ -9,20 +9,20 @@ import TrackFactory
 
 class MusicLibrary(object):
 
-    def __init__(self, workingDirectory):
+    def __init__(self, config):
 
         self.trackFactory = TrackFactory.TrackFactory()
 
-        self.workingDirectory = workingDirectory
+        self.musicDirectory = config.get("musicDirectory")
         self.artists = dict({})
 
         self.__generateIndexes()
 
     def __generateIndexes(self):
 
-        for artistDir in os.listdir(self.workingDirectory):
+        for artistDir in os.listdir(self.musicDirectory):
 
-            artistPath = os.path.join(self.workingDirectory, artistDir)
+            artistPath = os.path.join(self.musicDirectory, artistDir)
             if not os.path.isdir(artistPath):
                 continue
 
@@ -145,7 +145,7 @@ class MusicLibrary(object):
     def deleteTrack(self, track):
 
         trackPath = os.path.join(
-            self.workingDirectory,
+            self.musicDirectory,
             track.artistName,
             track.albumTitle,
             track.title
@@ -160,7 +160,7 @@ class MusicLibrary(object):
     def deleteAlbum(self, album):
 
         albumPath = os.path.join(
-            self.workingDirectory,
+            self.musicDirectory,
             album.artistName,
             album.title
             )
@@ -171,7 +171,7 @@ class MusicLibrary(object):
 
     def deleteArtist(self, artist):
 
-        artistPath = os.path.join(self.workingDirectory, artist.name)
+        artistPath = os.path.join(self.musicDirectory, artist.name)
         shutil.rmtree(artistPath)
 
         del self.artists[artist.name]

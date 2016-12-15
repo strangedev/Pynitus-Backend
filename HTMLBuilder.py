@@ -114,5 +114,5 @@ class HTMLBuilder(object):
 			voteCount = voteHandler.votes,
 			votesRequired = voteHandler.getRequiredVotes(),
 			playing = playbackQueue.playing,
-			attributes = attributes
+			attributes = sorted(attributes)
 			)

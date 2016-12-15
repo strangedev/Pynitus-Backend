@@ -1,4 +1,5 @@
 import signal
+import os
 
 import cherrypy
 from cherrypy.lib import auth_basic
@@ -8,318 +9,338 @@ import TrackFactory
 import PlaybackQueue
 import HTMLBuilder
 import VoteHandler
+import SessionHandler
 import Album
 
-"""
-UARGH
-"""
-userAndPass = {
-    "THEUSER": "THEPASSWD",
-    }
 
-adminUserAndPass = {
-    "THEADMINNAME": "THEADMINPASSWD"
-}
-
-
-def checkCredentials(realm, username, password):
-    if username in userAndPass:
-        if userAndPass[username] == password:
-            return True
-
-    return False
-
-
-def checkAdminCredentials(realm, username, password):
-    if username in adminUserAndPass:
-        if adminUserAndPass[username] == password:
-            return True
-
-    return False
-
-cherrypyConf = {
-    "/": {
-        "tools.auth_basic.on": True,
-        "tools.auth_basic.realm": "PiJukebox",
-        "tools.auth_basic.checkpassword": checkCredentials,
-        "tools.sessions.on": True
-    },
-
-    "/removeFromQueue": {
-        "tools.auth_basic.on": True,
-        "tools.auth_basic.realm": "localhost",
-        "tools.auth_basic.checkpassword": checkAdminCredentials,
-        "tools.sessions.on": True
-    },
-
-    "/deleteTrack": {
-        "tools.auth_basic.on": True,
-        "tools.auth_basic.realm": "localhost",
-        "tools.auth_basic.checkpassword": checkAdminCredentials,
-        "tools.sessions.on": True
-    },
-
-    "/deleteAlbum": {
-        "tools.auth_basic.on": True,
-        "tools.auth_basic.realm": "localhost",
-        "tools.auth_basic.checkpassword": checkAdminCredentials,
-        "tools.sessions.on": True
-    },
-
-    "/deleteArtist": {
-        "tools.auth_basic.on": True,
-        "tools.auth_basic.realm": "localhost",
-        "tools.auth_basic.checkpassword": checkAdminCredentials,
-        "tools.sessions.on": True
-    },
-
-    "/css/bootstrap.min.css": {
-        "tools.staticfile.on": True,
-        "tools.staticfile.filename": "THEWDIR/css/bootstrap.min.css"
-    },
-
-    "/fonts/glyphicons-halflings-regular.eot": {
-        "tools.staticfile.on": True,
-        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.eot"
-    },
-
-    "/fonts/glyphicons-halflings-regular.svg": {
-        "tools.staticfile.on": True,
-        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.svg"
-    },
-
-    "/fonts/glyphicons-halflings-regular.ttf": {
-        "tools.staticfile.on": True,
-        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.ttf"
-    },
-
-    "/fonts/glyphicons-halflings-regular.woff": {
-        "tools.staticfile.on": True,
-        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.woff"
-    },
-
-    "/fonts/glyphicons-halflings-regular.woff2": {
-        "tools.staticfile.on": True,
-        "tools.staticfile.filename": "THEWDIR/fonts/glyphicons-halflings-regular.woff2"
-    },
-
-    '/favicon.ico':
-        {
-                'tools.staticfile.on': True,
-                'tools.staticfile.filename': 'THEWDIR/img/pynitus_32x32.ico'
-        },
-
-    '/favicon.png':
-        {
-                'tools.staticfile.on': True,
-                'tools.staticfile.filename': 'THEWDIR/img/pynitus_32x32.png'
-        }
-
-}
-
-cherrypy.config.update({'server.socket_port': THEPORT,
-                        'log.access_file': './access.log',
-                        'log.error_file': './error.log',
-                        'server.socket_host': 'THEIPADDR'
-                        })
+def htmlRelPath(config, path):
+    return os.path.join(config.get("htmlDir"), path)
 
 
 class RESTHandler(object):
 
-    def __init__(self, playbackQueue, musicLibrary, trackFactory):
+    def __init__(self, config, playbackQueue, musicLibrary, trackFactory):
+        self.config = config
         self.playbackQueue = playbackQueue
         self.musicLibrary = musicLibrary
         self.trackFactory = trackFactory
-        self.HTMLBuilder = HTMLBuilder.HTMLBuilder(
-                "THEWDIR/html"
-                )
+        self.HTMLBuilder = HTMLBuilder.HTMLBuilder(config.get("htmlDir"))
         self.voteHandler = VoteHandler.VoteHandler(self.playbackQueue.playNext)
+        self.sessionHandler = SessionHandler.SessionHandler(self.config)
+
+        self.__configure()
+        self.__run()
+
+    def __configure(self):
+        self.cherrypyConf = {
+            self.config.get("htmlRootPath"): {
+                "tools.auth_basic.on": True,
+                "tools.auth_basic.realm": "PiJukebox",
+                "tools.auth_basic.checkpassword": self.__checkCredentials,
+                "tools.sessions.on": True
+            },
+
+            "/removeFromQueue": {
+                "tools.auth_basic.on": True,
+                "tools.auth_basic.realm": "localhost",
+                "tools.auth_basic.checkpassword": self.__checkAdminCredentials,
+                "tools.sessions.on": True
+            },
+
+            "/deleteTrack": {
+                "tools.auth_basic.on": True,
+                "tools.auth_basic.realm": "localhost",
+                "tools.auth_basic.checkpassword": self.__checkAdminCredentials,
+                "tools.sessions.on": True
+            },
+
+            "/deleteAlbum": {
+                "tools.auth_basic.on": True,
+                "tools.auth_basic.realm": "localhost",
+                "tools.auth_basic.checkpassword": self.__checkAdminCredentials,
+                "tools.sessions.on": True
+            },
+
+            "/deleteArtist": {
+                "tools.auth_basic.on": True,
+                "tools.auth_basic.realm": "localhost",
+                "tools.auth_basic.checkpassword": self.__checkAdminCredentials,
+                "tools.sessions.on": True
+            },
+
+            "/css/bootstrap.min.css": {
+                "tools.staticfile.on": True,
+                "tools.staticfile.filename": htmlRelPath(self.config, "css/bootstrap.min.css")
+            },
+
+            "/fonts/glyphicons-halflings-regular.eot": {
+                "tools.staticfile.on": True,
+                "tools.staticfile.filename": htmlRelPath(self.config, "fonts/glyphicons-halflings-regular.eot")
+            },
+
+            "/fonts/glyphicons-halflings-regular.svg": {
+                "tools.staticfile.on": True,
+                "tools.staticfile.filename": htmlRelPath(self.config, "fonts/glyphicons-halflings-regular.svg")
+            },
+
+            "/fonts/glyphicons-halflings-regular.ttf": {
+                "tools.staticfile.on": True,
+                "tools.staticfile.filename": htmlRelPath(self.config, "fonts/glyphicons-halflings-regular.ttf")
+            },
+
+            "/fonts/glyphicons-halflings-regular.woff": {
+                "tools.staticfile.on": True,
+                "tools.staticfile.filename": htmlRelPath(self.config, "fonts/glyphicons-halflings-regular.woff")
+            },
+
+            "/fonts/glyphicons-halflings-regular.woff2": {
+                "tools.staticfile.on": True,
+                "tools.staticfile.filename": htmlRelPath(self.config, "fonts/glyphicons-halflings-regular.woff2")
+            },
+
+            '/favicon.ico':
+                {
+                'tools.staticfile.on': True,
+                'tools.staticfile.filename': htmlRelPath(self.config, "img/pynitus_32x32.ico")
+            },
+
+            '/favicon.png':
+                {
+                'tools.staticfile.on': True,
+                'tools.staticfile.filename': htmlRelPath(self.config, "img/pynitus_32x32.png")
+            }
+
+        }
+
+        cherrypy.config.update(
+            {'server.socket_port': self.config.get("hostPort"),
+             'log.access_file': self.config.get("accessLogfile"),
+             'log.error_file': self.config.get("errorLogfile"),
+             'server.socket_host': self.config.get("hostAddress")}
+        )
+
+    def __run(self):
+        cherrypy.quickstart(
+            self,
+            self.config.get("htmlRootPath"),
+            self.cherrypyConf
+        )
+
+    def __checkCredentials(self, realm, username, password):
+        if username in self.config.get("users"):
+            if self.config.get("users")[username] == password:
+                return True
+
+        return False
+
+    def __checkAdminCredentials(self, realm, username, password):
+        if username in self.config.get("admins"):
+            if self.config.get("admins")[username] == password:
+                return True
+
+        return False
+
+    def __getCurrentSession(self):
+        return self.sessionHandler.get(self.__getClientIp())
+
+    def __returnToLastPage(self):
+        if self.__getCurrentSession().exists('lastpage') \
+           and self.__getCurrentSession().exists('lastpage'):
+
+            if self.__getCurrentSession().get('lastpageArgs'):
+                return \
+                    self.__getCurrentSession().get("lastpage")(
+                        *self.__getCurrentSession().get('lastpageArgs')
+                        )
+            else:
+                return self.__getCurrentSession().get("lastpage")()
+
+        return self.index()
+
+    def __getClientIp(self):
+        return cherrypy.request.headers['Remote-Addr']
+
+    def __refreshSession(self):
+        self.sessionHandler.activity(self.__getClientIp())
+
+    def __setLastPage(self, page, args):
+        self.sessionHandler.setAttribute(self.__getClientIp(), "lastpage", page)
+        self.sessionHandler.setAttribute(
+            self.__getClientIp(),
+            "lastpageArgs",
+            args
+            )
 
     @cherrypy.expose
     def index(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         return self.artists()
 
     @cherrypy.expose
     def artists(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
+        self.__setLastPage(self.artists, None)
         return self.HTMLBuilder.buildArtistsPage(
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary
-            )
+        )
 
     @cherrypy.expose
     def artist(self, artist=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        cherrypy.session['lastPage'] = self.artist
-        cherrypy.session['lastpageArgs'] = [artist]
+        self.__refreshSession()
+        self.__setLastPage(self.artist, [artist])
+
         return self.HTMLBuilder.buildArtistPage(
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary,
             artist
-            )
+        )
 
     @cherrypy.expose
     def albums(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        cherrypy.session['lastPage'] = self.albums
-        cherrypy.session['lastpageArgs'] = None
+        self.__refreshSession()
+        self.__setLastPage(self.albums, None)
+
         return self.HTMLBuilder.buildAlbumsPage(
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary
-            )
+        )
 
     @cherrypy.expose
     def album(self, artist=None, album=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        cherrypy.session['lastPage'] = self.album
-        cherrypy.session['lastpageArgs'] = [artist, album]
+        self.__refreshSession()
+        self.__setLastPage(self.album, [artist, album])
+
         return self.HTMLBuilder.buildAlbumPage(
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary,
             artist,
             album
-            )
+        )
 
     @cherrypy.expose
     def tracks(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        cherrypy.session['lastPage'] = self.tracks
-        cherrypy.session['lastpageArgs'] = None
+        self.__refreshSession()
+        self.__setLastPage(self.tracks, None)
+
         return self.HTMLBuilder.buildTracksPage(
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary
-            )
+        )
 
     @cherrypy.expose
     def track(self, artist=None, album=None, track=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        cherrypy.session['lastPage'] = self.track
-        cherrypy.session['lastpageArgs'] = [artist, album, track]
+        self.__refreshSession()
+        self.__setLastPage(self.track, [artist, album, track])
 
     @cherrypy.expose
     def add(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        cherrypy.session['lastPage'] = self.add
-        cherrypy.session['lastpageArgs'] = None
+        self.__refreshSession()
+        self.__setLastPage(self.add, None)
+
         return self.HTMLBuilder.buildAddPage(
             self.voteHandler,
             self.playbackQueue,
             self.musicLibrary.trackFactory
-            )
+        )
 
     @cherrypy.expose
     def addByType(self, trackType=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         uploadHandler = self.musicLibrary\
                             .trackFactory\
                             .availableTrackTypes[trackType]\
                             .uploadHandler
 
-        cherrypy.session['uploadHandler'] = uploadHandler("THEMDIR")
+        cherrypy.session['uploadHandler'] = uploadHandler(
+            "/home/strange/Music")
 
         return self.HTMLBuilder.buildUploadPage(
             self.voteHandler,
             self.playbackQueue,
             cherrypy.session['uploadHandler'].getUploadAttributes()
-            )
+        )
 
     @cherrypy.expose
     def upload(self, **args):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        trackToAdd = cherrypy.session['uploadHandler'].trackFromUploadedAttributes(args)
+        self.__refreshSession()
+        trackToAdd = cherrypy.session[
+            'uploadHandler'].trackFromUploadedAttributes(args)
         self.musicLibrary.addArtist(trackToAdd.artistName)
         self.musicLibrary.addAlbum(
             Album.Album(trackToAdd.albumTitle, trackToAdd.artistName)
-            )
+        )
         self.musicLibrary.addTrack(trackToAdd)
-        return self.artist(trackToAdd.artistName)#self.returnToLastPage(cherrypy.session)
+        # self.__returnToLastPage()
+        return self.artist(trackToAdd.artistName)
 
     @cherrypy.expose
     def startPlaying(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         self.playbackQueue.startPlaying()
-        return self.returnToLastPage(cherrypy.session)
+        return self.__returnToLastPage()
 
     @cherrypy.expose
     def stopPlaying(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         self.playbackQueue.stopPlaying(True)
-        return self.returnToLastPage(cherrypy.session)
+        return self.__returnToLastPage()
 
     @cherrypy.expose
     def voteSkip(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         self.voteHandler.vote(cherrypy.session.id)
-        return self.returnToLastPage(cherrypy.session)
+        return self.__returnToLastPage()
 
     @cherrypy.expose
     def addToQueue(self, artist=None, album=None, track=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         print("Adding tq: ", artist, album, track)
-        theTrack = self.musicLibrary.artists[artist].albums[album].tracks[track]
+        theTrack = self.musicLibrary.artists[
+            artist].albums[album].tracks[track]
         self.playbackQueue.addToQueue(theTrack)
-        return self.returnToLastPage(cherrypy.session)
+        return self.__returnToLastPage()
 
     @cherrypy.expose
     def queue(self):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        cherrypy.session['lastPage'] = self.queue
-        cherrypy.session['lastpageArgs'] = None
+        self.__refreshSession()
+        self.__setLastPage(self.queue, None)
+
         return self.HTMLBuilder.buildQueuePage(
-            self.voteHandler, 
+            self.voteHandler,
             self.playbackQueue
-            )
+        )
 
     @cherrypy.expose
     def removeFromQueue(self, artist=None, album=None, track=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         track = self.musicLibrary.artists[artist].albums[album].tracks[track]
         self.playbackQueue.removeFromQueueByTrack(track)
-        return self.returnToLastPage(cherrypy.session)
+        return self.__returnToLastPage()
 
     @cherrypy.expose
     def deleteTrack(self, track=None, artist=None, album=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
-        theTrack = self.musicLibrary.artists[artist].albums[album].tracks[track]
+        self.__refreshSession()
+        theTrack = self.musicLibrary.artists[
+            artist].albums[album].tracks[track]
         self.musicLibrary.deleteTrack(theTrack)
-        return self.returnToLastPage(cherrypy.session)
+        return self.__returnToLastPage()
 
     @cherrypy.expose
     def deleteAlbum(self, artist=None, album=None):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         theAlbum = self.musicLibrary.artists[artist].albums[album]
         self.musicLibrary.deleteAlbum(theAlbum)
-        return self.returnToLastPage(cherrypy.session)
+        return self.__returnToLastPage()
 
     @cherrypy.expose
     def deleteArtist(self, artist=None,):
-        self.voteHandler.userActivity(cherrypy.session.id)
+        self.__refreshSession()
         theArtist = self.musicLibrary.artists[artist]
         self.musicLibrary.deleteArtist(theArtist)
-        return self.returnToLastPage(cherrypy.session)
-
-    def returnToLastPage(self, userSession):
-        if 'lastPage' in cherrypy.session and 'lastpageArgs' in cherrypy.session:
-
-            if cherrypy.session['lastpageArgs']:
-                return cherrypy.session['lastPage'](*cherrypy.session['lastpageArgs'])
-            else:
-                return cherrypy.session['lastPage']()
-
-        return self.index()
-
-musicLibrary = MusicLibrary.MusicLibrary("THEMDIR")
-playbackQueue = PlaybackQueue.PlaybackQueue()
-trackFactory = TrackFactory.TrackFactory()
-
-cherrypy.quickstart(
-    RESTHandler(playbackQueue, musicLibrary, trackFactory),
-    "/",
-    cherrypyConf
-    )
+        return self.__returnToLastPage()

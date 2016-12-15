@@ -2,39 +2,41 @@ import inspect
 
 import Track
 
+
 class TrackFactory(object):
 
-	def __init__(self):
-		self.availableTrackTypes = dict({})
+    def __init__(self):
+        self.availableTrackTypes = dict({})
 
-		# Get all supported Track types and a reference to their
-		# class. These tracks can be instantiated later.
-		for name, obj in inspect.getmembers(Track):
-			if inspect.isclass(obj):
-				if (name.endswith("Track") and name != "Track"):
-					self.availableTrackTypes[name] = obj
+        # TODO: Bad practice fix this
+        # Get all supported Track types and a reference to their
+        # class. These tracks can be instantiated later.
+        for name, obj in inspect.getmembers(Track):
+            if inspect.isclass(obj):
+                if (name.endswith("Track") and name != "Track"):
+                    self.availableTrackTypes[name] = obj
 
-	def getTrackFromLocalRecord(self, pathToRecord, artist, album, title):
-		for trackType in self.availableTrackTypes:
-			
-			if self.availableTrackTypes[trackType].isTrackOfType(pathToRecord):
+    def getTrackFromLocalRecord(self, pathToRecord, artist, album, title):
+        for trackType in self.availableTrackTypes:
 
-				print("Track at: " + pathToRecord)
+            if self.availableTrackTypes[trackType].isTrackOfType(pathToRecord):
 
-				track = self.availableTrackTypes[trackType](artist, album, title)
-				track.restoreFromLocalRecord(pathToRecord)
+                print("Track at: " + pathToRecord)
 
-				return track
+                track = self.availableTrackTypes[
+                    trackType](artist, album, title)
+                track.restoreFromLocalRecord(pathToRecord)
 
-		return None
+                return track
 
-	def getTrackFromDictionary(self, dictionary):
-		requestedType = dictionary["type"]
+        return None
 
-		for trackType in self.availableTrackTypes:
+    def getTrackFromDictionary(self, dictionary):
+        requestedType = dictionary["type"]
 
-			if trackType == requestedType:
+        for trackType in self.availableTrackTypes:
 
-				# make some objectsies
-				pass
+            if trackType == requestedType:
 
+                # make some objectsies
+                pass
