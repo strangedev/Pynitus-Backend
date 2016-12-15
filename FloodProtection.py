@@ -1,15 +1,16 @@
 import math
+import time
 
 
-class VoteHandler(object):
+class FloodProtection(object):
 
-    def __init__(self, config, sessionHandler, voteSuccessfullCallback):
+    def __init__(self, config, sessionHandler):
         self.config = config
         self.sessionHandler = sessionHandler
 
         self.users = dict({})
         self.usersVoted = []
-        self.requiredVotePercentage = config.get("voteSuccessfullPercentage")
+        self.requiredVotePercentage = config.get("actionsPerMinute")
         self.votes = 0
         self.voteSuccessfullCallback = voteSuccessfullCallback
 

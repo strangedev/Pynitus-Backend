@@ -25,8 +25,12 @@ class RESTHandler(object):
         self.musicLibrary = musicLibrary
         self.trackFactory = trackFactory
         self.HTMLBuilder = HTMLBuilder.HTMLBuilder(config.get("htmlDir"))
-        self.voteHandler = VoteHandler.VoteHandler(self.playbackQueue.playNext)
         self.sessionHandler = SessionHandler.SessionHandler(self.config)
+        self.voteHandler = VoteHandler.VoteHandler(
+            self.config,
+            self.sessionHandler,
+            self.playbackQueue.playNext
+            )
 
         self.__configure()
         self.__run()
@@ -294,16 +298,24 @@ class RESTHandler(object):
     @cherrypy.expose
     def voteSkip(self):
         self.__refreshSession()
-        self.voteHandler.vote(cherrypy.session.id)
+        self.voteHandler.vote(self.__getClientIp())
         return self.__returnToLastPage()
 
     @cherrypy.expose
     def addToQueue(self, artist=None, album=None, track=None):
         self.__refreshSession()
-        print("Adding tq: ", artist, album, track)
         theTrack = self.musicLibrary.artists[
             artist].albums[album].tracks[track]
         self.playbackQueue.addToQueue(theTrack)
+        return self.__returnToLastPage()
+
+    @cherrypy.expose
+    def addAlbumToQueue(self, artist=None, album=None):
+        self.__refreshSession()
+        for trackName in self.musicLibrary\
+                .artists[artist].albums[album].tracks.keys():
+
+            self.addToQueue(artist, album, trackName)
         return self.__returnToLastPage()
 
     @cherrypy.expose
