@@ -151,7 +151,7 @@ class RESTHandler(object):
         self.sessionHandler.setAttribute(self.__getClientIp(), attr, val)
 
     def __getForCurrentSession(self, attr):
-        return self.__getCurrentSession.get(attr)
+        return self.__getCurrentSession().get(attr)
 
     def __returnToLastPage(self):
         if self.__getCurrentSession().exists('lastpage') \
