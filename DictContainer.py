@@ -30,6 +30,12 @@ class DictContainer(object):
 
         return self.items[attribute]
 
+    def set(self, attr, val):
+        if self.exists(attr):
+            self.update(attr, val)
+        else:
+            self.insert(attr, val)
+
     def getAll(self):
         return [(key, self.items[key]) for key in self.items.keys()]
 

@@ -2,15 +2,16 @@ import os
 
 import Track
 
+
 class Attribute(object):
 
     def __init__(
-        self, 
-        displayName = None,
-        attributeType = None,
-        required = None,
-        target = None
-        ):
+        self,
+        displayName=None,
+        attributeType=None,
+        required=None,
+        target=None
+    ):
         self.displayName = displayName
         self.attributeType = attributeType
         self.required = True if required == "required" else False
@@ -22,23 +23,23 @@ class UploadHandler(object):
     def __init__(self, workingDir):
         self.workingDir = workingDir
         self.attributes = {
-            "Artist" : ["string", "required", "artistName"],
-            "Album" : ["string", "required", "albumTitle"],
-            "Title" : ["string", "required", "title"],
-            "Genre" : ["string", "optional", "genre"],
-            "Label" : ["string", "optional", "label"],
-            "Release Date" : ["string", "optional", "releaseDate"],
-            "Featuring" : ["string", "optional", "features"]
+            "Artist": ["string", "required", "artistName"],
+            "Album": ["string", "required", "albumTitle"],
+            "Title": ["string", "required", "title"],
+            "Genre": ["string", "optional", "genre"],
+            "Label": ["string", "optional", "label"],
+            "Release Date": ["string", "optional", "releaseDate"],
+            "Featuring": ["string", "optional", "features"]
         }
 
     def getUploadAttributes(self):
         return [Attribute(
-                    attribute, 
-                    self.attributes[attribute][0], 
-                    self.attributes[attribute][1], 
-                    self.attributes[attribute][2]
-                    ) for attribute in self.attributes
-                ]
+            attribute,
+            self.attributes[attribute][0],
+            self.attributes[attribute][1],
+            self.attributes[attribute][2]
+        ) for attribute in self.attributes
+        ]
 
     def trackFromUploadedAttributes(self, attributes):
         return NotImplemented
@@ -66,13 +67,14 @@ class UploadHandler(object):
 
         track.storeToFilePath(recordPath)
 
+
 class FileUploadHandler(UploadHandler):
 
     def __init__(self, workingDir):
-        super().__init__(workingDir);
+        super().__init__(workingDir)
 
         self.attributes.update({
-            "File" : ["file", "required", None]
+            "File": ["file", "required", None]
         })
 
     def trackFromUploadedAttributes(self, attributes):
@@ -81,13 +83,13 @@ class FileUploadHandler(UploadHandler):
             attributes["Artist"],
             attributes["Album"],
             attributes["Title"]
-            )
+        )
 
         file = attributes["File"]
         fileData = None
 
-        #TODO
-        #if not file.content_type.startswith("audio"):
+        # TODO
+        # if not file.content_type.startswith("audio"):
         #    return None
 
         size = 0
@@ -100,7 +102,6 @@ class FileUploadHandler(UploadHandler):
                 fileData = dataChunk
             else:
                 fileData += dataChunk
-
 
         #fileData = file.read()
         fileName = file.filename
@@ -127,13 +128,14 @@ class FileUploadHandler(UploadHandler):
 
         return track
 
+
 class YoutubeUploadHandler(UploadHandler):
 
     def __init__(self, workingDir):
-        super().__init__(workingDir);
+        super().__init__(workingDir)
 
         self.attributes.update({
-            "URL" : ["string", "required", "url"]
+            "URL": ["string", "required", "url"]
         })
 
     def trackFromUploadedAttributes(self, attributes):
@@ -142,7 +144,7 @@ class YoutubeUploadHandler(UploadHandler):
             attributes["Artist"],
             attributes["Album"],
             attributes["Title"]
-            )
+        )
 
         del attributes["Artist"]
         del attributes["Album"]
@@ -166,10 +168,10 @@ class YoutubeUploadHandler(UploadHandler):
 class SoundcloudUploadHandler(UploadHandler):
 
     def __init__(self, workingDir):
-        super().__init__(workingDir);
+        super().__init__(workingDir)
 
         self.attributes.update({
-            "URL" : ["string", "required", "url"]
+            "URL": ["string", "required", "url"]
         })
 
     def trackFromUploadedAttributes(self, attributes):
@@ -178,7 +180,7 @@ class SoundcloudUploadHandler(UploadHandler):
             attributes["Artist"],
             attributes["Album"],
             attributes["Title"]
-            )
+        )
 
         del attributes["Artist"]
         del attributes["Album"]

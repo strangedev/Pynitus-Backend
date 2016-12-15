@@ -147,6 +147,12 @@ class RESTHandler(object):
     def __getCurrentSession(self):
         return self.sessionHandler.get(self.__getClientIp())
 
+    def __setForCurrentSession(self, attr, val):
+        self.sessionHandler.setAttribute(self.__getClientIp(), attr, val)
+
+    def __getForCurrentSession(self, attr):
+        return self.__getCurrentSession.get(attr)
+
     def __returnToLastPage(self):
         if self.__getCurrentSession().exists('lastpage') \
            and self.__getCurrentSession().exists('lastpage'):
@@ -261,26 +267,30 @@ class RESTHandler(object):
                             .availableTrackTypes[trackType]\
                             .uploadHandler
 
-        cherrypy.session['uploadHandler'] = uploadHandler(
-            config.get("musicDirectory"))
+        self.__setForCurrentSession(
+            'uploadHandler',
+            uploadHandler(config.get("musicDirectory"))
+            )
 
         return self.HTMLBuilder.buildUploadPage(
             self.voteHandler,
             self.playbackQueue,
-            cherrypy.session['uploadHandler'].getUploadAttributes()
+            uploadHandler.getUploadAttributes()
         )
 
     @cherrypy.expose
     def upload(self, **args):
         self.__refreshSession()
-        trackToAdd = cherrypy.session[
-            'uploadHandler'].trackFromUploadedAttributes(args)
+
+        trackToAdd = self.__getForCurrentSession('uploadHandler')\
+            .trackFromUploadedAttributes(args)
+
         self.musicLibrary.addArtist(trackToAdd.artistName)
         self.musicLibrary.addAlbum(
             Album.Album(trackToAdd.albumTitle, trackToAdd.artistName)
         )
         self.musicLibrary.addTrack(trackToAdd)
-        # self.__returnToLastPage()
+
         return self.artist(trackToAdd.artistName)
 
     @cherrypy.expose

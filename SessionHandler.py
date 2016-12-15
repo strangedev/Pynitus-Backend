@@ -28,10 +28,7 @@ class SessionHandler(DictContainer.DictContainer):
         self.__updateLastSeen(ipAddr)
 
     def setAttribute(self, ipAddr, attr, val):
-        if self.get(ipAddr).exists(attr):
-            self.get(ipAddr).update(attr, val)
-        else:
-            self.get(ipAddr).insert(attr, val)
+        self.get(ipAddr).set(attr, val)
 
     def __updateLastSeen(self, ipAddr):
         self.setAttribute(ipAddr, "lastSeen", datetime.datetime.now())
