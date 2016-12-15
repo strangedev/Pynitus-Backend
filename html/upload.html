@@ -15,22 +15,22 @@
         <td>{{attribute.displayName}}:</td>
         <td>
           {% if attribute.attributeType == "string" %}
-            <input type="text" name="{{attribute.displayName}}" {% if attribute.required %}required="required"{% endif %}></input>
+            <input type="text" class="form-control input-sm" name="{{attribute.displayName}}" {% if attribute.required %}required="required"{% endif %}></input>
           {% endif %}
           {% if attribute.attributeType == "file" %}
-            <input type="file" name="{{attribute.displayName}}" {% if attribute.required %}required="required"{% endif %}/>
+            <input type="file" class="form-control input-sm" name="{{attribute.displayName}}" {% if attribute.required %}required="required"{% endif %}/>
           {% endif %}
         </td>
         <td>
           {% if attribute.required %}
-            Required
+            <span class="label label-danger"><span class="glyphicon " aria-hidden="true"></span> Required</div>
           {% else %}
-            Optional
+            <span class="label label-default"><span class="glyphicon " aria-hidden="true"></span> Optional</button>
           {% endif %}
         </td>
       </tr>
       {% endfor %}
     </table>
-    <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-upload" aria-hidden="true"> Upload</button>
+    <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload</button>
   </form>
 {% endblock %}

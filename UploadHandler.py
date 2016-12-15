@@ -17,6 +17,9 @@ class Attribute(object):
         self.required = True if required == "required" else False
         self.target = target
 
+    def __lt__(self, other):
+        return self.displayName < other.displayName
+
 
 class UploadHandler(object):
 

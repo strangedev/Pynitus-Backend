@@ -56,6 +56,13 @@ class RESTHandler(object):
                 "tools.sessions.on": True
             },
 
+            "/stopPlaying": {
+                "tools.auth_basic.on": True,
+                "tools.auth_basic.realm": "localhost",
+                "tools.auth_basic.checkpassword": self.__checkAdminCredentials,
+                "tools.sessions.on": True
+            },
+
             "/deleteTrack": {
                 "tools.auth_basic.on": True,
                 "tools.auth_basic.realm": "localhost",
