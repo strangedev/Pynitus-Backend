@@ -72,3 +72,6 @@ class Database(object):
             track.title
             ) + recordContainerExtension
         shutil.rmtree(trackPath)
+
+    def mergeArtists(self, a1, a2):
+        realName = a1.title()

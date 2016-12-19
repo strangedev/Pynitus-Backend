@@ -4,6 +4,7 @@ from typing import NewType
 import Track
 import TrackFactory
 import Database
+import UnicodeUtils
 
 MusicLibraryType = NewType('MusicLibrary', object)
 
@@ -27,17 +28,25 @@ class MusicLibrary(object):
             except Exception as e:
                 print(e)
 
-    def __mergeArtists(self, fstArtistName, sndArtistName) -> None:
-        pass
-
-    def __mergeAlbums(self, fstAlbumTitle, sndAlbumTitle) -> None:
-        pass
-
-    def __mergeTracks(self, fstAlbumTitle, sndAlbumTitle) -> None:
-        pass
-
     def __cleanup(self) -> None:
-        pass
+        # TODO: find a faster way to do this (O(n^2) currently)
+        for artist in self.entries:
+            for other in self.entries:
+                if UnicodeUtils.unicode_compare(artist, other):
+                    self.db.mergeArtists(artist, other)
+
+        for artist in self.entries:
+            for album in self.entries[artist]:
+                for other in self.entries[artist]:
+                    if UnicodeUtils.unicode_compare(album, other):
+                        self.db.mergeAlbums(album, other)
+
+        for artist in self.entries:
+            for album in self.entries[artist]:
+                for track in self.entries[artist][album]:
+                    for other in self.entries[artist][album]:
+                        if UnicodeUtils.unicode_compare(track, other):
+                            self.db.mergeTracks(track, other)
 
     def getArtists(self) -> List[str]:
         return list(self.entries.keys())

@@ -1,6 +1,7 @@
 import os
 
 import Track
+import UnicodeUtils
 
 
 class Attribute(object):
@@ -48,6 +49,11 @@ class UploadHandler(object):
         return NotImplemented
 
     def autoImportAttributes(self, obj, attributes):
+
+        attributes["Artist"] = attribute["Artist"].title()
+        attributes["Album"] = attribute["Album"].title()
+        attributes["Track"] = attribute["Track"].title()
+
         for attribute in attributes:
 
             if attribute in self.attributes:
@@ -106,7 +112,7 @@ class FileUploadHandler(UploadHandler):
             else:
                 fileData += dataChunk
 
-        #fileData = file.read()
+        # fileData = file.read()
         fileName = file.filename
 
         del attributes["Artist"]
