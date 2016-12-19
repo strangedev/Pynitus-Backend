@@ -11,7 +11,6 @@ import HTMLBuilder
 import VoteHandler
 import SessionHandler
 import FloodProtection
-import Album
 
 
 def htmlRelPath(config, path):
@@ -25,7 +24,6 @@ class RESTHandler(object):
         self.playbackQueue = playbackQueue
         self.musicLibrary = musicLibrary
         self.trackFactory = trackFactory
-        self.HTMLBuilder = HTMLBuilder.HTMLBuilder(config.get("htmlDir"))
         self.sessionHandler = SessionHandler.SessionHandler(self.config)
         self.voteHandler = VoteHandler.VoteHandler(
             self.config,
@@ -36,6 +34,14 @@ class RESTHandler(object):
             self.config,
             self.sessionHandler
         )
+
+        self.HTMLBuilder = HTMLBuilder.HTMLBuilder(
+            config.get("htmlDir"),
+            self.floodProtection,
+            self.voteHandler,
+            self.playbackQueue,
+            self.musicLibrary
+            )
 
         self.__configure()
         self.__run()
@@ -172,10 +178,16 @@ class RESTHandler(object):
         if self.__getCurrentSession().exists('lastpage') \
            and self.__getCurrentSession().exists('lastpage'):
 
+            print(
+                "Returning to:",
+                self.__getCurrentSession().get('lastpage'))
+
             if self.__getCurrentSession().get('lastpageArgs'):
+                print("with args:", self.__getCurrentSession().get('lastpageArgs'))
                 return \
                     self.__getCurrentSession().get("lastpage")(
-                        *self.__getCurrentSession().get('lastpageArgs')
+                        self,
+                        **self.__getCurrentSession().get('lastpageArgs')
                     )
             else:
                 return self.__getCurrentSession().get("lastpage")()
@@ -197,99 +209,85 @@ class RESTHandler(object):
             args
         )
 
+    def hasSession(func):
+        def wrapper(self, **kwargs):
+            self.__refreshSession()
+            return func(self, **kwargs)
+        return wrapper
+
+    def isReturnable(func):
+        def wrapper(self, **kwargs):
+            self.__setLastPage(func, kwargs)
+            return func(self, **kwargs)
+        return wrapper
+
+    def returnsToLast(func):
+        def wrapper(self, **kwargs):
+            func(self, **kwargs)
+            return self.__returnToLastPage()
+        return wrapper
+
+    def floodProtected(func):
+        def wrapper(self, **kwargs):
+            if not self.floodProtection.actionPermitted(self.__getClientIp()):
+                return self.__returnToLastPage()
+            self.floodProtection.action(self.__getClientIp())
+            return func(self, **kwargs)
+        return wrapper
+
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def index(self):
-        self.__refreshSession()
         return self.artists()
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def artists(self):
-        self.__refreshSession()
-        self.__setLastPage(self.artists, None)
-        return self.HTMLBuilder.buildArtistsPage(
-            self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
-            self.musicLibrary
-        )
+        return self.HTMLBuilder.buildArtistsPage(self.__getClientIp())
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def artist(self, artist=None):
-        self.__refreshSession()
-        self.__setLastPage(self.artist, [artist])
-
-        return self.HTMLBuilder.buildArtistPage(
-            self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
-            self.musicLibrary,
-            artist
-        )
+        return self.HTMLBuilder.buildArtistPage(self.__getClientIp(), artist)
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def albums(self):
-        self.__refreshSession()
-        self.__setLastPage(self.albums, None)
-
-        return self.HTMLBuilder.buildAlbumsPage(
-            self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
-            self.musicLibrary
-        )
+        return self.HTMLBuilder.buildAlbumsPage(self.__getClientIp())
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def album(self, artist=None, album=None):
-        self.__refreshSession()
-        self.__setLastPage(self.album, [artist, album])
-
         return self.HTMLBuilder.buildAlbumPage(
-            self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
-            self.musicLibrary,
-            artist,
-            album
-        )
+            self.__getClientIp(), artist, album
+            )
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def tracks(self):
-        self.__refreshSession()
-        self.__setLastPage(self.tracks, None)
-
-        return self.HTMLBuilder.buildTracksPage(
-            self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
-            self.musicLibrary
-        )
+        return self.HTMLBuilder.buildTracksPage(self.__getClientIp())
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def track(self, artist=None, album=None, track=None):
-        self.__refreshSession()
-        self.__setLastPage(self.track, [artist, album, track])
+        pass
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def add(self):
-        self.__refreshSession()
-        self.__setLastPage(self.add, None)
-
-        return self.HTMLBuilder.buildAddPage(
-            self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
-            self.musicLibrary.trackFactory
-        )
+        return self.HTMLBuilder.buildAddPage(self.__getClientIp())
 
     @cherrypy.expose
+    @hasSession
     def addByType(self, trackType=None):
-        self.__refreshSession()
         uploadHandler = self.musicLibrary\
                             .trackFactory\
                             .availableTrackTypes[trackType]\
@@ -302,104 +300,81 @@ class RESTHandler(object):
 
         return self.HTMLBuilder.buildUploadPage(
             self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
             uploadHandler.getUploadAttributes()
         )
 
     @cherrypy.expose
+    @hasSession
     def upload(self, **args):
-        self.__refreshSession()
-
         trackToAdd = self.__getForCurrentSession('uploadHandler')\
             .trackFromUploadedAttributes(args)
-
-        self.musicLibrary.addArtist(trackToAdd.artistName)
-        self.musicLibrary.addAlbum(
-            Album.Album(trackToAdd.albumTitle, trackToAdd.artistName)
-        )
         self.musicLibrary.addTrack(trackToAdd)
-
         return self.artist(trackToAdd.artistName)
 
     @cherrypy.expose
+    @hasSession
+    @returnsToLast
     def startPlaying(self):
-        self.__refreshSession()
         self.playbackQueue.startPlaying()
-        return self.__returnToLastPage()
 
     @cherrypy.expose
+    @hasSession
+    @returnsToLast
     def stopPlaying(self):
-        self.__refreshSession()
         self.playbackQueue.stopPlaying(True)
-        return self.__returnToLastPage()
 
     @cherrypy.expose
+    @hasSession
+    @returnsToLast
     def voteSkip(self):
-        self.__refreshSession()
         self.voteHandler.vote(self.__getClientIp())
-        return self.__returnToLastPage()
 
     @cherrypy.expose
-    def addToQueue(self, artist=None, album=None, track=None):
-        self.__refreshSession()
-        if not self.floodProtection.actionPermitted(self.__getClientIp()):
-            print("Flood protection")
-            return self.__returnToLastPage()
-
-        self.floodProtection.action(self.__getClientIp())
-        theTrack = self.musicLibrary.artists[
-            artist].albums[album].tracks[track]
+    @hasSession
+    @floodProtected
+    @returnsToLast
+    def addToQueue(self, artist=None, album=None, track: str=None):
+        theTrack = self.musicLibrary.entries[artist][album][track]
         self.playbackQueue.addToQueue(theTrack)
-        return self.__returnToLastPage()
 
     @cherrypy.expose
+    @hasSession
+    @returnsToLast
     def addAlbumToQueue(self, artist=None, album=None):
-        self.__refreshSession()
         for trackName in self.musicLibrary\
-                .artists[artist].albums[album].tracks.keys():
-
-            self.addToQueue(artist, album, trackName)
-        return self.__returnToLastPage()
+                .entries[artist][album].keys():
+            self.addToQueue(artist=artist, album=album, track=trackName)
 
     @cherrypy.expose
+    @hasSession
+    @isReturnable
     def queue(self):
-        self.__refreshSession()
-        self.__setLastPage(self.queue, None)
-
-        return self.HTMLBuilder.buildQueuePage(
-            self.__getClientIp(),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue
-        )
+        return self.HTMLBuilder.buildQueuePage(self.__getClientIp())
 
     @cherrypy.expose
-    def removeFromQueue(self, artist=None, album=None, track=None):
-        self.__refreshSession()
-        track = self.musicLibrary.artists[artist].albums[album].tracks[track]
+    @returnsToLast
+    def removeFromQueue(self, artist=None, album=None, track: str=None):
+        track = self.musicLibrary.entries[artist][album][track]
         self.playbackQueue.removeFromQueueByTrack(track)
-        return self.__returnToLastPage()
 
     @cherrypy.expose
+    @hasSession
+    @returnsToLast
     def deleteTrack(self, track=None, artist=None, album=None):
-        self.__refreshSession()
         theTrack = self.musicLibrary.artists[
             artist].albums[album].tracks[track]
         self.musicLibrary.deleteTrack(theTrack)
-        return self.__returnToLastPage()
 
     @cherrypy.expose
+    @hasSession
+    @returnsToLast
     def deleteAlbum(self, artist=None, album=None):
-        self.__refreshSession()
         theAlbum = self.musicLibrary.artists[artist].albums[album]
         self.musicLibrary.deleteAlbum(theAlbum)
-        return self.__returnToLastPage()
 
     @cherrypy.expose
+    @hasSession
+    @returnsToLast
     def deleteArtist(self, artist=None,):
-        self.__refreshSession()
         theArtist = self.musicLibrary.artists[artist]
         self.musicLibrary.deleteArtist(theArtist)
-        return self.__returnToLastPage()

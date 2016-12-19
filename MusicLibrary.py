@@ -1,177 +1,123 @@
-import os
-import shutil
+from typing import List
+from typing import NewType
 
-import Artist
-import Album
 import Track
 import TrackFactory
+import Database
+
+MusicLibraryType = NewType('MusicLibrary', object)
 
 
 class MusicLibrary(object):
 
     def __init__(self, config):
 
-        self.trackFactory = TrackFactory.TrackFactory()
-
         self.musicDirectory = config.get("musicDirectory")
-        self.artists = dict({})
+        self.db = Database.Database(self.musicDirectory)
+        self.entries = dict({})
 
         self.__generateIndexes()
+        self.__cleanup()
 
-    def __generateIndexes(self):
+    def __generateIndexes(self) -> None:
+        tracks = self.db.getLocalTracks()
+        for track in tracks:
+            try:
+                self.addTrack(track)
+            except Exception as e:
+                print(e)
 
-        for artistDir in os.listdir(self.musicDirectory):
+    def __mergeArtists(self, fstArtistName, sndArtistName) -> None:
+        pass
 
-            artistPath = os.path.join(self.musicDirectory, artistDir)
-            if not os.path.isdir(artistPath):
-                continue
+    def __mergeAlbums(self, fstAlbumTitle, sndAlbumTitle) -> None:
+        pass
 
-            """
-            Top level of directory contains artist folders
-            """
-            self.addArtist(artistDir)
+    def __mergeTracks(self, fstAlbumTitle, sndAlbumTitle) -> None:
+        pass
 
-            for albumDir in os.listdir(artistPath):
+    def __cleanup(self) -> None:
+        pass
 
-                albumPath = os.path.join(artistPath, albumDir)
-                if not os.path.isdir(albumPath):
-                    continue
+    def getArtists(self) -> List[str]:
+        return list(self.entries.keys())
 
-                """
-                There might be other kinds of albums in the future
-                """
-                self.addAlbum(Album.Album(albumDir, artistDir))
-
-                for trackFilename in os.listdir(albumPath):
-
-                    trackPath = os.path.join(albumPath, trackFilename)
-                    trackName, trackContainerExtension \
-                        = os.path.splitext(trackFilename)
-
-                    maybeTrack = None
-
-                    if trackContainerExtension == ".rec":
-                        maybeTrack = self.trackFactory\
-                                         .getTrackFromLocalRecord(
-                                            trackPath,
-                                            artistDir,
-                                            albumDir,
-                                            trackName
-                                            )
-
-                    if maybeTrack:
-                        self.addTrack(maybeTrack)
-
-    def getArtists(self):
-
-        return list(self.artists.values())
-
-    def getAlbumsForArtist(self, artist):
-
-        if artist not in self.artists:
+    def getAlbumsForArtist(self, artist: str) -> List[str]:
+        if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
-        return self.artists[artist].getAlbums()
+        return list(self.entries[artist].keys())
 
-    def getAlbums(self):
-
-        return [item for sublist in [artist.getAlbums()
+    def getAlbums(self) -> List[str]:
+        return [item for sublist in [self.getAlbumsForArtist(artist)
                 for artist in self.getArtists()] for item in sublist]
 
-    def getTracksForAlbumOfArtist(self, artist, album):
-
-        if artist not in self.artists:
+    def getTracksForAlbumOfArtist(
+        self,
+        artist: str,
+        album: str
+    ) -> List[Track.TrackType]:
+        if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
-        if album not in [
-                            album.title for album in
-                            self.getAlbumsForArtist(artist)
-                        ]:
+        if album not in [album for album in self.getAlbumsForArtist(artist)]:
             raise Exception("Artist has no such album.")
 
-        return list(self.artists[artist].albums[album].getTracks())
+        return list(self.entries[artist][album].values())
 
-    def getTracksForArtist(self, artist):
-
-        if artist not in self.artists:
+    def getTracksForArtist(self, artist: str) -> List[Track.TrackType]:
+        if artist not in self.entries:
             raise Exception("Artist doesn't exist")
-
-        return [
-                item for sublist in
-                [
-                    album.getTracks()
-                    for album in self.artists[artist].getAlbums()
-                ]
-                for item in sublist
-                ]
-
-    def getTracks(self):
 
         return [item for sublist in
-                [
-                    self.getTracksForArtist(artist.name)
-                    for artist in self.getArtists()
-                    ] for item in sublist
-                ]
+                [self.entries[artist][album].values()
+                    for album in self.entries[artist].keys()]
+                for item in sublist]
 
-    def addArtist(self, artist):
+    def getTracks(self) -> List[Track.TrackType]:
 
-        print("Artist exists: ", artist in self.artists)
+        return [item for sublist in
+                [self.getTracksForArtist(artist)
+                    for artist in self.getArtists()] for item in sublist]
 
-        if artist not in self.artists:
-            self.artists[artist] = Artist.Artist(artist)
+    def addTrack(self, track: Track.TrackType) -> None:
+        self.__addArtist(track.artistName)
+        self.__addAlbum(track.artistName, track.albumTitle)
+        self.__addTrack(track.artistName, track.albumTitle, track)
 
-    def addAlbum(self, album):
+    def __addArtist(self, artist: str) -> None:
 
-        if album.artistName not in self.artists:
+        if artist not in self.entries:
+            self.entries[artist] = dict({})
+
+    def __addAlbum(self, artist: str, album: str) -> None:
+        if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
-        self.artists[album.artistName].addAlbum(album)
+        self.entries[artist][album] = dict({})
 
-    def addTrack(self, track):
-
-        if track.artistName not in self.artists:
+    def __addTrack(
+        self,
+        artist: str,
+        album: str,
+        track: Track.TrackType
+    ) -> None:
+        if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
-        if track.albumTitle not in [
-                                    album.title for album
-                                    in self.getAlbumsForArtist(
-                                        track.artistName)
-                                    ]:
+        if album not in [album for album in self.getAlbumsForArtist(artist)]:
             raise Exception("Album doesn't exist")
 
-        self.artists[track.artistName].albums[track.albumTitle].addTrack(track)
+        self.entries[artist][album][track.title] = track
 
-    def deleteTrack(self, track):
+    def deleteTrack(self, track: Track.TrackType) -> None:
+        self.db.deleteTrack(track)
+        del self.entries[track.artistName][track.albumTitle][track.title]
 
-        trackPath = os.path.join(
-            self.musicDirectory,
-            track.artistName,
-            track.albumTitle,
-            track.title
-            ) + ".rec"
+    def deleteAlbum(self, artist: str, album: str) -> None:
+        self.db.deleteAlbum(artist, album)
+        del self.entries[album.artistName].albums[album.title]
 
-        shutil.rmtree(trackPath)
-
-        del self.artists[track.artistName]\
-                .albums[track.albumTitle]\
-                .tracks[track.title]
-
-    def deleteAlbum(self, album):
-
-        albumPath = os.path.join(
-            self.musicDirectory,
-            album.artistName,
-            album.title
-            )
-
-        shutil.rmtree(albumPath)
-
-        del self.artists[album.artistName].albums[album.title]
-
-    def deleteArtist(self, artist):
-
-        artistPath = os.path.join(self.musicDirectory, artist.name)
-        shutil.rmtree(artistPath)
-
-        del self.artists[artist.name]
+    def deleteArtist(self, artist: str) -> None:
+        self.db.deleteArtist(artist)
+        del self.entries[artist]
