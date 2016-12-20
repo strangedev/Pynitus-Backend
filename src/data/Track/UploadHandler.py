@@ -47,9 +47,9 @@ class UploadHandler(object):
 
     def autoImportAttributes(self, obj, attributes):
 
-        attributes["Artist"] = attribute["Artist"].title()
-        attributes["Album"] = attribute["Album"].title()
-        attributes["Track"] = attribute["Track"].title()
+        attributes["Artist"] = attributes["Artist"].title()
+        attributes["Album"] = attributes["Album"].title()
+        attributes["Track"] = attributes["Track"].title()
 
         for attribute in attributes:
 
