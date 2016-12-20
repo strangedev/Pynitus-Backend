@@ -5,7 +5,7 @@ import ConfigLoader
 import PlaybackQueue
 from data import MusicLibrary
 from data.Track import TrackFactory
-from http import RESTHandler
+from server import RESTHandler
 
 
 def __main__(args):

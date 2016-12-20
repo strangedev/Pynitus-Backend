@@ -70,8 +70,14 @@ class Database(object):
             track.artistName,
             track.albumTitle,
             track.title
-            ) + recordContainerExtension
+            ) + Database.recordContainerExtension
         shutil.rmtree(trackPath)
 
     def mergeArtists(self, a1, a2):
+        realName = a1.title()
+
+    def mergeAlbums(self, a1, a2):
+        realName = a1.title()
+
+    def mergeTracks(self, a1, a2):
         realName = a1.title()

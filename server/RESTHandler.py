@@ -3,7 +3,7 @@ import os
 import cherrypy
 
 import HTMLBuilder
-from http import SessionHandler, FloodProtection, VoteHandler
+from server import SessionHandler, FloodProtection, VoteHandler
 
 
 def htmlRelPath(config, path):

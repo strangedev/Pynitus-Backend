@@ -17,10 +17,11 @@ class MusicLibrary(object):
         self.entries = dict({})
 
         self.__generateIndexes()
-        self.__cleanup()
+        #self.__cleanup()
 
     def __generateIndexes(self) -> None:
         tracks = self.db.getLocalTracks()
+        print(tracks)
         for track in tracks:
             try:
                 self.addTrack(track)
@@ -64,7 +65,7 @@ class MusicLibrary(object):
         self,
         artist: str,
         album: str
-    ) -> List[Track.TrackType]:
+    ) -> List[object]:
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
@@ -73,7 +74,7 @@ class MusicLibrary(object):
 
         return list(self.entries[artist][album].values())
 
-    def getTracksForArtist(self, artist: str) -> List[Track.TrackType]:
+    def getTracksForArtist(self, artist: str) -> List[object]:
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
@@ -82,13 +83,13 @@ class MusicLibrary(object):
                     for album in self.entries[artist].keys()]
                 for item in sublist]
 
-    def getTracks(self) -> List[Track.TrackType]:
+    def getTracks(self) -> List[object]:
 
         return [item for sublist in
                 [self.getTracksForArtist(artist)
                     for artist in self.getArtists()] for item in sublist]
 
-    def addTrack(self, track: Track.TrackType) -> None:
+    def addTrack(self, track: object) -> None:
         self.__addArtist(track.artistName)
         self.__addAlbum(track.artistName, track.albumTitle)
         self.__addTrack(track.artistName, track.albumTitle, track)
@@ -108,7 +109,7 @@ class MusicLibrary(object):
         self,
         artist: str,
         album: str,
-        track: Track.TrackType
+        track: object
     ) -> None:
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
@@ -118,7 +119,7 @@ class MusicLibrary(object):
 
         self.entries[artist][album][track.title] = track
 
-    def deleteTrack(self, track: Track.TrackType) -> None:
+    def deleteTrack(self, track: object) -> None:
         self.db.deleteTrack(track)
         del self.entries[track.artistName][track.albumTitle][track.title]
 
