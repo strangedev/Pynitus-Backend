@@ -1,62 +1,74 @@
 from typing import List
 from typing import NewType
 
+from src.data.Track import Track
+from src.data.Track import TrackFactory
 from src.database import Database
-from src.utilities import UnicodeUtils
+from src.config import ConfigLoader
 
 MusicLibraryType = NewType('MusicLibrary', object)
 
 
 class MusicLibrary(object):
+    def __init__(self, config: ConfigLoader.ConfigLoaderType) -> object:
 
-    def __init__(self, config):
+        """
 
-        self.musicDirectory = config.get("musicDirectory")
-        self.db = Database.Database(self.musicDirectory)
-        self.entries = dict({})
+        :param config: ConfigLoader.ConfigLoaderType
+        """
+        self.musicDirectory = config.get("musicDirectory")  # type: str
+        self.db = Database.Database(self.musicDirectory)  # type: Database.DatabaseType
+        self.entries = dict({})  # type: Dict[str, dict]
 
         self.__generateIndexes()
         #self.__cleanup()
 
     def __generateIndexes(self) -> None:
+        """
+        generates an construct entry for tracks given by Database based on local Track Dictionary
+        """
         tracks = self.db.getLocalTracks()
-        print(tracks)
         for track in tracks:
             try:
-                self.addTrack(track)
+                self.constructEntry(track)
             except Exception as e:
                 print(e)
 
+    def __mergeArtists(self, fstArtistName, sndArtistName) -> None:
+        pass
+
+    def __mergeAlbums(self, fstAlbumTitle, sndAlbumTitle) -> None:
+        pass
+
+    def __mergeTracks(self, fstAlbumTitle, sndAlbumTitle) -> None:
+        pass
+
     def __cleanup(self) -> None:
-        # TODO: find a faster way to do this (O(n^2) currently)
-        for artist in self.entries:
-            for other in self.entries:
-                if UnicodeUtils.unicode_compare(artist, other):
-                    self.db.mergeArtists(artist, other)
-
-        for artist in self.entries:
-            for album in self.entries[artist]:
-                for other in self.entries[artist]:
-                    if UnicodeUtils.unicode_compare(album, other):
-                        self.db.mergeAlbums(album, other)
-
-        for artist in self.entries:
-            for album in self.entries[artist]:
-                for track in self.entries[artist][album]:
-                    for other in self.entries[artist][album]:
-                        if UnicodeUtils.unicode_compare(track, other):
-                            self.db.mergeTracks(track, other)
+        pass
 
     def getArtists(self) -> List[str]:
+        """
+
+        :return: All Artist in entries of Music Library
+        """
         return list(self.entries.keys())
 
     def getAlbumsForArtist(self, artist: str) -> List[str]:
+        """
+
+        :param artist: str: name of Artist
+        :return: Names of Albums based on given Artist
+        """
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
         return list(self.entries[artist].keys())
 
     def getAlbums(self) -> List[str]:
+        """
+
+        :return: All Album stored in MusicLibrary
+        """
         return [item for sublist in [self.getAlbumsForArtist(artist)
                 for artist in self.getArtists()] for item in sublist]
 
@@ -64,7 +76,13 @@ class MusicLibrary(object):
         self,
         artist: str,
         album: str
-    ) -> List[object]:
+    ) -> List[Track.TrackType]:
+        """
+        :param artist: Artist to Album
+        :param album: Album to get Tracks from
+        :return: Tracks of Album
+        :rtype: List[Track.TrackType]
+        """
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
@@ -73,7 +91,12 @@ class MusicLibrary(object):
 
         return list(self.entries[artist][album].values())
 
-    def getTracksForArtist(self, artist: str) -> List[object]:
+    def getTracksForArtist(self, artist: str) -> List[Track.TrackType]:
+        """
+
+        :param artist: Artist to get Tracks from
+        :return: List of Tracks for given Artist
+        """
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
@@ -82,23 +105,40 @@ class MusicLibrary(object):
                     for album in self.entries[artist].keys()]
                 for item in sublist]
 
-    def getTracks(self) -> List[object]:
+    def getTracks(self) -> List[Track.TrackType]:
 
+        """
+
+        :return: All Tracks stored in Music Library as List
+        """
         return [item for sublist in
                 [self.getTracksForArtist(artist)
                     for artist in self.getArtists()] for item in sublist]
 
-    def addTrack(self, track: object) -> None:
+    def constructEntry(self, track: Track.TrackType) -> None:
+        """
+
+        :param track: Track to add in entries of Music Library
+        """
         self.__addArtist(track.artistName)
         self.__addAlbum(track.artistName, track.albumTitle)
         self.__addTrack(track.artistName, track.albumTitle, track)
 
     def __addArtist(self, artist: str) -> None:
 
+        """
+
+        :param artist: Artist to add in entries of Music Library
+        """
         if artist not in self.entries:
             self.entries[artist] = dict({})
 
     def __addAlbum(self, artist: str, album: str) -> None:
+        """
+
+        :param artist: Artist to Album
+        :param album: Album to add in entries of Music Library
+        """
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
@@ -108,8 +148,15 @@ class MusicLibrary(object):
         self,
         artist: str,
         album: str,
-        track: object
+        track: Track.TrackType
     ) -> None:
+        """
+
+        :rtype: None
+        :param artist: str: to find dict of artist
+        :param album: str: to find dict of album to artist
+        :param track: Track.TrackType: playable and manageable Object
+        """
         if artist not in self.entries:
             raise Exception("Artist doesn't exist")
 
@@ -118,14 +165,27 @@ class MusicLibrary(object):
 
         self.entries[artist][album][track.title] = track
 
-    def deleteTrack(self, track: object) -> None:
+    def deleteTrack(self, track: Track.TrackType) -> None:
+        """
+
+        :param track: Track to delete
+        """
         self.db.deleteTrack(track)
         del self.entries[track.artistName][track.albumTitle][track.title]
 
     def deleteAlbum(self, artist: str, album: str) -> None:
+        """
+
+        :param artist: Artist of Album
+        :param album: Album to delete
+        """
         self.db.deleteAlbum(artist, album)
         del self.entries[album.artistName].albums[album.title]
 
     def deleteArtist(self, artist: str) -> None:
+        """
+
+        :param artist: Artist to delete
+        """
         self.db.deleteArtist(artist)
         del self.entries[artist]
