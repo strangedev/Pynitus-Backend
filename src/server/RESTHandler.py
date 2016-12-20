@@ -1,10 +1,7 @@
 import os
 
 import cherrypy
-from server import SessionHandler, FloodProtection
-
-from src import HTMLBuilder
-from src.server import VoteHandler, HTMLBuilder
+from src.server import SessionHandler, FloodProtection, HTMLBuilder, VoteHandler
 
 
 def htmlRelPath(config, path):

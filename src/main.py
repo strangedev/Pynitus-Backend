@@ -2,10 +2,10 @@ import os
 import sys
 
 from src.config.ConfigLoader import ConfigLoader
-from src.data import MusicLibrary
-from src.data import TrackFactory
+from src.data.MusicLibrary import MusicLibrary
 from src.data.PlaybackQueue import PlaybackQueue
-from src.server import RESTHandler
+from src.data.Track.TrackFactory import TrackFactory
+from src.server.RESTHandler import RESTHandler
 
 
 def __main__(args):
