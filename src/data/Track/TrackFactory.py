@@ -1,10 +1,12 @@
 import inspect
+from typing import NewType
 
 from src.data import Track
 
+TrackFactoryType = NewType('TrackFactory', object)
+
 
 class TrackFactory(object):
-
     def __init__(self):
         self.availableTrackTypes = dict({})
 
@@ -20,7 +22,6 @@ class TrackFactory(object):
         for trackType in self.availableTrackTypes:
 
             if self.availableTrackTypes[trackType].isTrackOfType(pathToRecord):
-
                 print("Track at: " + pathToRecord)
 
                 track = self.availableTrackTypes[
@@ -37,6 +38,5 @@ class TrackFactory(object):
         for trackType in self.availableTrackTypes:
 
             if trackType == requestedType:
-
                 # make some objectsies
                 pass
