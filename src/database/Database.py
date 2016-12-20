@@ -22,8 +22,8 @@ class Database(object):
 
         :param db_directory: path to Directory
         """
-        self.dbDirectory = db_directory  # type: str
-        self.trackFactory = TrackFactory.TrackFactory() # type: TrackFactory.TrackFactoryType
+        self.db_directory = db_directory  # type: str
+        self.trackFactory = TrackFactory.TrackFactory()  # type: TrackFactory.TrackFactoryType
 
     def getLocalTracks(self) -> List[Track.TrackType]:
 
@@ -33,23 +33,23 @@ class Database(object):
         """
         tracks = []
 
-        for artistDir in os.listdir(self.dbDirectory):
+        for artist_dir in os.listdir(self.db_directory):
 
-            artist_path = os.path.join(self.dbDirectory, artistDir)
+            artist_path = os.path.join(self.db_directory, artist_dir)
             if not os.path.isdir(artist_path):
                 continue
 
-            for albumDir in os.listdir(artist_path):
+            for album_dir in os.listdir(artist_path):
 
-                album_path = os.path.join(artist_path, albumDir)
+                album_path = os.path.join(artist_path, album_dir)
                 if not os.path.isdir(album_path):
                     continue
 
-                for trackFilename in os.listdir(album_path):
+                for track_filename in os.listdir(album_path):
 
-                    track_path = os.path.join(album_path, trackFilename)
+                    track_path = os.path.join(album_path, track_filename)
                     track_name, track_container_extension \
-                        = os.path.splitext(trackFilename)
+                        = os.path.splitext(track_filename)
 
                     maybe_track = None
 
@@ -58,8 +58,8 @@ class Database(object):
                         maybe_track = self.trackFactory\
                                          .getTrackFromLocalRecord(
                                             track_path,
-                                            artistDir,
-                                            albumDir,
+                                            artist_dir,
+                                            album_dir,
                                             track_name
                                             )
 
@@ -73,7 +73,7 @@ class Database(object):
 
         :param artist: Artist to delete
         """
-        artist_path = os.path.join(self.dbDirectory, artist)
+        artist_path = os.path.join(self.db_directory, artist)
         shutil.rmtree(artist_path)
 
     def deleteAlbum(self,
@@ -85,18 +85,18 @@ class Database(object):
         :param artist: Artist of Album
         :param album: Album to delete
         """
-        album_path = os.path.join(self.dbDirectory, artist, album)
+        album_path = os.path.join(self.db_directory, artist, album)
         shutil.rmtree(album_path)
 
-    def deleteTrack(self, track: str) -> None:
+    def deleteTrack(self, track: Track.TrackType) -> None:
         """
 
         :param track: Track to delete
         """
         track_path = os.path.join(
-            self.dbDirectory,
-            track.artistName,
-            track.albumTitle,
+            self.db_directory,
+            track.artist_name,
+            track.album_title,
             track.title
             ) + Database.recordContainerExtension
         shutil.rmtree(track_path)
