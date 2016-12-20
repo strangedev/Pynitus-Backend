@@ -3,7 +3,7 @@ import mimetypes
 import os
 from typing import NewType
 
-from src.data import PlaybackHandler
+from src.data.Track.PlaybackHandler import PlaybackHandler
 
 mimetypes.init()  # used as part of isTrackOfType
 
@@ -17,26 +17,30 @@ class Track(object):
 
     description = "A Track"
 
-    def __init__(
-        self,
-        artistName: str,
-        albumTitle: str,
-        title: str,
-        features=None,
-        releaseDate=None,
-        genre=None,
-        label=None
-    ):
+    @staticmethod
+    def isTrackOfType(path_to_record):
+        return False
 
-        self.playbackHandlerClass = PlaybackHandler.PlaybackHandler
-        self.playbackHandlerInstance = None
+    @staticmethod
+    def __tryImportingAttribute(attribute_name, dictionary, destination):
+        try:
+            print("Trying to import: ", attribute_name, " from dict: ", dictionary, " to ", destination)
+            setattr(destination, attribute_name, dictionary[attribute_name])
+        except Exception as e:
+            print("Failed to import", attribute_name, " because of ", e)
+
+    def __init__(self, artist_name: str, album_title: str, title: str, features=None, release_date=None, genre=None,
+                 label=None):
+
+        self.playback_handler_class = PlaybackHandler
+        self.playback_handler_instance = None
         self.delegate = None
-        self.storedAttributes = ["features", "releaseDate", "genre", "label"]
+        self.stored_attributes = ["features", "releaseDate", "genre", "label"]
         self.title = title
-        self.artistName = artistName
-        self.albumTitle = albumTitle
+        self.artist_name = artist_name
+        self.album_title = album_title
         self.features = features if features else []
-        self.releaseDate = releaseDate
+        self.release_date = release_date
         self.genre = genre
         self.label = label
 
@@ -50,8 +54,8 @@ class Track(object):
         by stop().
         """
 
-        self.playbackHandlerInstance = self.playbackHandlerClass()
-        self.playbackHandlerInstance.play(self, delegate)
+        self.playback_handler_instance = self.playback_handler_class()
+        self.playback_handler_instance.play(self, delegate)
 
     def stop(self):
         """
@@ -59,8 +63,8 @@ class Track(object):
         stop() method.
         """
 
-        self.playbackHandlerInstance.stop()
-        del self.playbackHandlerInstance
+        self.playback_handler_instance.stop()
+        del self.playback_handler_instance
 
     def onFinished(self):
         self.delegate.onFinished()
@@ -68,45 +72,32 @@ class Track(object):
     def onStopped(self):
         self.delegate.onStopped()
 
-    def isTrackOfType(pathToRecord):
-        return False
+    def restoreFromLocalRecord(self, path_to_record):
 
-    def restoreFromLocalRecord(self, pathToRecord):
-
-        for item in os.listdir(pathToRecord):
+        for item in os.listdir(path_to_record):
 
             if item == "details.json":
 
                 try:
-                    attributeFileContents = open(os.path.join(pathToRecord, item)).read()
-                    attributes = json.loads(attributeFileContents)
+                    attributes_file = open(os.path.join(path_to_record, item))
+                    attribute_file_contents = attributes_file.read()
+                    attributes = json.loads(attribute_file_contents)
                     print(attributes)
-                    for attribute in self.storedAttributes:
-                        Track.__tryImportingAttribute(
-                            attribute,
-                            attributes,
-                            self
-                            )
+                    for attribute in self.stored_attributes:
+                        Track.__tryImportingAttribute(attribute, attributes, self)
 
-                    attributesFile.close()
+                    attributes_file.close()
 
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
 
-    def storeToFilePath(self, pathToRecord):
+    def storeToFilePath(self, path_to_record):
 
-        detailsFile = open(os.path.join(pathToRecord, "details.json"), "w+")
-        detailsToWrite = dict({})
+        details_file = open(os.path.join(path_to_record, "details.json"), "w+")
+        details_to_write = dict({})
 
-        for attribute in self.storedAttributes:
-            detailsToWrite[attribute] = getattr(self, attribute)
+        for attribute in self.stored_attributes:
+            details_to_write[attribute] = getattr(self, attribute)
 
-        detailsFile.write(json.dumps(detailsToWrite))
-        detailsFile.close()
-
-    def __tryImportingAttribute(attributeName, dictionary, destination):
-        try:
-            print("Trying to import: ", attributeName, " from dict: ", dictionary, " to ", destination)
-            setattr(destination, attributeName, dictionary[attributeName])
-        except Exception as e:
-            print("Failed to import", attributeName, " because of ", e)
+        details_file.write(json.dumps(details_to_write))
+        details_file.close()

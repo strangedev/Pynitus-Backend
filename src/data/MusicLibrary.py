@@ -1,23 +1,25 @@
 from typing import List
+from typing import Dict
 from typing import NewType
 
 from src.data.Track import Track
-from src.data.Track import TrackFactory
-from src.database import Database
-from src.config import ConfigLoader
+from src.database.Database import Database
+from src.database.Database import DatabaseType
+from src.config.ConfigLoader import ConfigLoader
+from src.config.ConfigLoader import ConfigLoaderType
 
 MusicLibraryType = NewType('MusicLibrary', object)
 
 
 class MusicLibrary(object):
-    def __init__(self, config: ConfigLoader.ConfigLoaderType) -> object:
+    def __init__(self, config: ConfigLoaderType) -> None:
 
         """
 
         :param config: ConfigLoader.ConfigLoaderType
         """
         self.musicDirectory = config.get("musicDirectory")  # type: str
-        self.db = Database.Database(self.musicDirectory)  # type: Database.DatabaseType
+        self.db = Database(self.musicDirectory)  # type: DatabaseType
         self.entries = dict({})  # type: Dict[str, dict]
 
         self.__generateIndexes()
@@ -34,13 +36,13 @@ class MusicLibrary(object):
             except Exception as e:
                 print(e)
 
-    def __mergeArtists(self, fstArtistName, sndArtistName) -> None:
+    def __mergeArtists(self, fst_artist_name, snd_artist_name) -> None:
         pass
 
-    def __mergeAlbums(self, fstAlbumTitle, sndAlbumTitle) -> None:
+    def __mergeAlbums(self, fst_album_title, snd_album_title) -> None:
         pass
 
-    def __mergeTracks(self, fstAlbumTitle, sndAlbumTitle) -> None:
+    def __mergeTracks(self, fst_album_title, snd_album_title) -> None:
         pass
 
     def __cleanup(self) -> None:
@@ -180,7 +182,7 @@ class MusicLibrary(object):
         :param album: Album to delete
         """
         self.db.deleteAlbum(artist, album)
-        del self.entries[album.artistName].albums[album.title]
+        del self.entries[artist][album]
 
     def deleteArtist(self, artist: str) -> None:
         """
