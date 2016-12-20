@@ -1,3 +1,6 @@
+from data.Track.PlaybackHandler import PlaybackHandler
+
+
 class FilePlaybackHandler(PlaybackHandler):
     """
     A PlaybackHandler capable of playing back local
@@ -11,6 +14,6 @@ class FilePlaybackHandler(PlaybackHandler):
         if self.isPlaying():
             return
 
-        playerCommand = ["mplayer", track.filepath]
+        player_command = ["mplayer", track.filepath]
 
-        super().play(playerCommand, delegate)
+        super().play(player_command, delegate)

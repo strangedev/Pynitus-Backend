@@ -1,6 +1,6 @@
 import datetime
 
-import DictContainer
+from data.foundation import DictContainer
 
 
 class Session(DictContainer.DictContainer):

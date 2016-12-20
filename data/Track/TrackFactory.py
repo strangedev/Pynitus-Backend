@@ -1,6 +1,6 @@
 import inspect
 
-import Track
+from data import Track
 
 
 class TrackFactory(object):

@@ -1,7 +1,7 @@
 import os
 import shutil
 
-import TrackFactory
+from data.Track import TrackFactory
 
 
 class Database(object):

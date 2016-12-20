@@ -1,16 +1,9 @@
-import signal
 import os
 
 import cherrypy
-from cherrypy.lib import auth_basic
 
-import MusicLibrary
-import TrackFactory
-import PlaybackQueue
 import HTMLBuilder
-import VoteHandler
-import SessionHandler
-import FloodProtection
+from http import SessionHandler, FloodProtection, VoteHandler
 
 
 def htmlRelPath(config, path):

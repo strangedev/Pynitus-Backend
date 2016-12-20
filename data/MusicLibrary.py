@@ -1,10 +1,9 @@
 from typing import List
 from typing import NewType
 
-import Track
-import TrackFactory
 import Database
 import UnicodeUtils
+from data import Track
 
 MusicLibraryType = NewType('MusicLibrary', object)
 

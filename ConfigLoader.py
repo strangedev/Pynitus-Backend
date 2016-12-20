@@ -1,7 +1,7 @@
-import os
 import json
+import os
 
-import DictContainer
+from data.foundation import DictContainer
 
 
 class ConfigLoader(DictContainer.DictContainer):

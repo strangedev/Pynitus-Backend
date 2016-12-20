@@ -1,9 +1,7 @@
 import os
 import signal
-import threading
 import subprocess
-
-import Track
+import threading
 
 
 class PlaybackHandler(object):
@@ -17,7 +15,7 @@ class PlaybackHandler(object):
     def __init__(self):
         self.playing = False  # type: bool
         self.stopCalled = False  # type: bool
-        self.playerProcess = None  # type: unsure
+        self.playerProcess = None  # type: Any
         self.playerProcessMutex = threading.BoundedSemaphore(1)
         self.delegate = None  # type: object
 
@@ -90,57 +88,3 @@ class PlaybackHandler(object):
         thread.start()
         # returns immediately after the thread starts
         return thread
-
-
-class FilePlaybackHandler(PlaybackHandler):
-    """
-    A PlaybackHandler capable of playing back local
-    audio files.
-    """
-
-    def __init__(self):
-        super().__init__()
-
-    def play(self, track, delegate: object) -> None:
-        if self.isPlaying():
-            return
-
-        playerCommand = ["mplayer", track.filepath]
-
-        super().play(playerCommand, delegate)
-
-
-class YoutubePlaybackHandler(PlaybackHandler):
-    """
-    A PlaybackHandler capable of playing back sound
-    from youtube videos.
-    """
-
-    def __init__(self):
-        super().__init__()
-
-    def play(self, track, delegate: object) -> None:
-        if self.isPlaying():
-            return
-
-        playerCommand = ["mpv", "--vid=no", track.url]
-
-        super().play(playerCommand, delegate)
-
-
-class SoundcloudPlaybackHandler(PlaybackHandler):
-    """
-    A PlaybackHandler capable of playing back sound
-    from youtube videos.
-    """
-
-    def __init__(self):
-        super().__init__()
-
-    def play(self, track, delegate: object) -> None:
-        if self.isPlaying():
-            return
-
-        playerCommand = ["mpv", track.url]
-
-        super().play(playerCommand, delegate)
