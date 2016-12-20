@@ -1,7 +1,6 @@
 import os
 
-import Track
-import UnicodeUtils
+from data import Track
 
 
 class Attribute(object):
