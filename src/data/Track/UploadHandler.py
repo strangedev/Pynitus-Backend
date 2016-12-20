@@ -5,24 +5,24 @@ class Attribute(object):
 
     def __init__(
         self,
-        displayName=None,
-        attributeType=None,
+        display_name=None,
+        attribute_type=None,
         required=None,
         target=None
     ):
-        self.displayName = displayName
-        self.attributeType = attributeType
+        self.display_name = display_name
+        self.attributeType = attribute_type
         self.required = True if required == "required" else False
         self.target = target
 
     def __lt__(self, other):
-        return self.displayName < other.displayName
+        return self.display_name < other.display_name
 
 
 class UploadHandler(object):
 
-    def __init__(self, workingDir):
-        self.workingDir = workingDir
+    def __init__(self, working_dir):
+        self.working_dir = working_dir
         self.attributes = {
             "Artist": ["string", "required", "artistName"],
             "Album": ["string", "required", "albumTitle"],
@@ -43,6 +43,7 @@ class UploadHandler(object):
         ]
 
     def trackFromUploadedAttributes(self, attributes):
+        #  TODO: Implement
         return NotImplemented
 
     def autoImportAttributes(self, obj, attributes):
@@ -60,15 +61,15 @@ class UploadHandler(object):
 
     def writeTrackRecord(self, track):
 
-        artistPath = os.path.join(self.workingDir, track.artistName)
-        albumPath = os.path.join(artistPath, track.albumTitle)
-        recordPath = os.path.join(albumPath, track.title) + ".rec"
+        artist_path = os.path.join(self.working_dir, track.artistName)
+        album_path = os.path.join(artist_path, track.albumTitle)
+        record_path = os.path.join(album_path, track.title) + ".rec"
 
-        if not os.path.exists(artistPath):
-            os.makedirs(artistPath)
-        if not os.path.exists(albumPath):
-            os.makedirs(albumPath)
-        if not os.path.exists(recordPath):
-            os.makedirs(recordPath)
+        if not os.path.exists(artist_path):
+            os.makedirs(artist_path)
+        if not os.path.exists(album_path):
+            os.makedirs(album_path)
+        if not os.path.exists(record_path):
+            os.makedirs(record_path)
 
-        track.storeToFilePath(recordPath)
+        track.storeToFilePath(record_path)
