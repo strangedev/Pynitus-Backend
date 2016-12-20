@@ -3,6 +3,8 @@ import os
 
 from src.data.foundation import DictContainer
 
+ConfigLoaderType = NewType('ConfigLoader', object)
+
 
 class ConfigLoader(DictContainer.DictContainer):
 
