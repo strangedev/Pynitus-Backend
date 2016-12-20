@@ -1,7 +1,10 @@
 import json
 import os
+from typing import NewType
 
 from src.data.foundation import DictContainer
+
+ConfigLoaderType = NewType('ConfigLoader', object)
 
 
 class ConfigLoader(DictContainer.DictContainer):

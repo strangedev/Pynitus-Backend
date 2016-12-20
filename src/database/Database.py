@@ -1,7 +1,11 @@
 import os
 import shutil
+from typing import List, NewType
 
-from src.data import TrackFactory
+from src.data.Track import Track
+from src.data.Track import TrackFactory
+
+DatabaseType = NewType('Database', object)
 
 
 class Database(object):
@@ -12,72 +16,110 @@ class Database(object):
     """
     recordContainerExtension = ".rec"
 
-    def __init__(self, dbDirectory):
+    def __init__(self, db_directory: str) -> object:
 
-        self.dbDirectory = dbDirectory
-        self.trackFactory = TrackFactory.TrackFactory()
+        """
 
-    def getLocalTracks(self):
+        :param db_directory: path to Directory
+        """
+        self.dbDirectory = db_directory  # type: str
+        self.trackFactory = TrackFactory.TrackFactory() # type: TrackFactory.TrackFactoryType
 
+    def getLocalTracks(self) -> List[Track.TrackType]:
+
+        """
+
+        :return: Tracks of Database
+        """
         tracks = []
 
         for artistDir in os.listdir(self.dbDirectory):
 
-            artistPath = os.path.join(self.dbDirectory, artistDir)
-            if not os.path.isdir(artistPath):
+            artist_path = os.path.join(self.dbDirectory, artistDir)
+            if not os.path.isdir(artist_path):
                 continue
 
-            for albumDir in os.listdir(artistPath):
+            for albumDir in os.listdir(artist_path):
 
-                albumPath = os.path.join(artistPath, albumDir)
-                if not os.path.isdir(albumPath):
+                album_path = os.path.join(artist_path, albumDir)
+                if not os.path.isdir(album_path):
                     continue
 
-                for trackFilename in os.listdir(albumPath):
+                for trackFilename in os.listdir(album_path):
 
-                    trackPath = os.path.join(albumPath, trackFilename)
-                    trackName, trackContainerExtension \
+                    track_path = os.path.join(album_path, trackFilename)
+                    track_name, track_container_extension \
                         = os.path.splitext(trackFilename)
 
-                    maybeTrack = None
+                    maybe_track = None
 
-                    if trackContainerExtension == \
+                    if track_container_extension == \
                             Database.recordContainerExtension:
-                        maybeTrack = self.trackFactory\
+                        maybe_track = self.trackFactory\
                                          .getTrackFromLocalRecord(
-                                            trackPath,
+                                            track_path,
                                             artistDir,
                                             albumDir,
-                                            trackName
+                                            track_name
                                             )
 
-                    if maybeTrack:
-                        tracks.append(maybeTrack)
+                    if maybe_track:
+                        tracks.append(maybe_track)
 
         return tracks
 
-    def deleteArtist(self, artist):
-        artistPath = os.path.join(self.dbDirectory, artist)
-        shutil.rmtree(artistPath)
+    def deleteArtist(self, artist: str) -> None:
+        """
 
-    def deleteAlbum(self, artist, album):
-        albumPath = os.path.join(self.dbDirectory, artist, album)
-        shutil.rmtree(albumPath)
+        :param artist: Artist to delete
+        """
+        artist_path = os.path.join(self.dbDirectory, artist)
+        shutil.rmtree(artist_path)
 
-    def deleteTrack(self, track):
-        trackPath = os.path.join(
+    def deleteAlbum(self,
+                    artist: str,
+                    album: str
+                    ) -> None:
+        """
+
+        :param artist: Artist of Album
+        :param album: Album to delete
+        """
+        album_path = os.path.join(self.dbDirectory, artist, album)
+        shutil.rmtree(album_path)
+
+    def deleteTrack(self, track: str) -> None:
+        """
+
+        :param track: Track to delete
+        """
+        track_path = os.path.join(
             self.dbDirectory,
             track.artistName,
             track.albumTitle,
             track.title
             ) + Database.recordContainerExtension
-        shutil.rmtree(trackPath)
+        shutil.rmtree(track_path)
 
-    def mergeArtists(self, a1, a2):
-        realName = a1.title()
+    def mergeArtists(self,
+                     a1: str,
+                     a2: str
+                     ) -> None:
+        # TODO: Implement
+        # realName = a1.title()
+        pass
 
-    def mergeAlbums(self, a1, a2):
-        realName = a1.title()
+    def mergeAlbums(self,
+                    a1: str,
+                    a2: str
+                    ) -> None:
+        # TODO: Implement
+        # realName = a1.title()
+        pass
 
-    def mergeTracks(self, a1, a2):
-        realName = a1.title()
+    def mergeTracks(self,
+                    a1: str,
+                    a2: str) -> None:
+        # TODO: Implement
+        # realName = a1.title()
+        pass
