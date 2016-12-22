@@ -1,4 +1,7 @@
 import math
+from typing import NewType
+
+VoteHandlerType = NewType('VoteHandler', object)
 
 
 class VoteHandler(object):
