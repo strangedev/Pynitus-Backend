@@ -1,8 +1,8 @@
 import os
 
 from src.data import Track
-from src.data import YoutubePlaybackHandler
-from src.data import YoutubeUploadHandler
+from src.data.Track.PlaybackHandlers import YoutubePlaybackHandler
+from src.data.Track.UploadHandlers import YoutubeUploadHandler
 
 
 class YoutubeTrack(Track):
