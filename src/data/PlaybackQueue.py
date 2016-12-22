@@ -1,4 +1,7 @@
 import threading
+from typing import NewType
+
+PlaybackQueueType = NewType('PlaybackQueue', object)
 
 
 class PlaybackQueue(object):
