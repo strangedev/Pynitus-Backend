@@ -1,8 +1,8 @@
 import mimetypes
 import os
 
-from src.data import FilePlaybackHandler
-from src.data import FileUploadHandler
+from src.data.Track.PlaybackHandlers import FilePlaybackHandler
+from src.data.Track.UploadHandlers import FileUploadHandler
 from src.data import Track
 
 

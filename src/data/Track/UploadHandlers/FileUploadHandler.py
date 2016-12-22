@@ -1,5 +1,5 @@
 from src.data import Track
-from src.data import UploadHandler
+from src.data.Track import UploadHandler
 
 
 class FileUploadHandler(UploadHandler):

@@ -1,8 +1,7 @@
 import os
 
-from data.Track.Track import Track
-from data.Track.UploadHandlers.SoundcloudUploadHandler import SoundcloudUploadHandler
-
+from src.data.Track.Track import Track
+from src.data.Track.UploadHandlers import SoundcloudUploadHandler
 from src.data.Track.PlaybackHandlers.SoundcloudPlaybackHandler import SoundcloudPlaybackHandler
 
 

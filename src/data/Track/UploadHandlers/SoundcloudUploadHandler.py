@@ -1,7 +1,6 @@
 import os
 
-from data.Track.UploadHandler import UploadHandler
-
+from src.data.Track.UploadHandler import UploadHandler
 from src.data.Track.Tracks import YoutubeTrack
 
 

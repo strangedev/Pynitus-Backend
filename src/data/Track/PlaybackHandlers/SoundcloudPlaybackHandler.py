@@ -1,4 +1,4 @@
-from src.data import PlaybackHandler
+from src.data.Track import PlaybackHandler
 
 
 class SoundcloudPlaybackHandler(PlaybackHandler):
