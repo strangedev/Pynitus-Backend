@@ -1,7 +1,10 @@
 import os
+from typing import NewType
 
 import cherrypy
 from src.server import SessionHandler, FloodProtection, HTMLBuilder, VoteHandler
+
+RESTHandlerType = NewType('RESTHandler', object)
 
 
 def htmlRelPath(config, path):
@@ -10,35 +13,36 @@ def htmlRelPath(config, path):
 
 class RESTHandler(object):
 
-    def __init__(self, config, playbackQueue, musicLibrary, trackFactory):
+    def __init__(self, config, playback_queue, music_library, track_factory):
         self.config = config
-        self.playbackQueue = playbackQueue
-        self.musicLibrary = musicLibrary
-        self.trackFactory = trackFactory
-        self.sessionHandler = SessionHandler.SessionHandler(self.config)
-        self.voteHandler = VoteHandler.VoteHandler(
+        self.playback_queue = playback_queue
+        self.music_library = music_library
+        self.track_factory = track_factory
+        self.session_handler = SessionHandler.SessionHandler(self.config)
+        self.vote_handler = VoteHandler.VoteHandler(
             self.config,
-            self.sessionHandler,
-            self.playbackQueue.playNext
+            self.session_handler,
+            self.playback_queue.playNext
         )
-        self.floodProtection = FloodProtection.FloodProtection(
+        self.flood_protection = FloodProtection.FloodProtection(
             self.config,
-            self.sessionHandler
+            self.session_handler
         )
 
         self.HTMLBuilder = HTMLBuilder.HTMLBuilder(
             config.get("htmlDir"),
-            self.floodProtection,
-            self.voteHandler,
-            self.playbackQueue,
-            self.musicLibrary
+            self.flood_protection,
+            self.vote_handler,
+            self.playback_queue,
+            self.music_library,
+            self.track_factory
             )
 
         self.__configure()
         self.__run()
 
     def __configure(self):
-        self.cherrypyConf = {
+        self.cherrypy_conf = {
             self.config.get("htmlRootPath"): {
                 "tools.auth_basic.on": True,
                 "tools.auth_basic.realm": "PiJukebox",
@@ -132,14 +136,14 @@ class RESTHandler(object):
              'server.socket_host': self.config.get("hostAddress")}
         )
 
-        self.playbackQueue.onFinishedCallback = self.voteHandler.newVoting
-        self.playbackQueue.onStoppedCallback = self.voteHandler.newVoting
+        self.playback_queue.onFinishedCallback = self.vote_handler.newVoting
+        self.playback_queue.onStoppedCallback = self.vote_handler.newVoting
 
     def __run(self):
         cherrypy.quickstart(
             self,
             self.config.get("htmlRootPath"),
-            self.cherrypyConf
+            self.cherrypy_conf
         )
 
     def __checkCredentials(self, realm, username, password):
@@ -157,10 +161,10 @@ class RESTHandler(object):
         return False
 
     def __getCurrentSession(self):
-        return self.sessionHandler.get(self.__getClientIp())
+        return self.session_handler.get(self.__getClientIp())
 
     def __setForCurrentSession(self, attr, val):
-        self.sessionHandler.setAttribute(self.__getClientIp(), attr, val)
+        self.session_handler.setAttribute(self.__getClientIp(), attr, val)
 
     def __getForCurrentSession(self, attr):
         return self.__getCurrentSession().get(attr)
@@ -189,12 +193,12 @@ class RESTHandler(object):
         return cherrypy.request.headers['Remote-Addr']
 
     def __refreshSession(self):
-        self.sessionHandler.activity(self.__getClientIp())
+        self.session_handler.activity(self.__getClientIp())
 
     def __setLastPage(self, page, args):
-        self.sessionHandler.setAttribute(
+        self.session_handler.setAttribute(
             self.__getClientIp(), "lastpage", page)
-        self.sessionHandler.setAttribute(
+        self.session_handler.setAttribute(
             self.__getClientIp(),
             "lastpageArgs",
             args
@@ -279,7 +283,7 @@ class RESTHandler(object):
     @cherrypy.expose
     @hasSession
     def addByType(self, trackType=None):
-        uploadHandler = self.musicLibrary\
+        uploadHandler = self.music_library\
                             .trackFactory\
                             .availableTrackTypes[trackType]\
                             .uploadHandler(self.config.get("musicDirectory"))
@@ -299,40 +303,40 @@ class RESTHandler(object):
     def upload(self, **args):
         trackToAdd = self.__getForCurrentSession('uploadHandler')\
             .trackFromUploadedAttributes(args)
-        self.musicLibrary.addTrack(trackToAdd)
+        self.music_library.addTrack(trackToAdd)
         return self.artist(trackToAdd.artistName)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def startPlaying(self):
-        self.playbackQueue.startPlaying()
+        self.playback_queue.startPlaying()
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def stopPlaying(self):
-        self.playbackQueue.stopPlaying(True)
+        self.playback_queue.stopPlaying(True)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def voteSkip(self):
-        self.voteHandler.vote(self.__getClientIp())
+        self.vote_handler.vote(self.__getClientIp())
 
     @cherrypy.expose
     @hasSession
     @floodProtected
     @returnsToLast
     def addToQueue(self, artist=None, album=None, track: str=None):
-        theTrack = self.musicLibrary.entries[artist][album][track]
-        self.playbackQueue.addToQueue(theTrack)
+        theTrack = self.music_library.entries[artist][album][track]
+        self.playback_queue.addToQueue(theTrack)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def addAlbumToQueue(self, artist=None, album=None):
-        for trackName in self.musicLibrary\
+        for trackName in self.music_library\
                 .entries[artist][album].keys():
             self.addToQueue(artist=artist, album=album, track=trackName)
 
@@ -345,27 +349,27 @@ class RESTHandler(object):
     @cherrypy.expose
     @returnsToLast
     def removeFromQueue(self, artist=None, album=None, track: str=None):
-        track = self.musicLibrary.entries[artist][album][track]
-        self.playbackQueue.removeFromQueueByTrack(track)
+        track = self.music_library.entries[artist][album][track]
+        self.playback_queue.removeFromQueueByTrack(track)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def deleteTrack(self, track=None, artist=None, album=None):
-        theTrack = self.musicLibrary.artists[
+        theTrack = self.music_library.artists[
             artist].albums[album].tracks[track]
-        self.musicLibrary.deleteTrack(theTrack)
+        self.music_library.deleteTrack(theTrack)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def deleteAlbum(self, artist=None, album=None):
-        theAlbum = self.musicLibrary.artists[artist].albums[album]
-        self.musicLibrary.deleteAlbum(theAlbum)
+        theAlbum = self.music_library.artists[artist].albums[album]
+        self.music_library.deleteAlbum(theAlbum)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def deleteArtist(self, artist=None,):
-        theArtist = self.musicLibrary.artists[artist]
-        self.musicLibrary.deleteArtist(theArtist)
+        theArtist = self.music_library.artists[artist]
+        self.music_library.deleteArtist(theArtist)

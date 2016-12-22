@@ -1,37 +1,46 @@
 import os
 
 import jinja2
+from jinja2 import Environment
+
+from src.data.MusicLibrary import MusicLibraryType
+from src.data.PlaybackQueue import PlaybackQueueType
+from src.data.Track.TrackFactory import TrackFactoryType
+from src.server.FloodProtection import FloodProtectionType
+from src.server.VoteHandler import VoteHandlerType
 
 
 class HTMLBuilder(object):
 
     def __init__(
         self,
-        templatePath,
-        floodProtection,
-        voteHandler,
-        playbackQueue,
-        musicLibrary
+        template_path: str,
+        flood_protection: FloodProtectionType,
+        vote_handler: VoteHandlerType,
+        playback_queue: PlaybackQueueType,
+        music_library: MusicLibraryType,
+        track_factory: TrackFactoryType
     ):
 
-        self.templatePath = templatePath
+        self.template_path = template_path  # type: str
         self.environment = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(self.templatePath)
-        )
+            loader=jinja2.FileSystemLoader(self.template_path)
+        )                                       # type: Environment
 
-        self.floodProtection = floodProtection
-        self.voteHandler = voteHandler
-        self.playbackQueue = playbackQueue
-        self.musicLibrary = musicLibrary
+        self.flood_protection = flood_protection  # type: FloodProtectionType
+        self.vote_handler = vote_handler  # type: VoteHandlerType
+        self.playback_queue = playback_queue  # type: PlaybackQueueType
+        self.music_library = music_library  # type: MusicLibraryType
+        self.track_factory = track_factory  # type: TrackFactoryType
 
-    def __render_common(self, template, ipAddr, **kwargs):
+    def __render_common(self, template, ip_addr, **kwargs):
         return template.render(
-            actionsLeft=self.floodProtection.actionsLeft(ipAddr),
-            maxActions=self.floodProtection.maxActions,
-            playbackQueue=self.playbackQueue,
-            voteCount=self.voteHandler.votes,
-            votesRequired=self.voteHandler.getRequiredVotes(),
-            playing=self.playbackQueue.playing,
+            actionsLeft=self.flood_protection.actionsLeft(ip_addr),
+            maxActions=self.flood_protection.maxActions,
+            playbackQueue=self.playback_queue,
+            voteCount=self.vote_handler.votes,
+            votesRequired=self.vote_handler.getRequiredVotes(),
+            playing=self.playback_queue.playing,
             **kwargs
         )
 
@@ -43,7 +52,7 @@ class HTMLBuilder(object):
             template,
             ipAddr,
             artistNames=sorted(
-                [artist for artist in self.musicLibrary.getArtists()]
+                [artist for artist in self.music_library.getArtists()]
             )
         )
 
@@ -55,8 +64,8 @@ class HTMLBuilder(object):
             template,
             ipAddr,
             albumAndArtistNames=sorted(
-                [(album, artist) for artist in self.musicLibrary.getArtists()
-                    for album in self.musicLibrary.getAlbumsForArtist(artist)]
+                [(album, artist) for artist in self.music_library.getArtists()
+                 for album in self.music_library.getAlbumsForArtist(artist)]
             )
         )
 
@@ -69,7 +78,7 @@ class HTMLBuilder(object):
             ipAddr,
             trackAndAlbumAndArtistNames=sorted(
                 [(track.title, track.albumTitle, track.artistName)
-                    for track in self.musicLibrary.getTracks()]
+                 for track in self.music_library.getTracks()]
             )
         )
 
@@ -82,7 +91,7 @@ class HTMLBuilder(object):
             ipAddr,
             trackAndAlbumAndArtistNames=[
                 (track.title, track.albumTitle, track.artistName)
-                for track in self.playbackQueue.getQueued()]
+                for track in self.playback_queue.getQueued()]
         )
 
     def buildArtistPage(self, ipAddr, artist):
@@ -94,11 +103,11 @@ class HTMLBuilder(object):
             ipAddr,
             albumTitles=sorted(
                 [album for album
-                    in self.musicLibrary.getAlbumsForArtist(artist)]
+                 in self.music_library.getAlbumsForArtist(artist)]
                 ),
             trackAndAlbumTitles=sorted(
                 [(track.title, track.albumTitle) for track
-                    in self.musicLibrary.getTracksForArtist(artist)]
+                 in self.music_library.getTracksForArtist(artist)]
                 ),
             artistName=artist
         )
@@ -114,7 +123,7 @@ class HTMLBuilder(object):
             artistName=artist,
             trackTitles=sorted(
                 [track.title for track
-                    in self.musicLibrary.getTracksForAlbumOfArtist(
+                    in self.music_library.getTracksForAlbumOfArtist(
                         artist, album)]
             )
         )
@@ -130,9 +139,9 @@ class HTMLBuilder(object):
             template,
             ipAddr,
             trackTypesAndDescs=sorted(
-                [(trackType, trackfactory.availableTrackTypes[
+                [(trackType, self.track_factory.availableTrackTypes[
                     trackType].description) for trackType
-                    in trackfactory.availableTrackTypes]
+                    in self.track_factory.availableTrackTypes]
             )
         )
 
