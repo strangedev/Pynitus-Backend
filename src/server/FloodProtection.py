@@ -1,4 +1,7 @@
 import datetime
+from typing import NewType
+
+FloodProtectionType = NewType('FloodProtection', object)
 
 
 class ActionRecord(object):
