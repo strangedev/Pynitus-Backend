@@ -1,37 +1,45 @@
-## Welcome to GitHub Pages
+### Pynitus is in alpha and might not be working as expected.
 
-You can use the [editor on GitHub](https://github.com/strangedev/Pynitus/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+## Listen to the people.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Pynitus is a music playlist by and for the people. Users may upload their own music from a plethora of online or local sources. Users decide on what's being played and what's being skipped.
 
-### Markdown
+### Features
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+- An Html & CSS only (no JavaScript needed!) web interface any device can access
+- A playback queue which can be filled by any user
+- A voting system to skip unpopular songs
+- A flood protection system to prohibit spamming
+- A persistent library of music which can be added to by anyone
 
-```markdown
-Syntax highlighted code block
+Pynitus supports the following sources:
 
-# Header 1
-## Header 2
-### Header 3
+- Local files (MP3, MP4/AAC, OGG, WMA)
+- YouTube
+- SoundCloud
 
-- Bulleted
-- List
+And because it's easy to extend, more sources will follow.
 
-1. Numbered
-2. List
+### Getting started
 
-**Bold** and _Italic_ and `Code` text
+Getting Pynitus up and running is easy. Just follow these steps:
 
-[Link](url) and ![Image](src)
+1. Download Pynitus as .tar.gz or .zip compressed archive
+2. Unpack Pynitus
+3. Install missing python dependencies by using:
+```
+pip install -r requirements.txt
+
+```
+4. Edit pynitus.conf to your liking
+5. Run it:
+```
+python3 main.py ./
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Prerequesites:
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/strangedev/Pynitus/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+- Python>=3.5
+- PIP (the python package manager)
+- mplayer
+- mpv
