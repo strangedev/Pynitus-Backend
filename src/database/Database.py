@@ -1,11 +1,10 @@
+from typing import List
+
 import os
 import shutil
-from typing import List, NewType
 
-from src.data.Track import Track
-from src.data.Track import TrackFactory
-
-DatabaseType = NewType('Database', object)
+from src.data.Track.Track import Track
+from src.data.Track.TrackFactory import TrackFactory
 
 
 class Database(object):
@@ -16,16 +15,16 @@ class Database(object):
     """
     recordContainerExtension = ".rec"
 
-    def __init__(self, db_directory: str) -> object:
+    def __init__(self, db_directory: str) -> None:
 
         """
 
         :param db_directory: path to Directory
         """
         self.db_directory = db_directory  # type: str
-        self.trackFactory = TrackFactory.TrackFactory()  # type: TrackFactory.TrackFactoryType
+        self.trackFactory = TrackFactory()  # type: TrackFactory
 
-    def getLocalTracks(self) -> List[Track.TrackType]:
+    def getLocalTracks(self) -> List[Track]:
 
         """
 
@@ -76,10 +75,7 @@ class Database(object):
         artist_path = os.path.join(self.db_directory, artist)
         shutil.rmtree(artist_path)
 
-    def deleteAlbum(self,
-                    artist: str,
-                    album: str
-                    ) -> None:
+    def deleteAlbum(self, artist: str, album: str) -> None:
         """
 
         :param artist: Artist of Album
@@ -88,7 +84,7 @@ class Database(object):
         album_path = os.path.join(self.db_directory, artist, album)
         shutil.rmtree(album_path)
 
-    def deleteTrack(self, track: Track.TrackType) -> None:
+    def deleteTrack(self, track: Track) -> None:
         """
 
         :param track: Track to delete
@@ -101,25 +97,18 @@ class Database(object):
             ) + Database.recordContainerExtension
         shutil.rmtree(track_path)
 
-    def mergeArtists(self,
-                     a1: str,
-                     a2: str
-                     ) -> None:
+    def mergeArtists(self, fst_artist: str, snd_artist: str) -> None:
         # TODO: Implement
         # realName = a1.title()
         pass
 
-    def mergeAlbums(self,
-                    a1: str,
-                    a2: str
-                    ) -> None:
+    def mergeAlbums(self, fst_album: str, snd_album: str) -> None:
         # TODO: Implement
         # realName = a1.title()
         pass
 
-    def mergeTracks(self,
-                    a1: str,
-                    a2: str) -> None:
+    def mergeTracks(self, fst_track: str, snd_track: str) -> None:
         # TODO: Implement
         # realName = a1.title()
         pass
+

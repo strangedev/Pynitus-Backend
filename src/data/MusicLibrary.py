@@ -1,29 +1,24 @@
 from typing import List
 from typing import Dict
-from typing import NewType
 
-from src.data.Track import Track
+from src.data.Track.Track import Track
 from src.database.Database import Database
-from src.database.Database import DatabaseType
 from src.config.ConfigLoader import ConfigLoader
-from src.config.ConfigLoader import ConfigLoaderType
-
-MusicLibraryType = NewType('MusicLibrary', object)
 
 
 class MusicLibrary(object):
-    def __init__(self, config: ConfigLoaderType) -> None:
+    def __init__(self, config: ConfigLoader) -> None:
 
         """
 
         :param config: ConfigLoader.ConfigLoaderType
         """
         self.musicDirectory = config.get("musicDirectory")  # type: str
-        self.db = Database(self.musicDirectory)  # type: DatabaseType
-        self.entries = dict({})  # type: Dict[str, dict]
+        self.db = Database(self.musicDirectory)  # type: Database
+        self.entries = dict({})  # type: Dict[str, Dict[str, Dict[str, Track]]]
 
         self.__generateIndexes()
-        #self.__cleanup()
+        # self.__cleanup()
 
     def __generateIndexes(self) -> None:
         """
@@ -36,13 +31,13 @@ class MusicLibrary(object):
             except Exception as e:
                 print(e)
 
-    def __mergeArtists(self, fst_artist_name, snd_artist_name) -> None:
+    def __mergeArtists(self, fst_artist_name: str, snd_artist_name: str) -> None:
         pass
 
-    def __mergeAlbums(self, fst_album_title, snd_album_title) -> None:
+    def __mergeAlbums(self, fst_album_title: str, snd_album_title: str) -> None:
         pass
 
-    def __mergeTracks(self, fst_album_title, snd_album_title) -> None:
+    def __mergeTracks(self, fst_album_title: str, snd_album_title: str) -> None:
         pass
 
     def __cleanup(self) -> None:
@@ -74,11 +69,7 @@ class MusicLibrary(object):
         return [item for sublist in [self.getAlbumsForArtist(artist)
                 for artist in self.getArtists()] for item in sublist]
 
-    def getTracksForAlbumOfArtist(
-        self,
-        artist: str,
-        album: str
-    ) -> List[Track.TrackType]:
+    def getTracksForAlbumOfArtist(self, artist: str, album: str) -> List[Track]:
         """
         :param artist: Artist to Album
         :param album: Album to get Tracks from
@@ -93,7 +84,7 @@ class MusicLibrary(object):
 
         return list(self.entries[artist][album].values())
 
-    def getTracksForArtist(self, artist: str) -> List[Track.TrackType]:
+    def getTracksForArtist(self, artist: str) -> List[Track]:
         """
 
         :param artist: Artist to get Tracks from
@@ -107,7 +98,7 @@ class MusicLibrary(object):
                     for album in self.entries[artist].keys()]
                 for item in sublist]
 
-    def getTracks(self) -> List[Track.TrackType]:
+    def getTracks(self) -> List[Track]:
 
         """
 
@@ -117,14 +108,14 @@ class MusicLibrary(object):
                 [self.getTracksForArtist(artist)
                     for artist in self.getArtists()] for item in sublist]
 
-    def constructEntry(self, track: Track.TrackType) -> None:
+    def constructEntry(self, track: Track) -> None:
         """
 
         :param track: Track to add in entries of Music Library
         """
-        self.__addArtist(track.artistName)
-        self.__addAlbum(track.artistName, track.albumTitle)
-        self.__addTrack(track.artistName, track.albumTitle, track)
+        self.__addArtist(track.artist_name)
+        self.__addAlbum(track.artist_name, track.album_title)
+        self.__addTrack(track.artist_name, track.album_title, track)
 
     def __addArtist(self, artist: str) -> None:
 
@@ -146,12 +137,7 @@ class MusicLibrary(object):
 
         self.entries[artist][album] = dict({})
 
-    def __addTrack(
-        self,
-        artist: str,
-        album: str,
-        track: Track.TrackType
-    ) -> None:
+    def __addTrack(self, artist: str, album: str, track: Track) -> None:
         """
 
         :rtype: None
@@ -167,13 +153,13 @@ class MusicLibrary(object):
 
         self.entries[artist][album][track.title] = track
 
-    def deleteTrack(self, track: Track.TrackType) -> None:
+    def deleteTrack(self, track: Track) -> None:
         """
 
         :param track: Track to delete
         """
         self.db.deleteTrack(track)
-        del self.entries[track.artistName][track.albumTitle][track.title]
+        del self.entries[track.artist_name][track.album_title][track.title]
 
     def deleteAlbum(self, artist: str, album: str) -> None:
         """
@@ -187,7 +173,8 @@ class MusicLibrary(object):
     def deleteArtist(self, artist: str) -> None:
         """
 
-        :param artist: Artist to delete
+        :param artist: Artist to deleteobject
         """
         self.db.deleteArtist(artist)
         del self.entries[artist]
+

@@ -1,45 +1,47 @@
-import datetime
+from datetime import datetime
+from typing import Any
 
-from src.data.foundation import DictContainer
+from src.config.ConfigLoader import ConfigLoader
+from src.data.foundation.DictContainer import DictContainer
 
 
-class Session(DictContainer.DictContainer):
+class Session(DictContainer):
     """docstring for Session"""
-    def __init__(self, ipAddr):
+    def __init__(self, ip_address: int) -> None:
         super(Session, self).__init__()
-        self.ipAddr = ipAddr
+        self.ip_address = ip_address  # type: int
 
 
-class SessionHandler(DictContainer.DictContainer):
+class SessionHandler(DictContainer):
     """docstring for SessionHandler"""
-    def __init__(self, config):
+    def __init__(self, config: ConfigLoader):
         super(SessionHandler, self).__init__()
 
-        self.config = config
+        self.config = config  # type: ConfigLoader
 
-    def activity(self, ipAddr):
+    def activity(self, ip_address: int) -> None:
 
         self.__cleanup()
 
-        if not self.exists(ipAddr):
-            s = Session(ipAddr)
-            self.insert(ipAddr, s)
+        if not self.exists(ip_address):
+            s = Session(ip_address)
+            self.insert(ip_address, s)
 
-        self.__updateLastSeen(ipAddr)
+        self.__updateLastSeen(ip_address)
 
-    def setAttribute(self, ipAddr, attr, val):
-        self.get(ipAddr).set(attr, val)
+    def setAttribute(self, ip_address: int, attr: str, val: Any) -> None:
+        self.get(ip_address).set(attr, val)
 
-    def __updateLastSeen(self, ipAddr):
-        self.setAttribute(ipAddr, "lastSeen", datetime.datetime.now())
+    def __updateLastSeen(self, ip_address: int) -> None:
+        self.setAttribute(ip_address, "lastSeen", datetime.now())
 
-    def __cleanup(self):
-        for ipAddr, session in self.getAll():
+    def __cleanup(self) -> None:
+        for ip_address, session in self.getAll():
             if self.__timeout(session):
-                self.remove(ipAddr)
+                self.remove(ip_address)
 
-    def __timeout(self, session):
-        currentTime = datetime.datetime.now()
+    def __timeout(self, session: Session) -> bool:
+        current_time = datetime.now()
 
-        return (currentTime - session.get("lastSeen")).seconds \
+        return (current_time - session.get("lastSeen")).seconds \
             >= self.config.get("sessionTimeout")

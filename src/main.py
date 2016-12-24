@@ -13,75 +13,29 @@ def __main__(args):
     if len(args) < 2:
         raise Exception("Specify a working directory.")
 
-    workingDir = args[1]
+    working_dir = args[1]
 
-    if not os.path.isdir(workingDir):
+    if not os.path.isdir(working_dir):
         raise Exception("Working directory is not a directory.")
 
-    config = ConfigLoader(workingDir)
-    musicLibrary = MusicLibrary(config)
-    playbackQueue = PlaybackQueue()
-    trackFactory = TrackFactory()
-    restHandler = RESTHandler(
-        config, playbackQueue, musicLibrary, trackFactory
+    config = ConfigLoader(working_dir)
+    music_library = MusicLibrary(config)
+    playback_queue = PlaybackQueue()
+    track_factory = TrackFactory()
+    RESTHandler(
+        config, playback_queue, music_library, track_factory
     )
 
-    # musicLibrary.addArtist("Panflöten Peter")
-    # musicLibrary.addAlbum("Panflöten Peter", "Flöten aus meiner Seele")
-    # musicLibrary.addTrack("Panflöten Peter", "Flöten aus meiner Seele", "Flötensolo, Duett in Z Moll")
-
-    # print(musicLibrary.getAlbumsForArtist("Panflöten Peter"))
-    # print(musicLibrary.getTracksForAlbumOfArtist("Panflöten Peter", "Flöten aus meiner Seele"))
-    # print(musicLibrary.getTracksForArtist("Panflöten Peter"))
-
     print("Artists:")
-    print(musicLibrary.getArtists())
+    print(music_library.getArtists())
     print("\n")
 
     print("Albums:")
-    print(musicLibrary.getAllAlbums())
+    print(music_library.getAllAlbums())
     print("\n")
 
     print("Tracks:")
-    print(musicLibrary.getAllTracks())
+    print(music_library.getAllTracks())
     print("\n")
-
-    # musicPlayer = MusicPlayer.MusicPlayer(musicLibrary)
-    # musicPlayer.startPlaying("/home/strange/test.mp3")
-    # time.sleep(3)
-
-    # musicPlayer.stopPlaying()
-
-    #musicLibrary.artists["Porcupine Tree"].albums["In Absentia"].tracks["05 - Gravity Eyelids"].play(DummyHandler())
-    # time.sleep(3)
-    #musicLibrary.artists["Porcupine Tree"].albums["In Absentia"].tracks["05 - Gravity Eyelids"].stop()
-
-    #theTrack = musicLibrary.artists["A Perfect Circle"].albums["Stone and Echo"].tracks["Full Album"]
-    # playbackQueue.addToQueue(musicLibrary.artists["Marst"]\
-    #					   	.albums["Unsorted"]\
-    #					  	.tracks["Aquamour"]
-    #					  	)
-    # playbackQueue.addToQueue(musicLibrary.artists["Unsorted"]\
-    #					   	.albums["Unsorted"]\
-    #					  	.tracks["test"]
-    #					  	)
-    # playbackQueue.addToQueue(musicLibrary.artists["A Perfect Circle"]\
-    #					   	.albums["Stone and Echo"]\
-    #					  	.tracks["Full Album"]
-    #					  	)
-
-    # playbackQueue.startPlaying()
-    # time.sleep(4)
-    # playbackQueue.playNext()
-    # time.sleep(4)
-    # playbackQueue.stopPlaying()
-    # print(playbackQueue.getQueued())
-    # time.sleep(4)
-    # playbackQueue.startPlaying()
-    # time.sleep(4)
-    # playbackQueue.playPrevious()
-    # time.sleep(4)
-    # playbackQueue.stopPlaying()
-
 
 __main__(sys.argv)
