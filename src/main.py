@@ -31,11 +31,11 @@ def __main__(args):
     print("\n")
 
     print("Albums:")
-    print(music_library.getAllAlbums())
+    print(music_library.getAlbums())
     print("\n")
 
     print("Tracks:")
-    print(music_library.getAllTracks())
+    print(music_library.getTracks())
     print("\n")
 
 __main__(sys.argv)
