@@ -31,12 +31,3 @@ class TrackFactory(object):
                 return track
 
         return None
-
-    def getTrackFromDictionary(self, dictionary):
-        requestedType = dictionary["type"]
-
-        for trackType in self.availableTrackTypes:
-
-            if trackType == requestedType:
-                # make some objectsies
-                pass
