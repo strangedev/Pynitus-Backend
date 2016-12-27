@@ -70,7 +70,7 @@ ID3_INTERNAL_NAMES = {
     "TEXT": "lyricist",  # type: str
     "IPLS": "involved_people",  # type: List[str]
     "TRCK": "track_number",  # type: str
-    "TPUB": "Publisher",  # type: str
+    "TPUB": "publisher",  # type: str
     "TCON": "genres",  # type: List[str]
     "TYER": "year",  # type: str
     "TBPM": "bpm",  # type: str
