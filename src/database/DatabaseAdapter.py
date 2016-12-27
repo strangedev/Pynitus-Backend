@@ -1,13 +1,7 @@
-from typing import Any, Dict
-
-from src.data.Track.Track import Track
+from typing import Dict, List
 
 
-class Database(object):
-
-    def refreshDB(self) -> None:
-        return NotImplemented
-
+class DatabaseAdapter(object):
     def addTrack(
             self,
             title: str,
@@ -19,24 +13,24 @@ class Database(object):
     ) -> None:
         return NotImplemented
 
-    def getTracksByArtist(self, artist: str) -> [Track]:
+    def getTracksByArtist(self, artist: str) -> List[Dict[str, str]]:
         return NotImplemented
 
     def getTracksByAlbum(self,
                          artist: str,
-                         album: str) -> [Track]:
+                         album: str) -> List[Dict[str, str]]:
         return NotImplemented
 
     def getTrack(self,
                  title: str,
                  artist: str,
-                 album: str) -> Track:
+                 album: str) -> Dict[str, str]:
         return NotImplemented
 
-    def getUnavailable(self) -> [Track]:
+    def getUnavailable(self) -> List[Dict[str, str]]:
         return NotImplemented
 
-    def getUnimported(self) -> [Track]:
+    def getUnimported(self) -> List[Dict[str, str]]:
         return NotImplemented
 
     def getMetainformation(
@@ -45,4 +39,3 @@ class Database(object):
             artist: str,
             album: str) -> Dict[str, str]:
         return NotImplemented
-
