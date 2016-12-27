@@ -64,11 +64,12 @@ Views:
 
 What DB refresh does:
 - recursively find all audio files (by mime type) in music directory
-- if track is known to db mark resourceUnavailable as false
-- if track is not known to db put into dirty tracks to process later
-
-DB cleanup:
-- looks through all unavailable tracks
+    - if track is known to db mark resourceUnavailable as false
+    - if track is not known to db put into dirty tracks to process later
+    - set initialized to true
+- For all uninitialized tracks in db
+    - perform sanity check
+    - flag as initialized
 
 How dirty tracks (not imported yet) are handled:
 - try to read the tag information into db
