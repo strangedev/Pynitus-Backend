@@ -50,6 +50,12 @@ class DatabaseSqlite(DatabaseAdapter):
                         a[18] + " text)")
 
     def getTrack(self, title: str, artist: str, album: str) -> Dict[str, any]:
+        """
+        :param title: Title from Track to get
+        :param artist: Artist from Track to get
+        :param album: Album from Track to get
+        :return: Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
+        """
         track_tuple = self.db.execute("SELECT * FROM " + "track " + "WHERE " + "title = " + title +
                                       " AND artist = " + artist + " AND album = " + album)
         t = track_tuple.fetchone()
@@ -58,6 +64,10 @@ class DatabaseSqlite(DatabaseAdapter):
         return track
 
     def getUnimported(self) -> List[Dict[str, any]]:
+        """
+        :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
+                where imported is 0
+        """
         r = []
         for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
                                      "imported = " + "0"):
@@ -69,6 +79,10 @@ class DatabaseSqlite(DatabaseAdapter):
         return r
 
     def getUnavailable(self) -> List[Dict[str, any]]:
+        """
+        :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
+                    where available is 0
+        """
         r = []
         for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
                                      "available = " + "0"):
@@ -80,14 +94,43 @@ class DatabaseSqlite(DatabaseAdapter):
         return r
 
     def getTracksByAlbum(self, artist: str, album: str) -> List[Dict[str, str]]:
-        return super().getTracksByAlbum(artist, album)
+        """
+
+        :param artist: Artist of Album to get Tracks from
+        :param album: Album to get Tracks from
+        :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
+                    based on given Artist and Album
+        """
+        r = []
+        for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
+                                     "artist = " + artist + " AND album = " + album):
+            t = track
+            r = r + list(
+                {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
+                 "available": t[5], "type": t[6]}
+            )
+        return r
 
     def addTrack(self, title: str, artist: str, album: str, format_type: str, location: str, **kwargs) -> None:
+        """
+        :param title: Track Title
+        :param artist: Track Artist
+        :param album: Track Album
+        :param format_type: Track Type
+        :param location: Track Location
+        :param kwargs: Additional Track Metainformation
+        :return: None
+        """
         self.db.execute("INSERT INTO track(" + title + ", " + artist + ", " + location + ", " + "1, " + "0, "
                         + format_type + ")")  # Will set Import True, Available False
         self.__addTag(kwargs, location)
 
     def __addTag(self, tag_dict: dict, location: str) -> None:
+        """
+        :param tag_dict: Additional Track Metainformation
+        :param location: Track Location
+        :return: None
+        """
         create_cmd = "INSERT INTO trackTag("
         create_cmd += location + ", "
         for i in range(11, 18):
@@ -117,6 +160,10 @@ class DatabaseSqlite(DatabaseAdapter):
                 self.db.execute(create_cmd + location + ", " + tag_dict["involved"][i] + ")")
 
     def getTracksByArtist(self, artist: str) -> List[Dict[str, str]]:
+        """
+        :param artist: Artist to get Tracks from
+        :return: List of Dictionary based on given Artist
+        """
         r = []
         for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
                                      "artist = " + artist):
@@ -128,6 +175,12 @@ class DatabaseSqlite(DatabaseAdapter):
         return r
 
     def getMetainformation(self, title: str, artist: str, album: str) -> Dict[str, str]:
+        """
+        :param title: Title to get Metainformation from
+        :param artist: Artist to get Metainformation from
+        :param album: Album to get Metainformation from
+        :return: Dictionary with Metainformation based on given Artist, Title and Album
+        """
         location = self.getTrack(title, artist, album).get("location")
         if location is None:
             return None
