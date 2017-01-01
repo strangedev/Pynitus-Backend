@@ -68,7 +68,7 @@ ID3_INTERNAL_NAMES = {
     "TPE4": "additional_artist_3",  # type: str
     "TCOM": "composer",  # type: str
     "TEXT": "lyricist",  # type: str
-    "IPLS": "involved_people",  # type: List[str]
+    "IPLS": "involved",  # type: List[str]
     "TRCK": "track_number",  # type: str
     "TPUB": "publisher",  # type: str
     "TCON": "genres",  # type: List[str]
@@ -94,7 +94,7 @@ ID3_TAG_IDENTIFIER_LOOKUP = {
     "additional_artist_3": "TPE4",  # type: str
     "composer": "TCOM",  # type: str
     "lyricist": "TEXT",  # type: str
-    "involved_people": "IPLS",  # type: List[str]
+    "involved": "IPLS",  # type: List[str]
     "track_number": "TRCK",  # type: str
     "Publisher": "TPUB",  # type: str
     "genres": "TCON",  # type: List[str]

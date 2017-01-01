@@ -20,7 +20,7 @@ class DatabaseSqlite(DatabaseAdapter):
                         "location text primary key, " +
                         "imported bool, " +
                         "available bool, " +
-                        "type text)")
+                        "type text)")  # FIXME: Initialized flag missing, see TODO.md line 15
         self.db.execute("CREATE TABLE" + "involved(" +
                         "location text, " +
                         "feature text)")
@@ -30,9 +30,9 @@ class DatabaseSqlite(DatabaseAdapter):
         self._t_nfo = ["location", "subtitle text", "additional_artist1", "additional_artist2",
                        "additional_artist3", "composer", "lyricist", "publisher", "year", "track_number", "bpm", "key",
                        "mood", "length", "lyrics", "artist_url", "publisher_url", "file_type",
-                       "user_comment"]  # type [str]
+                       "user_comment"]  # type [str]  FIXME: Get from ID3Standard.py
         a = self._t_nfo
-        self.db.execute("CREATE TABLE" + "trackTag(" +
+        self.db.execute("CREATE TABLE" + "trackTag(" +  # TODO: beautify/automate
                         a[0] + " text primary key, " +
                         a[1] + " text, " +
                         a[2] + " text, " +
@@ -60,8 +60,9 @@ class DatabaseSqlite(DatabaseAdapter):
         :param album: Album from Track to get
         :return: Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
         """
+        # FIXME: escape input strings
         track_tuple = self.db.execute("SELECT * FROM " + "track " + "WHERE " + "title = " + title +
-                                      " AND artist = " + artist + " AND album = " + album)
+                                      " AND artist = " + artist + " AND album = " + album)  # FIXME: SQL-Inj. possible
         t = track_tuple.fetchone()
         track = {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": bool(t[4]),
                  "available": bool(t[5]), "type": t[6]}
@@ -76,10 +77,10 @@ class DatabaseSqlite(DatabaseAdapter):
         for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
                                      "imported = " + "0"):
             t = track
-            r = r + list(
+            r.append(list(
                 {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
                  "available": t[5], "type": t[6]}
-            )
+            ))
         return r
 
     def getUnavailable(self) -> List[Dict[str, any]]:
@@ -91,10 +92,10 @@ class DatabaseSqlite(DatabaseAdapter):
         for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
                                      "available = " + "0"):
             t = track
-            r = r + list(
+            r.append(list(
                 {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
                  "available": t[5], "type": t[6]}
-            )
+            ))
         return r
 
     def getTracksByAlbum(self, artist: str, album: str) -> List[Dict[str, str]]:
@@ -105,14 +106,15 @@ class DatabaseSqlite(DatabaseAdapter):
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
                     based on given Artist and Album
         """
+        # FIXME: escape input strings
         r = []
         for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
-                                     "artist = " + artist + " AND album = " + album):
+                                     "artist = " + artist + " AND album = " + album):  # FIXME: SQL-Inj. possible
             t = track
-            r = r + list(
+            r.append(list(
                 {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
                  "available": t[5], "type": t[6]}
-            )
+            ))
         return r
 
     def addTrack(self, title: str, artist: str, album: str, format_type: str, location: str, **kwargs) -> None:
@@ -125,8 +127,9 @@ class DatabaseSqlite(DatabaseAdapter):
         :param kwargs: Additional Track Metainformation
         :return: None
         """
+        # FIXME: escape input strings
         self.db.execute("INSERT INTO track(" + title + ", " + artist + ", " + location + ", " + "1, " + "0, "
-                        + format_type + ")")  # Will set Import True, Available False
+                        + format_type + ")")  # Will set Import True, Available False   # FIXME: SQL-Inj. possible
         self.__addTag(kwargs, location)
 
     def __addTag(self, tag_dict: dict, location: str) -> None:
@@ -137,8 +140,8 @@ class DatabaseSqlite(DatabaseAdapter):
         """
         create_cmd = "INSERT INTO trackTag("
         create_cmd += location + ", "
-        for i in range(11, 18):
-            if tag_dict.get(self._t_nfo[i]) is None:
+        for i in range(11, 18):  # TODO: Range 11-18?
+            if tag_dict.get(self._t_nfo[i]) is None:  # TODO: Wrong membership test, use more readable style
                 create_cmd += " None, "
             else:
                 create_cmd += tag_dict.get(self._t_nfo[i]) + ", "
@@ -151,7 +154,7 @@ class DatabaseSqlite(DatabaseAdapter):
 
         create_cmd = "INSERT INTO genres("
         if tag_dict["genres"] is None:
-            self.db.execute(create_cmd + location + ", None)")
+            self.db.execute(create_cmd + location + ", None)")  # TODO: Same logic as in line 141, reuse
         else:
             for i in range(0, len(tag_dict["genres"])):
                 self.db.execute(create_cmd + location + ", " + tag_dict["genres"][i] + ")")
@@ -172,10 +175,10 @@ class DatabaseSqlite(DatabaseAdapter):
         for track in self.db.execute("SELECT * FROM " + "track " + "WHERE " +
                                      "artist = " + artist):
             t = track
-            r = r + list(
+            r.append(list(
                 {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
                  "available": t[5], "type": t[6]}
-            )
+            ))
         return r
 
     def getMetainformation(self, title: str, artist: str, album: str) -> Dict[str, str]:
@@ -208,7 +211,7 @@ class DatabaseSqlite(DatabaseAdapter):
         if involved is None:
             track["involved"] = None
         else:
-            for involve in involved:
+            for involve in involved:  # TODO: Better naming
                 i += [involve[1]]
             track["involved"] = i
 
