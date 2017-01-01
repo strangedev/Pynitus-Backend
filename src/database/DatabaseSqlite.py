@@ -12,7 +12,7 @@ class DatabaseSqlite(DatabaseAdapter):
         """
         :param db_path: Location where to Store DB
         """
-        self.db = sqlite3.connect(db_path)
+        self.db = sqlite3.connect(db_path)  # type: sqlite3.Connection
         self.db.execute("CREATE TABLE " + "track(" +
                         "title text, " +
                         "artist text, " +
@@ -29,7 +29,8 @@ class DatabaseSqlite(DatabaseAdapter):
                         "genre text)")
         self._t_nfo = ["location", "subtitle text", "additional_artist1", "additional_artist2",
                        "additional_artist3", "composer", "lyricist", "publisher", "year", "track_number", "bpm", "key",
-                       "mood", "length", "lyrics", "artist_url", "publisher_url", "file_type", "user_comment"]
+                       "mood", "length", "lyrics", "artist_url", "publisher_url", "file_type",
+                       "user_comment"]  # type [str]
         a = self._t_nfo
         self.db.execute("CREATE TABLE" + "trackTag(" +
                         a[0] + " text primary key, " +
