@@ -8,8 +8,11 @@ from src.database.DatabaseAdapter import DatabaseAdapter
 class DatabaseSqlite(DatabaseAdapter):
     def __init__(
             self,
-            config_path: str):
-        self.db = sqlite3.connect(config_path)
+            db_path: str):
+        """
+        :param db_path: Location where to Store DB
+        """
+        self.db = sqlite3.connect(db_path)
         self.db.execute("CREATE TABLE " + "track(" +
                         "title text, " +
                         "artist text, " +
