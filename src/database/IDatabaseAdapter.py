@@ -55,6 +55,13 @@ class IDatabaseAdapter(object):
         """
         return NotImplemented
 
+    def getTracks(self) -> List[Dict[str, any]]:
+        """
+        Returns all stored Track_Information as Dictionary
+        :return: List of Dictionary based on all Tracks in Database
+        """
+        return NotImplemented
+
     def getArtists(self) -> List[str]:
         """
         Returns all artist names in the database as strings.
