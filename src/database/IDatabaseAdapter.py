@@ -127,7 +127,7 @@ class IDatabaseAdapter(object):
         addTrack. The admin has the option to provide this information
         in order to import any unimported tracks at any time.
 
-        :return:
+        :return: A list of dictionaries containing the basic track information.
         """
         return NotImplemented
 
@@ -135,7 +135,12 @@ class IDatabaseAdapter(object):
         """
         Returns all tracks marked as unavailable in the database.
 
-        :return:
+        Availability marks a tracks readiness to be played back.
+        The availability of a track is checked on startup and when a track is added
+        to the playlist. The admin has the option to check on unavailable tracks
+        and take some form of action to fix the issue.
+
+        :return: A list of dictionaries containing the basic track information.
         """
         return NotImplemented
 
@@ -143,14 +148,47 @@ class IDatabaseAdapter(object):
             self,
             title: str,
             artist: str,
-            album: str) -> Dict[str, str]:
+            album: str) -> Dict[str, Any]:
+        """
+        Returns a tracks meta information a specified in ID3Standard.ID3_ATTRIBUTES
+        as a dictionary. The used dictionary keys are from ID3Standard.ID3_INTERNAL_NAMES.
+
+        :param title: The track title
+        :param artist: The artist name
+        :param album: The album title
+        :return: A dictionary of meta information
+        """
         return NotImplemented
 
     def setTrackIsImported(self, title: str, artist: str, album: str) -> None:
+        """
+        Marks a track as imported and usable.
+
+        :param title: The track title
+        :param artist: The artist name
+        :param album: The album title
+        :return: None
+        """
         return NotImplemented
 
     def setTrackIsInitialized(self, title: str, artist: str, album: str) -> None:
+        """
+        Marks a track as initialized (startup check was performed)
+
+        :param title: The track title
+        :param artist: The artist name
+        :param album: The album name
+        :return: None
+        """
         return NotImplemented
 
     def setTrackIsAvailable(self, title: str, artist: str, album: str) -> None:
+        """
+        Marks a track as available (can be played back).
+
+        :param title: The track title
+        :param artist: The artist name
+        :param album: The album title
+        :return: None
+        """
         return NotImplemented
