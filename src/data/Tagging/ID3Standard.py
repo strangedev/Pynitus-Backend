@@ -96,7 +96,7 @@ ID3_TAG_IDENTIFIER_LOOKUP = {
     "lyricist": "TEXT",  # type: str
     "involved": "IPLS",  # type: List[str]
     "track_number": "TRCK",  # type: str
-    "Publisher": "TPUB",  # type: str
+    "publisher": "TPUB",  # type: str
     "genres": "TCON",  # type: List[str]
     "year": "TYER",  # type: str
     "bpm": "TBPM",  # type: str

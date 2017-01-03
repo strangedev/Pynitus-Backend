@@ -1,13 +1,12 @@
-import json
-import mimetypes
-import os
-from typing import NewType
-
 from src.data.Track.PlaybackHandler import PlaybackHandler
 
-mimetypes.init()  # used as part of isTrackOfType
 
-TrackType = NewType('Track', object)
+def lazy_metadata(func):
+    def wrapper(self, **kwargs):
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return func(self, **kwargs)
+    return wrapper
 
 
 class Track(object):
@@ -17,32 +16,221 @@ class Track(object):
 
     description = "A Track"
 
-    @staticmethod
-    def isTrackOfType(path_to_record):
-        return False
-
-    @staticmethod
-    def __tryImportingAttribute(attribute_name, dictionary, destination):
-        try:
-            print("Trying to import: ", attribute_name, " from dict: ", dictionary, " to ", destination)
-            setattr(destination, attribute_name, dictionary[attribute_name])
-        except Exception as e:
-            print("Failed to import", attribute_name, " because of ", e)
-
-    def __init__(self, artist_name: str, album_title: str, title: str, features=None, release_date=None, genre=None,
-                 label=None):
+    def __init__(self, title: str, artist: str, album: str):
 
         self.playback_handler_class = PlaybackHandler
-        self.playback_handler_instance = None
+        self.playback_handler_instance = None  # TODO: Move to central PlaybackHandler
         self.delegate = None
-        self.stored_attributes = ["features", "releaseDate", "genre", "label"]
+        self.__meta_info_loaded = False
+        self.__meta_info_load_hook = None
+
         self.title = title
-        self.artist_name = artist_name
-        self.album_title = album_title
-        self.features = features if features else []
-        self.release_date = release_date
-        self.genre = genre
-        self.label = label
+        self.artist = artist
+        self.album = album
+
+    @property
+    def title(self):
+        return self.title
+
+    @title.setter
+    def title(self, title):
+        self.title = title
+
+    @property
+    def artist(self):
+        return self.artist
+
+    @artist.setter
+    def artist(self, artist):
+        self.artist = artist
+
+    @property
+    def album(self):
+        return self.album
+
+    @album.setter
+    def album(self, album):
+        self.album = album
+
+    @property
+    @lazy_metadata
+    def subtitle(self):
+        return self.subtitle
+
+    @subtitle.setter
+    def subtitle(self, subtitle):
+        self.subtitle = subtitle
+
+    @property
+    @lazy_metadata
+    def additional_artist(self):
+        return self.additional_artist
+
+    @additional_artist.setter
+    def additional_artist(self, additional_artist):
+        self.additional_artist = additional_artist
+
+    @property
+    @lazy_metadata
+    def additional_artist_2(self):
+        return self.additional_artist_2
+
+    @additional_artist_2.setter
+    def additional_artist_2(self, additional_artist_2):
+        self.additional_artist_2 = additional_artist_2
+
+    @property
+    @lazy_metadata
+    def additional_artist_3(self):
+        return self.additional_artist_3
+
+    @additional_artist_3.setter
+    def additional_artist_3(self, additional_artist_3):
+        self.additional_artist_3 = additional_artist_3
+
+    @property
+    @lazy_metadata
+    def composer(self):
+        return self.composer
+
+    @composer.setter
+    def composer(self, composer):
+        self.composer = composer
+
+    @property
+    @lazy_metadata
+    def lyricist(self):
+        return self.lyricist
+
+    @lyricist.setter
+    def lyricist(self, lyricist):
+        self.lyricist = lyricist
+
+    @property
+    @lazy_metadata
+    def involved(self):
+        return self.involved
+
+    @involved.setter
+    def involved(self, involved):
+        self.involved = involved
+
+    @property
+    @lazy_metadata
+    def track_number(self):
+        return self.track_number
+
+    @track_number.setter
+    def track_number(self, track_number):
+        self.track_number = track_number
+
+    @property
+    @lazy_metadata
+    def publisher(self):
+        return self.publisher
+
+    @publisher.setter
+    def publisher(self, publisher):
+        self.publisher = publisher
+
+    @property
+    @lazy_metadata
+    def genres(self):
+        return self.genres
+
+    @genres.setter
+    def genres(self, genres):
+        self.genres = genres
+
+    @property
+    @lazy_metadata
+    def year(self):
+        return self.year
+
+    @year.setter
+    def year(self, year):
+        self.year = year
+
+    @property
+    @lazy_metadata
+    def bpm(self):
+        return self.bpm
+
+    @bpm.setter
+    def bpm(self, bpm):
+        self.bpm = bpm
+
+    @property
+    @lazy_metadata
+    def key(self):
+        return self.key
+
+    @key.setter
+    def key(self, key):
+        self.key = key
+
+    @property
+    @lazy_metadata
+    def mood(self):
+        return self.mood
+
+    @mood.setter
+    def mood(self, mood):
+        self.mood = mood
+
+    @property
+    @lazy_metadata
+    def length(self):
+        return self.length
+
+    @length.setter
+    def length(self, length):
+        self.length = length
+
+    @property
+    @lazy_metadata
+    def lyrics(self):
+        return self.lyrics
+
+    @lyrics.setter
+    def lyrics(self, lyrics):
+        self.lyrics = lyrics
+
+    @property
+    @lazy_metadata
+    def artist_url(self):
+        return self.artist_url
+
+    @artist_url.setter
+    def artist_url(self, artist_url):
+        self.artist_url = artist_url
+
+    @property
+    @lazy_metadata
+    def publisher_url(self):
+        return self.publisher_url
+
+    @publisher_url.setter
+    def publisher_url(self, publisher_url):
+        self.publisher_url = publisher_url
+
+    @property
+    @lazy_metadata
+    def file_type(self):
+        return self.file_type
+
+    @file_type.setter
+    def file_type(self, file_type):
+        self.file_type = file_type
+
+    @property
+    @lazy_metadata
+    def user_comment(self):
+        return self.user_comment
+
+    @user_comment.setter
+    def user_comment(self, user_comment):
+        self.user_comment = user_comment
 
     def play(self, delegate: object):
         """
@@ -71,33 +259,3 @@ class Track(object):
 
     def onStopped(self):
         self.delegate.onStopped()
-
-    def restoreFromLocalRecord(self, path_to_record):
-
-        for item in os.listdir(path_to_record):
-
-            if item == "details.json":
-
-                try:
-                    attributes_file = open(os.path.join(path_to_record, item))
-                    attribute_file_contents = attributes_file.read()
-                    attributes = json.loads(attribute_file_contents)
-                    print(attributes)
-                    for attribute in self.stored_attributes:
-                        Track.__tryImportingAttribute(attribute, attributes, self)
-
-                    attributes_file.close()
-
-                except Exception as e:
-                    print(e)
-
-    def storeToFilePath(self, path_to_record):
-
-        details_file = open(os.path.join(path_to_record, "details.json"), "w+")
-        details_to_write = dict({})
-
-        for attribute in self.stored_attributes:
-            details_to_write[attribute] = getattr(self, attribute)
-
-        details_file.write(json.dumps(details_to_write))
-        details_file.close()
