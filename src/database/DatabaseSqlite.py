@@ -239,7 +239,6 @@ class DatabaseSqlite(DatabaseAdapter):
         all_tracks = self.db.execute("SELECT * FROM track")
         for track in all_tracks:
             self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
-            track[7] = False
             self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
                             [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
 
@@ -251,9 +250,8 @@ class DatabaseSqlite(DatabaseAdapter):
         all_tracks = self.db.execute("SELECT * FROM track")
         for track in all_tracks:
             self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
-            track[4] = False
             self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
-                            [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
+                            [track[0], track[1], track[2], track[3], False, track[5], track[6], track[7]])
 
     def __setAllUnavailable(self) -> None:
         """
@@ -263,9 +261,8 @@ class DatabaseSqlite(DatabaseAdapter):
         all_tracks = self.db.execute("SELECT * FROM track")
         for track in all_tracks:
             self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
-            track[5] = False
             self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
-                            [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
+                            [track[0], track[1], track[2], track[3], track[4], False, track[6], track[7]])
 
     def setTrackIsImported(self, location: str) -> None:
         """
