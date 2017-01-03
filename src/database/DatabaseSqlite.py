@@ -240,3 +240,39 @@ class DatabaseSqlite(DatabaseAdapter):
                 names += [involve_row[1]]
             track["involved"] = names
         return track
+
+    def _setAllUninitialized(self) -> None:
+        """
+        sets all Data in Tracks marked as uninitialized
+        :return: None
+        """
+        all_tracks = self.db.execute("SELECT * FROM track")
+        for track in all_tracks:
+            self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
+            track[7] = False
+            self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
+                            [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
+
+    def _setAllUnimported(self) -> None:
+        """
+        sets all Data in Tracks marked as unimported
+        :return: None
+        """
+        all_tracks = self.db.execute("SELECT * FROM track")
+        for track in all_tracks:
+            self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
+            track[4] = False
+            self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
+                            [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
+
+    def _setAllUnavailable(self) -> None:
+        """
+        sets all Data in Tracks marked as unavailable
+        :return: None
+        """
+        all_tracks = self.db.execute("SELECT * FROM track")
+        for track in all_tracks:
+            self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
+            track[5] = False
+            self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
+                            [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
