@@ -68,6 +68,10 @@ class DatabaseSqlite(DatabaseAdapter):
         except sqlite3.OperationalError as e:
             print(e)
 
+        self._setAllUnavailable()
+        self._setAllUnimported()
+        self._setAllUninitialized()
+
     def getTrack(self, title: str, artist: str, album: str) -> Dict[str, any]:
         """
         :param title: Title from Track to get
