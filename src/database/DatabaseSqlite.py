@@ -142,6 +142,7 @@ class DatabaseSqlite(DatabaseAdapter):
         :param kwargs: Additional Track Metainformation
         :return: None
         """
+        # TODO: Handle Exception if location already exists. Adding Method to edit existing rows?
         # FIXME: escape input strings
         self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                         [title, artist, album, location, True, False, format_type, False])
@@ -156,7 +157,7 @@ class DatabaseSqlite(DatabaseAdapter):
         :return: None
         """
         tag_informations = []
-        for i in range(0, 19):  # TODO: Range 11-18?
+        for i in range(0, 19):
             if tag_dict.get(self._t_nfo[i]) is None:  # TODO: Wrong membership test, use more readable style
                 tag_informations += [None]
             else:
@@ -167,7 +168,7 @@ class DatabaseSqlite(DatabaseAdapter):
 
         if tag_dict.get("genres") is None:
             self.db.execute("INSERT INTO genres VALUES(?, ?)",
-                            [location, None])  # TODO: Same logic as in line 141, reuse
+                            [location, None])
         else:
             for gen in tag_dict["genres"]:
                 self.db.execute("INSERT INTO genres VALUES(?, ?)", [location, gen])
