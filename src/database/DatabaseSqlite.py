@@ -2,10 +2,10 @@ from typing import List, Dict
 
 import sqlite3
 
-from src.database.DatabaseAdapter import DatabaseAdapter
+from src.database.IDatabaseAdapter import IDatabaseAdapter
 
 
-class DatabaseSqlite(DatabaseAdapter):
+class IDatabaseSqlite(IDatabaseAdapter):
     def __init__(
             self,
             db_path: str):
