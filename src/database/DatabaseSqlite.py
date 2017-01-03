@@ -142,11 +142,17 @@ class DatabaseSqlite(DatabaseAdapter):
         :param kwargs: Additional Track Metainformation
         :return: None
         """
-        # TODO: Handle Exception if location already exists. Adding Method to edit existing rows?
+        # TODO: Think of a better way to Handle Exception if location already exists
         # FIXME: escape input strings
-        self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                        [title, artist, album, location, True, False, format_type, False])
-        # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
+        try:
+            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                            [title, artist, album, location, True, False, format_type, False])
+            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
+        except sqlite3.IntegrityError:
+            self.db.execute("DELETE FROM track WHERE location = ?", [location])
+            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                            [title, artist, album, location, True, False, format_type, False])
+            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         self.db.commit()
         self.__addTag(kwargs, location)
 
@@ -162,9 +168,16 @@ class DatabaseSqlite(DatabaseAdapter):
                 tag_informations += [None]
             else:
                 tag_informations += [tag_dict.get(self._t_nfo[i])]
-
-        self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        tag_informations)
+        # TODO: Think of a better way to Handle Exception if location already exists
+        try:
+            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            tag_informations)
+        except sqlite3.IntegrityError:
+            self.db.execute("DELETE FROM trackTag WHERE location = ?", [location])
+            self.db.execute("DELETE FROM genres WHERE location = ?", [location])
+            self.db.execute("DELETE FROM involved WHERE location = ?", [location])
+            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            tag_informations)
 
         if tag_dict.get("genres") is None:
             self.db.execute("INSERT INTO genres VALUES(?, ?)",
