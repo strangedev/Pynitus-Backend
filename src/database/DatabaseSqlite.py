@@ -280,3 +280,33 @@ class DatabaseSqlite(DatabaseAdapter):
             track[5] = False
             self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
                             [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
+
+    def setTrackIsImported(self, location: str) -> None:
+        """
+        :param location: Key of Track which should marked as Imported
+        :return: None
+        """
+        track = self.db.execute("SELECT * FROM track WHERE location = ?", location)
+        t = track.fetchone()
+        self.db.execute("DELETE FROM track WHERE location = ?", location)
+        self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)", [t[0], t[1], t[2], t[3], True, t[5], t[6], t[7]])
+
+    def setTrackIsInitialized(self, location: str) -> None:
+        """
+        :param location: Key of Track which should marked as Initialized
+        :return: None
+        """
+        track = self.db.execute("SELECT * FROM track WHERE location = ?", location)
+        t = track.fetchone()
+        self.db.execute("DELETE FROM track WHERE location = ?", location)
+        self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)", [t[0], t[1], t[2], t[3], t[4], t[5], t[6], True])
+
+    def setTrackIsAvailable(self, location: str) -> None:
+        """
+        :param location: Key of Track which should marked as Available
+        :return: None
+        """
+        track = self.db.execute("SELECT * FROM track WHERE location = ?", location)
+        t = track.fetchone()
+        self.db.execute("DELETE FROM track WHERE location = ?", location)
+        self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)", [t[0], t[1], t[2], t[3], t[4], True, t[6], t[7]])
