@@ -195,6 +195,7 @@ class DatabaseSqlite(DatabaseAdapter):
         else:
             for inv in tag_dict["involved"]:
                 self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, inv])
+        self.db.commit()
 
     def getTracksByArtist(self, artist: str) -> List[Dict[str, any]]:
         """
@@ -245,7 +246,7 @@ class DatabaseSqlite(DatabaseAdapter):
             track["involved"] = names
         return track
 
-    def _setAllUninitialized(self) -> None:
+    def __setAllUninitialized(self) -> None:
         """
         sets all Data in Tracks marked as uninitialized
         :return: None
@@ -257,7 +258,7 @@ class DatabaseSqlite(DatabaseAdapter):
             self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
                             [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
 
-    def _setAllUnimported(self) -> None:
+    def __setAllUnimported(self) -> None:
         """
         sets all Data in Tracks marked as unimported
         :return: None
@@ -269,7 +270,7 @@ class DatabaseSqlite(DatabaseAdapter):
             self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)",
                             [track[0], track[1], track[2], track[3], track[4], track[5], track[6], track[7]])
 
-    def _setAllUnavailable(self) -> None:
+    def __setAllUnavailable(self) -> None:
         """
         sets all Data in Tracks marked as unavailable
         :return: None
