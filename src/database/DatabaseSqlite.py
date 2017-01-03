@@ -45,26 +45,11 @@ class DatabaseSqlite(DatabaseAdapter):
                        "user_comment"]  # type [str]  FIXME: Get from ID3Standard.py
         a = self._t_nfo
         try:
-            self.db.execute("CREATE TABLE " + "trackTag(" +  # TODO: beautify/automate
-                            a[0] + " text primary key, " +
-                            a[1] + " text, " +
-                            a[2] + " text, " +
-                            a[3] + " text, " +
-                            a[4] + " text, " +
-                            a[5] + " text, " +
-                            a[6] + " text, " +
-                            a[7] + " text, " +
-                            a[8] + " text, " +
-                            a[9] + " text, " +
-                            a[10] + " text, " +
-                            a[11] + " text, " +
-                            a[12] + " text, " +
-                            a[13] + " text, " +
-                            a[14] + " text, " +
-                            a[15] + " text, " +
-                            a[16] + " text, " +
-                            a[17] + " text, " +
-                            a[18] + " text)")
+            ex_cmd = "CREATE TABLE trackTag(" + a[0] + "text primary key, "
+            for i in range(1,18):
+                ex_cmd += a[i] + "text, "
+            ex_cmd += a[18] + "text)"
+            self.db.execute(ex_cmd)
         except sqlite3.OperationalError as e:
             print(e)
 
