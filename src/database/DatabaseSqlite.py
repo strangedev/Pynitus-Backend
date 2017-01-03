@@ -117,7 +117,7 @@ class DatabaseSqlite(DatabaseAdapter):
             ]
         return r
 
-    def getTracksByAlbum(self, artist: str, album: str) -> List[Dict[str, str]]:
+    def getTracksByAlbum(self, artist: str, album: str) -> List[Dict[str, any]]:
         """
 
         :param artist: Artist of Album to get Tracks from
@@ -196,7 +196,7 @@ class DatabaseSqlite(DatabaseAdapter):
             for inv in tag_dict["involved"]:
                 self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, inv])
 
-    def getTracksByArtist(self, artist: str) -> List[Dict[str, str]]:
+    def getTracksByArtist(self, artist: str) -> List[Dict[str, any]]:
         """
         :param artist: Artist to get Tracks from
         :return: List of Dictionary based on given Artist
@@ -210,7 +210,7 @@ class DatabaseSqlite(DatabaseAdapter):
             ]
         return r
 
-    def getMetainformation(self, title: str, artist: str, album: str) -> Dict[str, str]:
+    def getMetainformation(self, title: str, artist: str, album: str) -> Dict[str, any]:
         """
         :param title: Title to get Metainformation from
         :param artist: Artist to get Metainformation from
