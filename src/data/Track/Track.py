@@ -259,3 +259,15 @@ class Track(object):
 
     def onStopped(self):
         self.delegate.onStopped()
+
+    def checkAvailability(self) -> bool:
+        """
+        Checks if the resource is available and the track can be played
+        back. This method is called regularly and on startup. It should
+        return true if the track can be played. If this method returns false,
+        the associated track is not shown to the user and the admin is asked
+        to perform some kind of action to fix the issue.
+
+        :return: A bool indicating whether the track can be played.
+        """
+        return NotImplemented
