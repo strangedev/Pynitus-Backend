@@ -63,30 +63,30 @@ class Track(object):
 
     @property
     @lazy_metadata
-    def additional_artist(self):
-        return self.additional_artist
+    def album_artist(self):
+        return self.album_artist
 
-    @additional_artist.setter
-    def additional_artist(self, additional_artist):
-        self.additional_artist = additional_artist
-
-    @property
-    @lazy_metadata
-    def additional_artist_2(self):
-        return self.additional_artist_2
-
-    @additional_artist_2.setter
-    def additional_artist_2(self, additional_artist_2):
-        self.additional_artist_2 = additional_artist_2
+    @album_artist.setter
+    def album_artist(self, album_artist):
+        self.album_artist = album_artist
 
     @property
     @lazy_metadata
-    def additional_artist_3(self):
-        return self.additional_artist_3
+    def conductor(self):
+        return self.conductor
 
-    @additional_artist_3.setter
-    def additional_artist_3(self, additional_artist_3):
-        self.additional_artist_3 = additional_artist_3
+    @conductor.setter
+    def conductor(self, conductor):
+        self.conductor = conductor
+
+    @property
+    @lazy_metadata
+    def remixer(self):
+        return self.remixer
+
+    @remixer.setter
+    def remixer(self, remixer):
+        self.remixer = remixer
 
     @property
     @lazy_metadata
@@ -108,12 +108,12 @@ class Track(object):
 
     @property
     @lazy_metadata
-    def involved(self):
-        return self.involved
+    def features(self):
+        return self.features
 
-    @involved.setter
-    def involved(self, involved):
-        self.involved = involved
+    @features.setter
+    def features(self, features):
+        self.features = features
 
     @property
     @lazy_metadata
@@ -126,12 +126,12 @@ class Track(object):
 
     @property
     @lazy_metadata
-    def publisher(self):
-        return self.publisher
+    def label(self):
+        return self.label
 
-    @publisher.setter
-    def publisher(self, publisher):
-        self.publisher = publisher
+    @label.setter
+    def label(self, label):
+        self.label = label
 
     @property
     @lazy_metadata
@@ -144,12 +144,12 @@ class Track(object):
 
     @property
     @lazy_metadata
-    def year(self):
-        return self.year
+    def date(self):
+        return self.date
 
-    @year.setter
-    def year(self, year):
-        self.year = year
+    @date.setter
+    def date(self, date):
+        self.date = date
 
     @property
     @lazy_metadata
@@ -189,48 +189,12 @@ class Track(object):
 
     @property
     @lazy_metadata
-    def lyrics(self):
-        return self.lyrics
+    def comment(self):
+        return self.comment
 
-    @lyrics.setter
-    def lyrics(self, lyrics):
-        self.lyrics = lyrics
-
-    @property
-    @lazy_metadata
-    def artist_url(self):
-        return self.artist_url
-
-    @artist_url.setter
-    def artist_url(self, artist_url):
-        self.artist_url = artist_url
-
-    @property
-    @lazy_metadata
-    def publisher_url(self):
-        return self.publisher_url
-
-    @publisher_url.setter
-    def publisher_url(self, publisher_url):
-        self.publisher_url = publisher_url
-
-    @property
-    @lazy_metadata
-    def file_type(self):
-        return self.file_type
-
-    @file_type.setter
-    def file_type(self, file_type):
-        self.file_type = file_type
-
-    @property
-    @lazy_metadata
-    def user_comment(self):
-        return self.user_comment
-
-    @user_comment.setter
-    def user_comment(self, user_comment):
-        self.user_comment = user_comment
+    @comment.setter
+    def comment(self, comment):
+        self.comment = comment
 
     def play(self, delegate: object):
         """
