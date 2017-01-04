@@ -147,7 +147,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET imported = ?, where location = ?",
+        self.db.execute("UPDATE track SET imported = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
         self.db.commit()
 
@@ -159,7 +159,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET init = ?, where location = ?",
+        self.db.execute("UPDATE track SET init = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
         self.db.commit()
 
@@ -171,7 +171,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET available = ?, where location = ?",
+        self.db.execute("UPDATE track SET available = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
         self.db.commit()
 
