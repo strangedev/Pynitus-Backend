@@ -7,7 +7,7 @@ class TagReader(object):
     def __init__(self, file_path: str) -> None:  # TODO: pass filepath to read method not to constructor, if it's passed to constructor, a new object has to be created for each read access
         """
         Construct Audio File Tag
-        :param file_path: Path to File (types that tests passed .aiff, .flac, .m4a, .mp3, .ogg, .wav, .wma)
+        :param file_path: Path to File (types that tests passed .aiff, .flac, .m4a, .mp3, .ogg, .wav, .wma) <- See MediaScanner.SUPPORTED_TYPES
         """
         self.audio_file = taglib.File(file_path)
 
@@ -31,7 +31,7 @@ class TagReader(object):
         for tag in TAGLIB_INTERNAL_NAMES.keys():
             if not self.audio_file.tags.get(tag):
                 num += 1
-        return 0
+        return 0  # TODO: (<.<)
 
     def getUnselectedTag(self) -> Dict[str, any]:  # TODO: why is this needed?
         """
