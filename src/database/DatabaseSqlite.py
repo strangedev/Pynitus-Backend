@@ -273,8 +273,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: Dictionary with Keys: Title, Artist, Album, Location, imported, available and type
         """
         # FIXME: escape input strings
-        track_tuple = self.db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ?",
-                                      [title, artist, album])
+        track_tuple = self.db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ? \
+                                      AND imported = ? AND available = ? AND init = ?",
+                                      [title, artist, album, True, True, True])
         track = track_tuple.fetchone()
         if track is None:
             return None
@@ -294,7 +295,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: List of Dictionary based on given Artist
         """
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE artist = ?", [artist]):
+        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND imported = ? AND available = ? \
+                                     AND init = ?", [artist, True, True, True]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -317,7 +319,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         # FIXME: escape input strings
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND album = ?", [artist, album]):
+        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND album = ? AND imported = ? AND \
+                                     available = ? AND init = ?", [artist, album, True, True, True]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
