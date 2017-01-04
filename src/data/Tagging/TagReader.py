@@ -55,7 +55,7 @@ class TagReader(object):
 
     def writeTag(self, **kwargs) -> None:
         """
-        Writes given Information to Tag vorrausgesetzt it is defined in TagSupport
+        Writes given Information to Tag assuming that it is defined in TagSupport
         :param kwargs: tag Keys and Values
         :return: None
         """
