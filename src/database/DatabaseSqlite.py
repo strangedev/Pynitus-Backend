@@ -17,14 +17,13 @@ class DatabaseSqlite(IDatabaseAdapter):
                         location text primary key, imported bool, available bool, type text, init bool)")
         self.db.execute("CREATE TABLE IF NOT EXISTS involved(location text, feature text)")
         self.db.execute("CREATE TABLE IF NOT EXISTS genres(location text, genre text)")
-        self._tag_information = ["location", "subtitle", "additional_artist1", "additional_artist2",
-                                 "additional_artist3", "composer", "lyricist", "publisher", "year", "track_number",
-                                 "bpm", "key", "mood", "length", "lyrics", "artist_url", "publisher_url", "file_type",
+        self._tag_information = ["location", "subtitle", "album_artist", "conductor", "remixer", "composer",
+                                 "lyricist", "track_number", "label", "date", "bpm", "key", "mood", "length",
                                  "user_comment"]
-        self.db.execute("CREATE TABLE IF NOT EXISTS trackTag(location text primary key, subtitle text, additional_artist1 text, \
-                        additional_artist2 text, additional_artist3 text, composer text, lyricist text, \
-                        publisher text, year text, track_number text, bpm text, key text, mood text, length text, \
-                        lyrics text, artist_url text, publisher_url text, file_type text, user_comment text)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS trackTag(location text primary key, subtitle text, \
+                        album_artist text, conductor text, remixer text, composer text, lyricist text, \
+                        track_number text, label text, date text, bpm text, key text, mood text, length text, \
+                        user_comment text)")
 
     def __fetchAllTracks(self) -> List[tuple]:
         """
@@ -57,14 +56,12 @@ class DatabaseSqlite(IDatabaseAdapter):
             else:
                 tag_informations.append(tag_dict.get(self._tag_information[i]))
         try:
-            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             tag_informations)
         except sqlite3.IntegrityError:
-            self.db.execute("UPDATE trackTag SET subtitle = ?, additional_artist1 = ?, \
-                        additional_artist2 = ?, additional_artist3 = ?, composer = ?, lyricist = ?, \
-                        publisher = ?, year = ?, track_number = ?, bpm = ?, key = ?, mood = ?, length = ?, \
-                        lyrics = ?, artist_url = ?, publisher_url = ?, file_type = ?, user_comment = ? WHERE \
-                        location = ?)",
+            self.db.execute("UPDATE trackTag SET subtitle = ?, album_artist = ?, conductor = ?, remixer = ?, \
+                            composer = ?, lyricist = ?, track_number = ?, label = ?, date = ?, bpm = ?, key = ?, \
+                            mood = ?, length = ?, user_comment = ? WHERE location = ?)",
                             tag_informations[1:] + [tag_informations[0]])
 
         if tag_dict.get("genres") is None:
@@ -366,7 +363,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         track_tuple = self.db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
         t = track_tuple.fetchone()
         track = {}
-        for i in range(0, 19):
+        for i in range(0, len(self._tag_information)):
             track[self._tag_information[i]] = t[i]
 
         genres = self.db.execute("SELECT genre FROM genres WHERE location = ?", [location]).fetchall()
