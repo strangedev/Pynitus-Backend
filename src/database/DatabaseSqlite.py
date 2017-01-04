@@ -5,7 +5,7 @@ import sqlite3
 from src.database.IDatabaseAdapter import IDatabaseAdapter
 
 
-class IDatabaseSqlite(IDatabaseAdapter):
+class DatabaseSqlite(IDatabaseAdapter):
     def __init__(
             self,
             db_path: str):
@@ -13,101 +13,299 @@ class IDatabaseSqlite(IDatabaseAdapter):
         :param db_path: Location where to Store DB
         """
         self.db = sqlite3.connect(db_path)  # type: sqlite3.Connection
-        try:
-            self.db.execute("CREATE TABLE " + "track(" +
-                            "title text, " +
-                            "artist text, " +
-                            "album text, " +
-                            "location text primary key, " +
-                            "imported bool, " +
-                            "available bool, " +
-                            "type text, " +
-                            "init bool)")  # TODO: Use full name for readability
-        except sqlite3.OperationalError as e:
-            print(e)  # TODO: Check if DB exists first and don't rely on try/except to handle this case
+        self.db.execute("CREATE TABLE IF NOT EXISTS track (title text, artist text, album text, \
+                        location text primary key, imported bool, available bool, type text, init bool)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS involved(location text, feature text)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS genres(location text, genre text)")
+        self._tag_information = ["location", "subtitle", "additional_artist1", "additional_artist2",
+                                 "additional_artist3", "composer", "lyricist", "publisher", "year", "track_number",
+                                 "bpm", "key", "mood", "length", "lyrics", "artist_url", "publisher_url", "file_type",
+                                 "user_comment"]
+        self.db.execute("CREATE TABLE IF NOT EXISTS trackTag(location text primary key, subtitle text, additional_artist1 text, \
+                        additional_artist2 text, additional_artist3 text, composer text, lyricist text, \
+                        publisher text, year text, track_number text, bpm text, key text, mood text, length text, \
+                        lyrics text, artist_url text, publisher_url text, file_type text, user_comment text)")
 
-        try:
-            self.db.execute("CREATE TABLE " + "involved(" +
-                            "location text, " +
-                            "feature text)")
-        except sqlite3.OperationalError as e:
-            print(e)  # TODO: Check if DB exists first and don't rely on try/except to handle this case
-
-        try:
-            self.db.execute("CREATE TABLE " + "genres(" +
-                            "location text, " +
-                            "genre text)")
-        except sqlite3.OperationalError as e:
-            print(e)  # TODO: Check if DB exists first and don't rely on try/except to handle this case
-
-        self._t_nfo = ["location", "subtitle text", "additional_artist1", "additional_artist2",
-                       "additional_artist3", "composer", "lyricist", "publisher", "year", "track_number", "bpm", "key",
-                       "mood", "length", "lyrics", "artist_url", "publisher_url", "file_type",
-                       "user_comment"]  # type [str]  FIXME: Get from ID3Standard.py, Bad naming
-        a = self._t_nfo
-        try:
-            ex_cmd = "CREATE TABLE trackTag(" + a[0] + "text primary key, "
-            for i in range(1,18):  # FIXME: Either do this fully automatically or write it out for readability, right now it doesn't benefit anyone
-                ex_cmd += a[i] + "text, "
-            ex_cmd += a[18] + "text)"
-            self.db.execute(ex_cmd)
-        except sqlite3.OperationalError as e:
-            print(e)
-
-        self.__setAllUnavailable()
-        self.__setAllUnimported()  # FIXME: Tracks are not all unimported on startup, only newly discovered tracks are unimported
-        self.__setAllUninitialized()
-
-    # TODO: def getTracks -> Returns all tracks
-
-    # TODO: def getAlbums -> Returns all albums
-
-    # TODO: def getAlbumsByArtist -> Returns albums by artist
-
-    def getTrack(self, title: str, artist: str, album: str) -> Dict[str, any]:
+    def __fetchAllTracks(self) -> List[tuple]:
         """
-        :param title: Title from Track to get
-        :param artist: Artist from Track to get
-        :param album: Album from Track to get
-        :return: Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
+        Returns all stored Information from track
+        :return: All stored Information from track in a List within Tuples
+        """
+        return self.db.execute("SELECT * FROM track").fetchall()
+
+    def __getLocation(self, title: str, artist: str, album: str) -> str:
+        """
+        Returns location String
+        :param title: title of location
+        :param artist: artist of location
+        :param album: album of location
+        :return: Location as String for given information
+        """
+        return self.db.execute("SELECT location FROM track where title = ? AND artist = ? AND album = ?",
+                               [title, artist, album]).fetchone()[0]
+
+    def __addTag(self, tag_dict: dict, location: str) -> None:
+        """
+        :param tag_dict: Additional Track Metainformation
+        :param location: Track Location
+        :return: None
+        """
+        tag_informations = [location]
+        for i in range(1, 19):
+            if tag_dict.get(self._tag_information[i]) is None:  # TODO: Wrong membership test, use more readable style
+                tag_informations += [None]
+            else:
+                tag_informations += [tag_dict.get(self._tag_information[i])]
+        try:
+            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            tag_informations)
+        except sqlite3.IntegrityError:
+            self.db.execute("UPDATE trackTag SET subtitle = ?, additional_artist1 = ?, \
+                        additional_artist2 = ?, additional_artist3 = ?, composer = ?, lyricist = ?, \
+                        publisher = ?, year = ?, track_number = ?, bpm = ?, key = ?, mood = ?, length = ?, \
+                        lyrics = ?, artist_url = ?, publisher_url = ?, file_type = ?, user_comment = ? WHERE \
+                        location = ?)",
+                            tag_informations[1:] + tag_informations[0])
+
+        if tag_dict.get("genres") is None:
+            self.db.execute("INSERT INTO genres VALUES(?, ?)",
+                            [location, None])
+        else:
+            for gen in tag_dict["genres"]:
+                try:
+                    self.db.execute("INSERT INTO genres VALUES(?, ?)", [location, gen])
+                except sqlite3.IntegrityError:
+                    pass  # Here is nothing to do, cause in this case row already exist
+
+        if tag_dict.get("involved") is None:
+            self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, None])
+        else:
+            for inv in tag_dict["involved"]:
+                try:
+                    self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, inv])
+                except sqlite3.IntegrityError:
+                    pass  # Here is nothing to do, cause in this case row already exist
+
+        self.db.commit()
+
+    def addTrack(self, location: str,
+                 title: str=None,
+                 artist: str=None,
+                 album: str=None,
+                 format_type: str=None,
+                 **kwargs) -> None:
+        """
+        :param title: Track Title
+        :param artist: Track Artist
+        :param album: Track Album
+        :param format_type: Track Type
+        :param location: Track Location
+        :param kwargs: Additional Track Metainformation
+        :return: None
         """
         # FIXME: escape input strings
-        track_tuple = self.db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ?",
-                                      [title, artist, album])
-        t = track_tuple.fetchone()
-        if t is None:
-            return None
-        track = {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": bool(t[4]),
-                 "available": bool(t[5]), "type": t[6], "initialized": t[7]}
-        return track
+        try:
+            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                            [title, artist, album, location, False, False, format_type, False])
+            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
+        except sqlite3.IntegrityError:
+            self.db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
+            init = ? where location = ?", [title, artist, album, False, False, format_type, False, location])
+            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
+        self.db.commit()
+        self.__addTag(kwargs, location)
+
+    def setAllUninitialized(self) -> None:
+        """
+        sets all Data in Tracks marked as uninitialized
+        :return: None
+        """
+        self.db.execute("UPDATE track set initialized = 0")
+        self.db.commit()
+
+    def setAllUnimported(self) -> None:
+        """
+        sets all Data in Tracks marked as unimported
+        :return: None
+        """
+        self.db.execute("UPDATE track set imported = 0")
+        self.db.commit()
+
+    def setAllUnavailable(self) -> None:
+        """
+        sets all Data in Tracks marked as unavailable
+        :return: None
+        """
+        self.db.execute("UPDATE track set available = 0")
+        self.db.commit()
+
+    def setTrackIsImported(self, title: str, artist: str, album: str) -> None:
+        """
+        Sets Tracks imported Attribute to True
+        :param title: Title of Track
+        :param artist: Artist of Track
+        :param album: Album of Track
+        :return: None
+        """
+        self.db.execute("UPDATE track SET imported = ?, where location = ?",
+                        [True, self.__getLocation(title, artist, album)])
+        self.db.commit()
+
+    def setTrackIsInitialized(self, title: str, artist: str, album: str) -> None:
+        """
+        Sets Tracks init Attribute to True
+        :param title: Title of Track
+        :param artist: Artist of Track
+        :param album: Album of Track
+        :return: None
+        """
+        self.db.execute("UPDATE track SET init = ?, where location = ?",
+                        [True, self.__getLocation(title, artist, album)])
+        self.db.commit()
+
+    def setTrackIsAvailable(self, title: str, artist: str, album: str) -> None:
+        """
+        Sets Tracks available Attribute to True
+        :param title: Title of Track
+        :param artist: Artist of Track
+        :param album: Album of Track
+        :return: None
+        """
+        self.db.execute("UPDATE track SET available = ?, where location = ?",
+                        [True, self.__getLocation(title, artist, album)])
+        self.db.commit()
+
+    def getTracks(self) -> List[Dict[str, any]]:
+        """
+        Returns all Tracks in a List of Dictionary
+        :return: List of Dictionary with information for Tracks stored in DB
+        """
+        result = []
+        for track in self.db.execute("SELECT * FROM track").fetchall():
+            result.append(
+                {"title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]}
+            )  # Perhaps 4,5,7 convert to bool
+        return result
+
+    def getArtists(self) -> List[str]:
+        """
+
+        :return: All stored Artists in DB
+        """
+        artists = []
+        artist_tuple = self.db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
+        for artist in artist_tuple:
+            artists.append(artist[0])
+        return artists
+
+    def getAlbums(self) -> List[str]:
+        """
+        Returns all stored Albums
+        :return: All stored Albums in DB
+        """
+        albums = []
+        albums_tuple = self.db.execute("SELECT album FROM track GROUP BY album").fetchall()
+        for album in albums_tuple:
+            albums.append(album[0])
+        return albums
+
+    def getAlbumsByArtist(self, artist: str) -> List[str]:
+        """
+        Returns all stored Albums from given Artist
+        :return: All stored Albums from given Artist
+        """
+        albums = []
+        albums_tuple = self.db.execute("SELECT album FROM track WHERE artist = ? GROUP BY album", [artist]).fetchall()
+        for album in albums_tuple:
+            albums.append(album[0])
+        return albums
 
     def getUnimported(self) -> List[Dict[str, any]]:
         """
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
                 where imported is 0
         """
-        r = []
+        result = []
         for track in self.db.execute("SELECT * FROM track WHERE imported = ?", [False]):
-            t = track  # TODO: Don't rename here, rename in loop declaration
-            r.append(
-                {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
-                 "available": t[5], "type": t[6], "initialized": t[7]}
+            result.append(
+                {"title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]}
             )
-        return r
+        return result
 
     def getUnavailable(self) -> List[Dict[str, any]]:
         """
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
                     where available is 0
         """
-        r = []
+        result = []
         for track in self.db.execute("SELECT * FROM track WHERE available = ?", [False]):
-            t = track  # TODO: Don't rename here, rename in loop declaration
-            r.append(
-                {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
-                 "available": t[5], "type": t[6], "initialized": t[7]}
+            result.append(
+                {"title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]}
             )
-        return r
+        return result
+
+    def getTrack(self, title: str, artist: str, album: str) -> Dict[str, any]:
+        """
+        :param title: Title from Track to get
+        :param artist: Artist from Track to get
+        :param album: Album from Track to get
+        :return: Dictionary with Keys: Title, Artist, Album, Location, imported, available and type
+        """
+        # FIXME: escape input strings
+        track_tuple = self.db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ?",
+                                      [title, artist, album])
+        track = track_tuple.fetchone()
+        if track is None:
+            return None
+        track_dict = {"title": track[0],
+                      "artist": track[1],
+                      "album": track[2],
+                      "location": track[3],
+                      "imported": track[4],
+                      "available": track[5],
+                      "type": track[6],
+                      "initialized": track[7]}
+        return track_dict
+
+    def getTracksByArtist(self, artist: str) -> List[Dict[str, any]]:
+        """
+        :param artist: Artist to get Tracks from
+        :return: List of Dictionary based on given Artist
+        """
+        result = []
+        for track in self.db.execute("SELECT * FROM track WHERE artist = ?", [artist]):
+            result.append(
+                {"title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]}
+            )
+        return result
 
     def getTracksByAlbum(self, artist: str, album: str) -> List[Dict[str, any]]:
         """
@@ -118,91 +316,19 @@ class IDatabaseSqlite(IDatabaseAdapter):
                     based on given Artist and Album
         """
         # FIXME: escape input strings
-        r = []
-        for track in self.db.execute(
-                "SELECT * FROM track WHERE artist = ? AND album = ?", [artist, album]):  # FIXME: SQL-Inj. possible
-            t = track  # TODO: Don't rename here, rename in loop declaration
-            r.append(
-                {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
-                 "available": t[5], "type": t[6], "initialized": t[7]}
+        result = []
+        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND album = ?", [artist, album]):
+            result.append(
+                {"title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]}
             )
-        return r
-
-    def addTrack(self, title: str, artist: str, album: str, format_type: str, location: str, **kwargs) -> None:
-        """
-        :param title: Track Title
-        :param artist: Track Artist
-        :param album: Track Album
-        :param format_type: Track Type
-        :param location: Track Location
-        :param kwargs: Additional Track Metainformation
-        :return: None
-        """
-        # TODO: Think of a better way to Handle Exception if location already exists
-        # FIXME: escape input strings
-        try:
-            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                            [title, artist, album, location, True, False, format_type, False])
-            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
-        except sqlite3.IntegrityError:
-            self.db.execute("DELETE FROM track WHERE location = ?", [location])
-            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                            [title, artist, album, location, True, False, format_type, False])
-            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
-        self.db.commit()
-        self.__addTag(kwargs, location)
-
-    def __addTag(self, tag_dict: dict, location: str) -> None:
-        """
-        :param tag_dict: Additional Track Metainformation
-        :param location: Track Location
-        :return: None
-        """
-        tag_informations = []
-        for i in range(0, 19):
-            if tag_dict.get(self._t_nfo[i]) is None:  # TODO: Wrong membership test, use more readable style
-                tag_informations += [None]
-            else:
-                tag_informations += [tag_dict.get(self._t_nfo[i])]
-        # TODO: Think of a better way to Handle Exception if location already exists
-        try:
-            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            tag_informations)
-        except sqlite3.IntegrityError:  # TODO: Comment in which case this error is raised
-            self.db.execute("DELETE FROM trackTag WHERE location = ?", [location])
-            self.db.execute("DELETE FROM genres WHERE location = ?", [location])
-            self.db.execute("DELETE FROM involved WHERE location = ?", [location])
-            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            tag_informations)
-
-        if tag_dict.get("genres") is None:
-            self.db.execute("INSERT INTO genres VALUES(?, ?)",
-                            [location, None])  # TODO: Is None a valid value for text type?
-        else:
-            for gen in tag_dict["genres"]:
-                self.db.execute("INSERT INTO genres VALUES(?, ?)", [location, gen])
-
-        if tag_dict.get("involved") is None:
-            self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, None])  # TODO: Is None a valid value for text type?
-        else:
-            for inv in tag_dict["involved"]:
-                self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, inv])
-
-        self.db.commit()
-
-    def getTracksByArtist(self, artist: str) -> List[Dict[str, any]]:
-        """
-        :param artist: Artist to get Tracks from
-        :return: List of Dictionary based on given Artist
-        """
-        r = []
-        for track in self.db.execute("SELECT * FROM track WHERE artist = ?", [artist]):
-            t = track  # TODO: Don't rename here, rename in loop declaration
-            r.append(
-                {"title": t[0], "artist": t[1], "album": t[2], "location": t[3], "imported": t[4],
-                 "available": t[5], "type": t[6], "initialized": t[7]}
-            )
-        return r
+        return result
 
     def getMetainformation(self, title: str, artist: str, album: str) -> Dict[str, any]:
         """
@@ -211,100 +337,31 @@ class IDatabaseSqlite(IDatabaseAdapter):
         :param album: Album to get Metainformation from
         :return: Dictionary with Metainformation based on given Artist, Title and Album
         """
-        location = self.getTrack(title, artist, album).get("location")
+        location = self.__getLocation(title, artist, album)
         if location is None:
             return None
-        track_tuple = self.db.execute("SELECT * FROM track WHERE location = ?", [location])
+
+        track_tuple = self.db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
         t = track_tuple.fetchone()
         track = {}
         for i in range(0, 19):
-            track[self._t_nfo[i]] = t[i]
+            track[self._tag_information[i]] = t[i]
 
-        genres = self.db.execute("SELECT * FROM genres WHERE location = ?", [location])
-        g = []  # TODO: Bad naming
-        if genres is None:  # TODO: Is cursor really None, or empty list?
+        genres = self.db.execute("SELECT genre FROM genres WHERE location = ?", [location]).fetchall()
+        genre_of_track = []
+        if not genres:
             track["genres"] = None
         else:
             for genre in genres:
-                g.append(genre[1])
-            track["genres"] = g
+                genre_of_track.append(genre[0])
+            track["genres"] = genre_of_track
 
-        involved = self.db.execute("SELECT * FROM genres WHERE location = ?", [location])
+        involved = self.db.execute("SELECT feature FROM involved WHERE location = ?", [location]).fetchall()
         names = []
-        if involved is None:  # TODO: Is cursor really None, or empty list?
+        if not involved:
             track["involved"] = None
         else:
-            for involve_row in involved:
-                names.append(involve_row[1])
+            for feature in involved:
+                names.append(feature[0])
             track["involved"] = names
         return track
-
-    def __setAllUninitialized(self) -> None:
-        """
-        sets all Data in Tracks marked as uninitialized
-        :return: None
-        """
-        all_tracks = self.db.execute("SELECT * FROM track").fetchall()  # TODO: Use getTracks method
-        for track in all_tracks:
-            self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
-            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                            [track[0], track[1], track[2], track[3], track[4], track[5], track[6], False])  # TODO: store this list seperately so it can be commented for readability
-            self.db.commit()
-
-    def __setAllUnimported(self) -> None:
-        """
-        sets all Data in Tracks marked as unimported
-        :return: None
-        """
-        all_tracks = self.db.execute("SELECT * FROM track").fetchall()  # TODO: Use getTracks method
-        for track in all_tracks:
-            self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
-            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",  # TODO: Find out if column can be altered in place
-                            [track[0], track[1], track[2], track[3], False, track[5], track[6], track[7]])  # TODO: store this list seperately so it can be commented for readability
-            self.db.commit()
-
-    def __setAllUnavailable(self) -> None:
-        """
-        sets all Data in Tracks marked as unavailable
-        :return: None
-        """
-        all_tracks = self.db.execute("SELECT * FROM track").fetchall()  # TODO: Use getTracks method
-        for track in all_tracks:
-            print(track)
-            self.db.execute("DELETE FROM track WHERE location = ?", [track[3]])
-            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",  # TODO: Find out if column can be altered in place
-                            [track[0], track[1], track[2], track[3], track[4], False, track[6], track[7]])  # TODO: store this list seperately so it can be commented for readability
-            self.db.commit()
-
-    def setTrackIsImported(self, location: str) -> None:
-        """
-        :param location: Key of Track which should marked as Imported
-        :return: None
-        """
-        track = self.db.execute("SELECT * FROM track WHERE location = ?", location)
-        t = track.fetchone()
-        self.db.execute("DELETE FROM track WHERE location = ?", location)  # TODO: Find out if column can be altered in place
-        self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)", [t[0], t[1], t[2], t[3], True, t[5], t[6], t[7]])  # TODO: store this list seperately so it can be commented for readability
-        self.db.commit()
-
-    def setTrackIsInitialized(self, location: str) -> None:
-        """
-        :param location: Key of Track which should marked as Initialized
-        :return: None
-        """
-        track = self.db.execute("SELECT * FROM track WHERE location = ?", location)
-        t = track.fetchone()
-        self.db.execute("DELETE FROM track WHERE location = ?", location)  # TODO: Find out if column can be altered in place
-        self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)", [t[0], t[1], t[2], t[3], t[4], t[5], t[6], True])  # TODO: store this list seperately so it can be commented for readability
-        self.db.commit()
-
-    def setTrackIsAvailable(self, location: str) -> None:
-        """
-        :param location: Key of Track which should marked as Available
-        :return: None
-        """
-        track = self.db.execute("SELECT * FROM track WHERE location = ?", location)
-        t = track.fetchone()
-        self.db.execute("DELETE FROM track WHERE location = ?", location)  # TODO: Find out if column can be altered in place
-        self.db.execute("INSERT INTO track VALUES(?,?,?,?,?,?,?,?)", [t[0], t[1], t[2], t[3], t[4], True, t[6], t[7]])  # TODO: store this list seperately so it can be commented for readability
-        self.db.commit()
