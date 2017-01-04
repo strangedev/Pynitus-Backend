@@ -1,5 +1,4 @@
 from typing import List, Dict
-
 import sqlite3
 
 from src.database.IDatabaseAdapter import IDatabaseAdapter
