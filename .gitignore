@@ -3,10 +3,10 @@
 /pynitus.conf
 __pycache__/
 src/__pycache__/
-src/config/__pycache__/
-src/data/Track/__pycache__/
-src/data/__pycache__/
-src/data/foundation/__pycache__/
-src/database/__pycache__/
-src/server/__pycache__/
+src/Config/__pycache__/
+src/Data/Track/__pycache__/
+src/Data/__pycache__/
+src/Data/Foundation/__pycache__/
+src/Database/__pycache__/
+src/Server/__pycache__/
 *.pyc
