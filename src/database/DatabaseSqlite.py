@@ -52,10 +52,10 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         tag_informations = [location]
         for i in range(1, 19):
-            if tag_dict.get(self._tag_information[i]) is None:  # TODO: Wrong membership test, use more readable style
-                tag_informations += [None]
+            if not tag_dict.get(self._tag_information[i]):  # TODO: Wrong membership test, use more readable style
+                tag_informations.append(None)
             else:
-                tag_informations += [tag_dict.get(self._tag_information[i])]
+                tag_informations.append(tag_dict.get(self._tag_information[i]))
         try:
             self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             tag_informations)
@@ -65,7 +65,7 @@ class DatabaseSqlite(IDatabaseAdapter):
                         publisher = ?, year = ?, track_number = ?, bpm = ?, key = ?, mood = ?, length = ?, \
                         lyrics = ?, artist_url = ?, publisher_url = ?, file_type = ?, user_comment = ? WHERE \
                         location = ?)",
-                            tag_informations[1:] + tag_informations[0])
+                            tag_informations[1:] + [tag_informations[0]])
 
         if tag_dict.get("genres") is None:
             self.db.execute("INSERT INTO genres VALUES(?, ?)",
@@ -147,7 +147,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET imported = ?, where location = ?",
+        self.db.execute("UPDATE track SET imported = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
         self.db.commit()
 
@@ -159,7 +159,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET init = ?, where location = ?",
+        self.db.execute("UPDATE track SET init = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
         self.db.commit()
 
@@ -171,7 +171,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET available = ?, where location = ?",
+        self.db.execute("UPDATE track SET available = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
         self.db.commit()
 
@@ -230,7 +230,7 @@ class DatabaseSqlite(IDatabaseAdapter):
     def getUnimported(self) -> List[Dict[str, any]]:
         """
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
-                where imported is 0
+                where imported is False
         """
         result = []
         for track in self.db.execute("SELECT * FROM track WHERE imported = ?", [False]):
@@ -249,10 +249,29 @@ class DatabaseSqlite(IDatabaseAdapter):
     def getUnavailable(self) -> List[Dict[str, any]]:
         """
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
-                    where available is 0
+                    where available is False
         """
         result = []
         for track in self.db.execute("SELECT * FROM track WHERE available = ?", [False]):
+            result.append(
+                {"title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]}
+            )
+        return result
+
+    def getUninitialized(self) -> List[Dict[str, any]]:
+        """
+        :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
+                    where init is False
+        """
+        result = []
+        for track in self.db.execute("SELECT * FROM track WHERE init = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -273,8 +292,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: Dictionary with Keys: Title, Artist, Album, Location, imported, available and type
         """
         # FIXME: escape input strings
-        track_tuple = self.db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ?",
-                                      [title, artist, album])
+        track_tuple = self.db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ? \
+                                      AND imported = ? AND available = ? AND init = ?",
+                                      [title, artist, album, True, True, True])
         track = track_tuple.fetchone()
         if track is None:
             return None
@@ -294,7 +314,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: List of Dictionary based on given Artist
         """
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE artist = ?", [artist]):
+        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND imported = ? AND available = ? \
+                                     AND init = ?", [artist, True, True, True]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -317,7 +338,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         # FIXME: escape input strings
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND album = ?", [artist, album]):
+        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND album = ? AND imported = ? AND \
+                                     available = ? AND init = ?", [artist, album, True, True, True]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
