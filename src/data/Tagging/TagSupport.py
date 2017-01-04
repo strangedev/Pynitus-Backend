@@ -74,12 +74,11 @@ TAGLIB_IDENTIFIER_LOOKUP = {
 
 def getTaglibIdentifier(attribute_name: str) -> str:
     """
-    Returns the 4 letter ID3 descriptor for a given internal attribute
+    Returns the Taglib descriptor for a given internal attribute
     name.
-    :raises ID3TagUnsupportedException If the internal attribute has no supported ID3
-    tag equivalent
+    :raises TagUnsupportedException If the internal attribute has no supported Taglib equivalent
     :param attribute_name: The name of the internal attribute
-    :return: The 4 letter ID3 descriptor
+    :return: The Taglib descriptor
     """
     if attribute_name not in TAGLIB_IDENTIFIER_LOOKUP:
         raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(attribute_name))
@@ -87,39 +86,39 @@ def getTaglibIdentifier(attribute_name: str) -> str:
     return TAGLIB_IDENTIFIER_LOOKUP[attribute_name]
 
 
-def getInternalName(id3_identifier: str) -> str:
+def getInternalName(taglib_identifier: str) -> str:
     """
-    Returns the  internal attribute name for a given 4 letter ID3 descriptor
+    Returns the  internal attribute name for a given Taglib descriptor
     name.
-    :raises ID3TagUnsupportedException If the ID3 tag is not supported by this software
-    :param id3_identifier: The 4 letter ID3 descriptor
+    :raises TagUnsupportedException If the tag is not supported by this software
+    :param taglib_identifier: The Taglib descriptor
     :return: The internal attribute name
     """
-    if id3_identifier not in TAGLIB_INTERNAL_NAMES:
-        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(id3_identifier))
+    if taglib_identifier not in TAGLIB_INTERNAL_NAMES:
+        raise TagUnsupportedException("{} is not a supported tag attribute.".format(taglib_identifier))
 
-    return TAGLIB_INTERNAL_NAMES[id3_identifier]
+    return TAGLIB_INTERNAL_NAMES[taglib_identifier]
 
 
-def getDisplayNameByTaglibIdentifier(id3_identifier: str) -> str:
+def getDisplayNameByTaglibIdentifier(taglib_identifier: str) -> str:
     """
-    Returns the display name for a given 4 letter ID3 descriptor
+    Returns the display name for a given Taglib descriptor
     name.
-    :raises ID3TagUnsupportedException If the ID3 tag is not supported by this software
-    :param id3_identifier: The 4 letter ID3 descriptor
+    :raises TagUnsupportedException If the tag is not supported by this software
+    :param taglib_identifier: The Taglib descriptor
     :return: The display name
     """
-    if id3_identifier not in TAGLIB_DISPLAY_NAMES:
-        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(id3_identifier))
+    if taglib_identifier not in TAGLIB_DISPLAY_NAMES:
+        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(taglib_identifier))
 
-    return TAGLIB_DISPLAY_NAMES[id3_identifier]
+    return TAGLIB_DISPLAY_NAMES[taglib_identifier]
 
 
 def getDisplayNameByInternalName(attribute_name: str) -> str:
     """
     Returns the display name for a given internal attribute name
     name.
-    :raises ID3TagUnsupportedException If the ID3 tag is not supported by this software
+    :raises TagUnsupportedException If the tag is not supported by this software
     :param attribute_name: The internal attribute name
     :return: The display name
     """

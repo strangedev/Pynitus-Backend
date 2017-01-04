@@ -31,7 +31,7 @@ class Database(object):
         # Get all local files
         for filepath in MediaScanner.findAudioFiles(self.config.get("musicDirectory")):
             add_track = False
-            tag_info = ID3TagReader.readTag(filepath)
+            tag_info = TagReader.readTag(filepath)
 
             # Check if exists in db
             if not all([x in tag_info for x in ["title", "artist", "album"]]):
