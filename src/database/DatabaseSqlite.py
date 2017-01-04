@@ -230,7 +230,7 @@ class DatabaseSqlite(IDatabaseAdapter):
     def getUnimported(self) -> List[Dict[str, any]]:
         """
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
-                where imported is 0
+                where imported is False
         """
         result = []
         for track in self.db.execute("SELECT * FROM track WHERE imported = ?", [False]):
@@ -249,10 +249,29 @@ class DatabaseSqlite(IDatabaseAdapter):
     def getUnavailable(self) -> List[Dict[str, any]]:
         """
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
-                    where available is 0
+                    where available is False
         """
         result = []
         for track in self.db.execute("SELECT * FROM track WHERE available = ?", [False]):
+            result.append(
+                {"title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]}
+            )
+        return result
+
+    def getUninitialized(self) -> List[Dict[str, any]]:
+        """
+        :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
+                    where init is False
+        """
+        result = []
+        for track in self.db.execute("SELECT * FROM track WHERE init = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
