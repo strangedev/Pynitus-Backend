@@ -27,7 +27,7 @@ class TrackFactory(UniqueFactory):
             album=kwargs["album"]
         )
 
-        for key in set(kwargs) - {"type", "title", "artists", "album"}:
+        for key in set(kwargs) - {"type", "title", "artist", "album"}:
             setattr(track, key, kwargs[key])
 
         track.__metadata_load_hook = self.loadMetadata

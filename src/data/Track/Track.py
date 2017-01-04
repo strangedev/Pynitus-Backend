@@ -2,10 +2,10 @@ from src.data.Track.PlaybackHandler import PlaybackHandler
 
 
 def lazy_metadata(func):
-    def wrapper(self, **kwargs):
+    def wrapper(self, *args, **kwargs):
         if not self.__meta_info_loaded:
             self.__meta_info_load_hook(self)
-        return func(self, **kwargs)
+        return func(self, *args, **kwargs)
     return wrapper
 
 

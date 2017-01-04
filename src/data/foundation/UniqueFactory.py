@@ -22,8 +22,10 @@ class UniqueFactory(object):
 
             cargs.append(kwargs[key])
 
+        cargs = tuple(cargs)
+
         if cargs not in self.__instances:
-            new_instance = self.__constructor(*cargs)
+            new_instance = self.__constructor(**kwargs)
             self.__instances[cargs] = new_instance
 
         return self.__instances[cargs]

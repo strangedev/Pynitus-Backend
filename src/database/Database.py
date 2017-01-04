@@ -39,10 +39,3 @@ class Database(object):
     def getUnimported(self) -> [Track]:
         return NotImplemented
 
-    def getMetainformation(
-            self,
-            title: str,
-            artist: str,
-            album: str) -> Dict[str, str]:
-        return NotImplemented
-
