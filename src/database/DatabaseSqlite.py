@@ -52,10 +52,10 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         tag_informations = [location]
         for i in range(1, 19):
-            if tag_dict.get(self._tag_information[i]) is None:  # TODO: Wrong membership test, use more readable style
-                tag_informations += [None]
+            if not tag_dict.get(self._tag_information[i]):  # TODO: Wrong membership test, use more readable style
+                tag_informations.append(None)
             else:
-                tag_informations += [tag_dict.get(self._tag_information[i])]
+                tag_informations.append(tag_dict.get(self._tag_information[i]))
         try:
             self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             tag_informations)
