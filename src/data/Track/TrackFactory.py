@@ -1,4 +1,4 @@
-from src.data.Tagging import ID3Standard
+from src.data.Tagging import TagSupport
 from src.data.Track.Track import Track
 from src.data.foundation.UniqueFactory import UniqueFactory
 from src.database.IDatabaseAdapter import IDatabaseAdapter
@@ -38,7 +38,7 @@ class TrackFactory(UniqueFactory):
 
         meta_data = self.db.getMetainformation(track.title, track.artist, track.album)
 
-        for key in ID3Standard.ID3_INTERNAL_NAMES.values():
+        for key in TagSupport.TAGLIB_INTERNAL_NAMES.values():
             setattr(track, key, None)
 
         for key in meta_data:

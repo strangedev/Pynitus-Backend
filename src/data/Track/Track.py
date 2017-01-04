@@ -260,7 +260,7 @@ class Track(object):
     def onStopped(self):
         self.delegate.onStopped()
 
-    def checkAvailability(self) -> bool:
+    def available(self) -> bool:
         """
         Checks if the resource is available and the track can be played
         back. This method is called regularly and on startup. It should

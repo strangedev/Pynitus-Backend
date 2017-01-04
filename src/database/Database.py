@@ -1,18 +1,63 @@
 from typing import Any, Dict, List
 
+from src.config.ConfigLoader import ConfigLoader
 from src.data.Track.Track import Track
 from src.data.Track.TrackFactory import TrackFactory
 from src.database.IDatabaseAdapter import IDatabaseAdapter
+from src.utilities import MediaScanner
 
 
 class Database(object):
 
-    def __init__(self, database: IDatabaseAdapter, track_factory: TrackFactory):
-        self.db = database
+    adapter = None
+
+    @classmethod
+    def setDatabaseAdapter(cls, adapter:IDatabaseAdapter.__class__):
+        cls.adapter = adapter
+
+    def __init__(self, config: ConfigLoader, track_factory: TrackFactory):
+        self.config = config
+        self.db = Database.adapter(self.config.get("db_path"))
         self.trackFactory = track_factory
 
+        self.refreshDB()
+
     def refreshDB(self) -> None:
-        return NotImplemented
+        self.db.setAllUninitialized()
+        self.db.setAllUnavailable()
+
+        # TODO: Baustelle
+
+        # Get all local files
+        for filepath in MediaScanner.findAudioFiles(self.config.get("musicDirectory")):
+            add_track = False
+            tag_info = ID3TagReader.readTag(filepath)
+
+            # Check if exists in db
+            if not all([x in tag_info for x in ["title", "artist", "album"]]):
+                add_track = True
+
+            if not self.db.getTrack(tag_info["title"], tag_info["artist"], tag_info["album"]):
+                add_track = True
+
+            if add_track:
+                self.addTrack(
+                    filepath,
+                    tag_info.get("title"),
+                    tag_info.get("artist"),
+                    tag_info.get("album"),
+                    "FileTrack",
+                    **tag_info
+                )
+
+            self.db.setTrackIsAvailable(tag_info["title"], tag_info["artist"], tag_info["album"])
+            self.db.setTrackIsInitialized(tag_info["title"], tag_info["artist"], tag_info["album"])
+
+        # Check remaining uninitialized tracks
+        for track in [self.trackFactory.getTrack(**td) for td in self.db.getUninitialized()]:
+            if track.available():
+                self.db.setTrackIsAvailable(track.title, track.artist, track.album)
+            self.db.setTrackIsInitialized(track.title, track.artist, track.album)
 
     def addTrack(
             self,

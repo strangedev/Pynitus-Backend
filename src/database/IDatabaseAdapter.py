@@ -39,7 +39,7 @@ class IDatabaseAdapter(object):
         Supported meta information according to ID3Standard.ID3_ATTRIBUTES can
         be passed as a dictionary. The corresponding internal names (the names
         used by this software) for ID3 attributes can be found in
-        ID3Standard.ID3_INTERNAL_NAMES. Type hints are provided.
+        ID3Standard.TAGLIB_INTERNAL_NAMES. Type hints are provided.
         The meta information dictionary should use the internal attribute names
         of the attributes to be associated with the track as keys and any
         information of appropriate type that should be stored in the database
@@ -125,7 +125,7 @@ class IDatabaseAdapter(object):
         """
         return NotImplemented
 
-    def getUnimported(self) -> List[Dict[str, str]]:
+    def getUnimported(self) -> List[Dict[str, Any]]:
         """
         Returns all tracks marked as unimported in the database.
 
@@ -138,7 +138,7 @@ class IDatabaseAdapter(object):
         """
         return NotImplemented
 
-    def getUnavailable(self) -> List[Dict[str, str]]:
+    def getUnavailable(self) -> List[Dict[str, Any]]:
         """
         Returns all tracks marked as unavailable in the database.
 
@@ -151,6 +151,18 @@ class IDatabaseAdapter(object):
         """
         return NotImplemented
 
+    def getUninitialized(self) -> List[Dict[str, Any]]:
+        """
+        Returns all tracks marked as uninitialized in the database.
+
+        A track is initialized when it has passed the database refresh.
+        This internal flag is only used by the refresh mechanism to keep
+        track of the yet unvisited tracks.
+
+        :return: A list of dictionaries containing the basic track information.
+        """
+        return NotImplemented
+
     def getMetainformation(
             self,
             title: str,
@@ -158,7 +170,7 @@ class IDatabaseAdapter(object):
             album: str) -> Dict[str, Any]:
         """
         Returns a tracks meta information a specified in ID3Standard.ID3_ATTRIBUTES
-        as a dictionary. The used dictionary keys are from ID3Standard.ID3_INTERNAL_NAMES.
+        as a dictionary. The used dictionary keys are from ID3Standard.TAGLIB_INTERNAL_NAMES.
 
         :param title: The track title
         :param artist: The artist name
@@ -196,6 +208,27 @@ class IDatabaseAdapter(object):
         :param title: The track title
         :param artist: The artist name
         :param album: The album title
+        :return: None
+        """
+        return NotImplemented
+
+    def setAllUninitialized(self) -> None:
+        """
+        sets all Data in Tracks marked as uninitialized
+        :return: None
+        """
+        return NotImplemented
+
+    def setAllUnimported(self) -> None:
+        """
+        sets all Data in Tracks marked as unimported
+        :return: None
+        """
+        return NotImplemented
+
+    def setAllUnavailable(self) -> None:
+        """
+        sets all Data in Tracks marked as unavailable
         :return: None
         """
         return NotImplemented
