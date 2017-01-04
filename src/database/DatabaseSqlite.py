@@ -65,7 +65,7 @@ class DatabaseSqlite(IDatabaseAdapter):
                         publisher = ?, year = ?, track_number = ?, bpm = ?, key = ?, mood = ?, length = ?, \
                         lyrics = ?, artist_url = ?, publisher_url = ?, file_type = ?, user_comment = ? WHERE \
                         location = ?)",
-                            tag_informations[1:] + tag_informations[0])
+                            tag_informations[1:] + [tag_informations[0]])
 
         if tag_dict.get("genres") is None:
             self.db.execute("INSERT INTO genres VALUES(?, ?)",
