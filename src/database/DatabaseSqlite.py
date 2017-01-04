@@ -106,11 +106,11 @@ class DatabaseSqlite(IDatabaseAdapter):
         # FIXME: escape input strings
         try:
             self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                            [title, artist, album, location, True, False, format_type, False])
+                            [title, artist, album, location, False, False, format_type, False])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         except sqlite3.IntegrityError:
             self.db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
-            init = ? where location = ?", [title, artist, album, True, False, format_type, False, location])
+            init = ? where location = ?", [title, artist, album, False, False, format_type, False, location])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         self.db.commit()
         self.__addTag(kwargs, location)
