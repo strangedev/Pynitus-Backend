@@ -204,24 +204,28 @@ class RESTHandler(object):
             args
         )
 
+    @staticmethod
     def hasSession(func):
         def wrapper(self, **kwargs):
             self.__refreshSession()
             return func(self, **kwargs)
         return wrapper
 
+    @staticmethod
     def isReturnable(func):
         def wrapper(self, **kwargs):
             self.__setLastPage(func, kwargs)
             return func(self, **kwargs)
         return wrapper
 
+    @staticmethod
     def returnsToLast(func):
         def wrapper(self, **kwargs):
             func(self, **kwargs)
             return self.__returnToLastPage()
         return wrapper
 
+    @staticmethod
     def floodProtected(func):
         def wrapper(self, **kwargs):
             if not self.floodProtection.actionPermitted(self.__getClientIp()):
