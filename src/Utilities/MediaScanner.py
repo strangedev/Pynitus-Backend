@@ -24,19 +24,15 @@ SUPPORTED_TYPES = {
 }
 
 
-def findAudioFiles(base_directory):
+def iterateAudioFiles(base_directory):
     mimetypes.init()
+    p = base_directory + "**/*.*" if base_directory.endswith("/") else base_directory + "/**/*.*"
 
-    ret = []
-
-    for filepath in glob.iglob(os.path.join(base_directory, "/**/*.*"), recursive=True):
-
+    for filepath in glob.iglob(p, recursive=True):
         guessed_type = mimetypes.guess_type(filepath)
 
-        if not guessed_type:  # TODO: maybe allow other types to be handled elsewhere?
+        if not guessed_type or not guessed_type[0]:  # TODO: maybe allow other types to be handled elsewhere?
             continue
 
         if guessed_type[0].startswith("audio") and os.path.splitext(filepath)[1] in SUPPORTED_TYPES:
-            ret.append(filepath)
-
-    return ret
+            yield filepath
