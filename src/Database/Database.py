@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import List
 
 from src.Config.ConfigLoader import ConfigLoader
 from src.Data.Track.Track import Track
@@ -29,7 +29,7 @@ class Database(object):
         # TODO: Baustelle
 
         # Get all local files
-        for filepath in MediaScanner.findAudioFiles(self.config.get("musicDirectory")):
+        for filepath in MediaScanner.iterateAudioFiles(self.config.get("musicDirectory")):
             add_track = False
             tag_info = TagReader.readTag(filepath)
 
