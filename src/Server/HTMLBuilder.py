@@ -24,12 +24,11 @@ import jinja2
 from jinja2 import Environment
 from jinja2 import Template
 
-from src.Data.MusicLibrary import MusicLibrary
 from src.Data.PlaybackQueue import PlaybackQueue
 from src.Data.Track.TrackFactory import TrackFactory
 from src.Server.FloodProtection import FloodProtection
 from src.Server.VoteHandler import VoteHandler
-
+from src.Database.Database import Database
 
 class HTMLBuilder(object):
 

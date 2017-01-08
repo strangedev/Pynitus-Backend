@@ -35,10 +35,10 @@ class Database(object):
     def setDatabaseAdapter(cls, adapter:IDatabaseAdapter.__class__):
         cls.adapter = adapter
 
-    def __init__(self, config: ConfigLoader, track_factory: TrackFactory):
+    def __init__(self, config: ConfigLoader):
         self.config = config
         self.db = Database.adapter(self.config.get("db_path"))
-        self.trackFactory = track_factory
+        self.trackFactory = TrackFactory(self.db)
 
         self.refreshDB()
 
