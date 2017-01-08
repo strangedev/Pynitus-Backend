@@ -27,15 +27,17 @@ Getting Pynitus up and running is easy. Just follow these steps:
 1. Download Pynitus as .tar.gz or .zip compressed archive
 2. Unpack Pynitus
 3. Install missing python dependencies by using:
-```
-pip install -r requirements.txt
 
-```
+
+    pip install -r requirements.txt
+
+
 4. Edit pynitus.conf to your liking
 5. Run it:
-```
-python3 main.py ./
-```
+
+
+    python3 main.py ./
+
 
 Prerequesites:
 
