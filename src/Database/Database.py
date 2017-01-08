@@ -21,6 +21,7 @@
 from typing import List
 
 from src.Config.ConfigLoader import ConfigLoader
+from src.Data.Tagging import TagReader
 from src.Data.Track.Track import Track
 from src.Data.Track.TrackFactory import TrackFactory
 from src.Database.IDatabaseAdapter import IDatabaseAdapter
