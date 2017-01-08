@@ -80,7 +80,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         except sqlite3.IntegrityError:
             self.db.execute("UPDATE trackTag SET subtitle = ?, album_artist = ?, conductor = ?, remixer = ?, \
                             composer = ?, lyricist = ?, track_number = ?, label = ?, date = ?, bpm = ?, key = ?, \
-                            mood = ?, length = ?, user_comment = ? WHERE location = ?)",
+                            mood = ?, length = ?, user_comment = ? WHERE location = ?",
                             tag_informations[1:] + [tag_informations[0]])
 
         if tag_dict.get("genres") is None:
@@ -136,7 +136,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         sets all Data in Tracks marked as uninitialized
         :return: None
         """
-        self.db.execute("UPDATE track set initialized = 0")
+        self.db.execute("UPDATE track set init = 0")
         self.db.commit()
 
     def setAllUnimported(self) -> None:
