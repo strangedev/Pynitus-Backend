@@ -1,4 +1,49 @@
-# Switch Database to SQLite
+# *TODO*
+
+# -> New UploadHandler architecture
+
+* Should incorporate new TagReader
+* Should incorporate a TagReader for each source (i.e. Youtube via youtube-dl etc.)
+* User may change automatically generated tag info
+
+## Design user story to define structural goals
+
+## Design HTML views
+
+## Integrate into RESTHandler
+
+# -> New PlaybackHandler architecture
+
+* Use vlc or other lib with remote control
+
+# -> Admin view
+
+* Specialized view only for admin user
+* Show unimported/unavailable tracks
+
+## Add admin status to session management
+
+* Via IP? Maybe not secure. Maybe improve session management.
+
+## Hide certain buttons from standard views
+
+* Delete button only visible to admin
+* Start/Stop playback only visible to admin
+
+## Design admin specific HTML view
+
+## Integrate into RESTHandler
+
+# -> RESTHandler rewrite
+
+Use a new dispatch method: Each view has it's own class of static methods defining it's behavior
+
+* keeps RESTHandler clean & small
+* makes integration of new views easier
+
+# *FINALIZE*
+
+# -> Switch Database to SQLite
 
 ## Think of structure for sql db
 
@@ -85,3 +130,5 @@ How dirty tracks (not imported yet) are handled:
 - If sanity check fails, set resourceUnavailable to true
 - Unavailable tracks are not shown to the user
 - Unavailable tracks are shown to the admin, admin has the option to fix the track or delete the track entry
+
+# *DONE*

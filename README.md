@@ -43,3 +43,33 @@ Prerequesites:
 - PIP (the python package manager)
 - mplayer
 - mpv
+
+## Contributing
+
+Contributions to Pynitus are welcome. However, it is still in alpha and there's not much of a codebase to build upon.
+If you'd still like to help out, see TODO.md in our Github repository for notes on planned features, fixes etc.
+Feel free to contact [strangedev](https://github.com/strangedev) if you've got any questions concerning contributing.
+
+If you are contributing to this project, make sure to include the license boilerplate in all files created by you:
+
+    
+    Pynitus - A free and democratic music playlist
+    Copyright (C) 2017  <Author(s)>
+
+    This file is part of the Pynitus program, see <https://github.com/strangedev/Pynitus>.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Also make sure to credit all authors who contributed meaningful contributions to files created by you, by mentioning
+them as authors.
