@@ -31,13 +31,11 @@ Getting Pynitus up and running is easy. Just follow these steps:
 
     pip install -r requirements.txt
 
-
 4. Edit pynitus.conf to your liking
 5. Run it:
 
 
     python3 main.py ./
-
 
 Prerequesites:
 
