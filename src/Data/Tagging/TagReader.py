@@ -19,19 +19,20 @@
 """
 
 import taglib
-from typing import Dict
-from src.Data.Tagging.TagSupport import TAGLIB_INTERNAL_NAMES
+from typing import Dict, List
+
+from src.Data.Tagging import TagSupport
 
 
-def writeTag(file_path: str, **kwargs) -> None:
+def writeTag(file_path: str, tags: Dict[str, List[str]]) -> None:
     """
     Writes given Information to Tag assuming that it is defined in TagSupport
     :param file_path: Path of Media File to writes Tags
-    :param kwargs: tag Keys and Values (Values have to been Lists!)
+    :param tags: tag Keys and Values
     :return: None
     """
     audio_file = taglib.File(file_path)
-    audio_file.tags.update(kwargs)
+    audio_file.tags.update(tags)
     audio_file.save()
     audio_file.close()
 
@@ -43,4 +44,9 @@ def readTag(file_path: str) -> Dict[str, any]:
     :return: Dict with filled Tag Information given by Track and selected by TAGLIB_INTERNAL_NAMES
     """
     audio_file = taglib.File(file_path)
-    return {key: value for key, value in audio_file.tags.items() if key in TAGLIB_INTERNAL_NAMES.keys()}
+
+    tags = dict(audio_file.tags)
+    tags["LENGTH"] = audio_file.length  # Fix to make taglib behave consistently with TagSupport
+    writeTag(file_path, tags)
+
+    return {TagSupport.getInternalName(k): audio_file.tags.get(k) for k in TagSupport.TAGLIB_INTERNAL_NAMES.keys()}

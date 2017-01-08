@@ -33,7 +33,7 @@ class Database(object):
     adapter = None
 
     @classmethod
-    def setDatabaseAdapter(cls, adapter:IDatabaseAdapter.__class__):
+    def setDatabaseAdapter(cls, adapter: IDatabaseAdapter.__class__):
         cls.adapter = adapter
 
     def __init__(self, config: ConfigLoader):
