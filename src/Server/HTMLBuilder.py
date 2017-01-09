@@ -30,6 +30,7 @@ from src.Server.FloodProtection import FloodProtection
 from src.Server.VoteHandler import VoteHandler
 from src.Database.Database import Database
 
+
 class HTMLBuilder(object):
 
     def __init__(
@@ -38,8 +39,7 @@ class HTMLBuilder(object):
         flood_protection: FloodProtection,
         vote_handler: VoteHandler,
         playback_queue: PlaybackQueue,
-        music_library: MusicLibrary,
-        track_factory: TrackFactory
+        database: Database
     ):
 
         self.template_path = template_path  # type: str
@@ -50,8 +50,7 @@ class HTMLBuilder(object):
         self.flood_protection = flood_protection  # type: FloodProtection
         self.vote_handler = vote_handler  # type: VoteHandler
         self.playback_queue = playback_queue  # type: PlaybackQueue
-        self.music_library = music_library  # type: MusicLibrary
-        self.track_factory = track_factory  # type: TrackFactory
+        self.db = database  # type: Database
 
     def __render_common(self, template: Template, ip_address: int, **kwargs) -> str:
         return template.render(
@@ -72,7 +71,7 @@ class HTMLBuilder(object):
             template,
             ip_address,
             artistNames=sorted(
-                [artist for artist in self.music_library.getArtists()]
+                [artist for artist in self.db.getArtists()]
             )
         )
 
@@ -84,8 +83,8 @@ class HTMLBuilder(object):
             template,
             ip_address,
             albumAndArtistNames=sorted(
-                [(album, artist) for artist in self.music_library.getArtists()
-                 for album in self.music_library.getAlbumsForArtist(artist)]
+                [(album, artist) for artist in self.db.getArtists()
+                 for album in self.db.getAlbumsByArtist(artist)]
             )
         )
 
@@ -97,8 +96,8 @@ class HTMLBuilder(object):
             template,
             ip_address,
             trackAndAlbumAndArtistNames=sorted(
-                [(track.title, track.album_title, track.artist_name)
-                 for track in self.music_library.getTracks()]
+                [(track.title, track.album, track.artist)
+                 for track in self.db.getTracks()]
             )
         )
 
@@ -110,7 +109,7 @@ class HTMLBuilder(object):
             template,
             ip_address,
             trackAndAlbumAndArtistNames=[
-                (track.title, track.albumTitle, track.artistName)
+                (track.title, track.album, track.artist)
                 for track in self.playback_queue.getQueued()]
         )
 
@@ -123,11 +122,11 @@ class HTMLBuilder(object):
             ip_address,
             albumTitles=sorted(
                 [album for album
-                 in self.music_library.getAlbumsForArtist(artist)]
+                 in self.db.getAlbumsByArtist(artist)]
                 ),
             trackAndAlbumTitles=sorted(
-                [(track.title, track.album_title) for track
-                 in self.music_library.getTracksForArtist(artist)]
+                [(track.title, track.album) for track
+                 in self.db.getTracksByArtist(artist)]
                 ),
             artistName=artist
         )
@@ -143,8 +142,7 @@ class HTMLBuilder(object):
             artistName=artist,
             trackTitles=sorted(
                 [track.title for track
-                    in self.music_library.getTracksForAlbumOfArtist(
-                        artist, album)]
+                    in self.db.getTracksByAlbum(artist, album)]
             )
         )
 
@@ -159,9 +157,9 @@ class HTMLBuilder(object):
             template,
             ip_address,
             trackTypesAndDescs=sorted(
-                [(track_type, self.track_factory.availableTrackTypes[
+                [(track_type, TrackFactory.track_types[
                     track_type].description) for track_type
-                    in self.track_factory.availableTrackTypes]
+                    in TrackFactory.track_types]
             )
         )
 
