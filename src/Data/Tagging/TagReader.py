@@ -26,6 +26,7 @@ from src.Data.Tagging import TagSupport
 Strings = TypeVar("Strings", str, List[str], None)
 
 
+# TODO: make tag cleaning a separate module so it can be used by any MetadataReader implementation
 def __cleanAttribute(tag_name: str, tag_value: Any) -> TagSupport.TagValue:  # TODO: refactor for readability
     """
     Performs strong type checking on a previously read attribute and tries to convert it's type
