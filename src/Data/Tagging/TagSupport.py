@@ -229,13 +229,10 @@ def isListType(attribute_name: str) -> bool:
     :return: True if tag attribute should be represented as a list type
     """
 
-    if attribute_name in TAGLIB_IDENTIFIER_TYPES:
-        return TAGLIB_IDENTIFIER_TYPES[attribute_name] in USED_LIST_TYPES
+    if not isSupported(attribute_name):
+        return False
 
-    if attribute_name in TAGLIB_INTERNAL_NAMES_TYPES:
-        return TAGLIB_INTERNAL_NAMES_TYPES[attribute_name] in USED_LIST_TYPES
-
-    return False
+    return ALL_TYPES[attribute_name] in USED_LIST_TYPES
 
 
 def getType(attribute_name: str) -> TagType:

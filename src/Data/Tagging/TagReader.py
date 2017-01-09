@@ -1,6 +1,6 @@
 """
     Pynitus - A free and democratic music playlist
-    Copyright (C) 2017  Vivian Franz
+    Copyright (C) 2017  Vivian Franz, Noah Hummel
 
     This file is part of the Pynitus program, see <https://github.com/strangedev/Pynitus>.
 
