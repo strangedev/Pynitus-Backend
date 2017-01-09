@@ -38,7 +38,7 @@ __SANITIZATION_METHODS__ = {
 
 def __getSanitizationMethod(tag_type: type) -> Callable[[str, One], Maybe(One)]:
     if tag_type not in __SANITIZATION_METHODS__:
-        return lambda t: t
+        return lambda t, v: v
 
     return __SANITIZATION_METHODS__[tag_type]
 
@@ -48,7 +48,8 @@ def __naiveTypeCast(tag_name: str, tag_value: Any) -> TagSupport.TagValue:
 
     try:
         tag_value = primitive_type(tag_value)
-    except Exception:
+    except Exception as e:
+        print(e)  # TODO: log
         tag_value = None
 
     return tag_value
@@ -125,6 +126,7 @@ def sanitizeTags(tags: Dict[str, Any]) -> Dict[str, TagSupport.TagValue]:
     :return: The sanitized and type checked tag value dict
     """
 
-    tags = {k: v for k, v in tags.items() if TagSupport.isSupported(k)}
+    tags = {__sanitizeTagName(k): v for k, v in tags.items() if TagSupport.isSupported(k)}
+    tags = {k: tags.get(k) for k in TagSupport.INTERNAL_NAMES}
 
-    return {__sanitizeTagName(k): __sanitizeTagValue(k, __convertTagType(k, v)) for k, v in tags.items()}
+    return {k: __sanitizeTagValue(k, __convertTagType(k, v)) for k, v in tags.items()}

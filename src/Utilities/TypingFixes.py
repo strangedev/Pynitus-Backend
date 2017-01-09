@@ -43,7 +43,7 @@ def Either(*ts):
     :param ts: Any number of types
     :return: A type that can be any of the given types
     """
-    name = "".join((t.__name__ for t in ts))
+    name = "".join((str(t) for t in ts))
     return typing.TypeVar(name, *ts)
 
 

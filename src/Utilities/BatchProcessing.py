@@ -33,7 +33,7 @@ def apply(method: Callable[[One], Maybe(Another)], one_or_many: Either(One, List
     """
 
     if type(one_or_many) is list:
-        return map(method, one_or_many)
+        return list(map(method, one_or_many))
     else:
         return method(one_or_many)
 
