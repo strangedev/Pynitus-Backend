@@ -35,3 +35,26 @@ def c(self):
     return self.__args__
 
 typing.GenericMeta.containedTypes = c
+
+
+def Either(*ts):
+    """
+    A type that can be any of the given types.
+    :param ts: Any number of types
+    :return: A type that can be any of the given types
+    """
+    name = "".join((t.__name__ for t in ts))
+    return typing.TypeVar(name, *ts)
+
+
+def Maybe(t: type):
+    """
+    A type that can either be t or None.
+    :param t: A type
+    :return: A type that can either be t or None
+    """
+    return Either(t, None)
+
+One = typing.TypeVar("One")
+
+Another = typing.TypeVar("Another")
