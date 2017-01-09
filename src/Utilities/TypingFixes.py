@@ -31,7 +31,7 @@ import typing
 #   True
 
 
-def c(self) -> typing.Tuple[typing.TypeVar]:
+def c(self):
     return self.__args__
 
 typing.GenericMeta.containedTypes = c

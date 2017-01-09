@@ -26,7 +26,7 @@ class TagUnsupportedException(Exception):
     def __init__(self, message):
         self.message = message
 
-TagType = TypeVar(GenericMeta, TypeVar)
+TagType = TypeVar("TagType", GenericMeta, type)
 
 TAGLIB_DISPLAY_NAMES = {
     "ARTIST": "Artist",  # type: str
@@ -138,6 +138,15 @@ TAGLIB_INTERNAL_NAMES_TYPES = {
     "comment": str,  # type: TagType
 }
 
+EMPTY_SYNONYMS = {  # TODO: expand
+    "",
+    "N/A",
+    "None",
+    "Unbekannt",
+    "Unknown",
+    "-"
+}
+
 ALL_TYPES = {**TAGLIB_IDENTIFIER_TYPES, **TAGLIB_INTERNAL_NAMES_TYPES}
 
 USED_PRIMITIVE_TYPES = {str}  # type: Set[TagType]
@@ -154,7 +163,7 @@ DISPLAY_NAMES = set(TAGLIB_DISPLAY_NAMES.values())
 
 ALL_SUPPORTED_IDENTIFIERS = INTERNAL_NAMES.union(TAGLIB_IDENTIFIERS)
 
-TagValue = TypeVar(*ALL_TYPEVARS)
+TagValue = TypeVar("TagValue", *ALL_TYPEVARS)
 
 
 def getTaglibIdentifier(attribute_name: str) -> str:
@@ -166,7 +175,7 @@ def getTaglibIdentifier(attribute_name: str) -> str:
     :return: The Taglib descriptor
     """
     if attribute_name not in TAGLIB_IDENTIFIER_LOOKUP:
-        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(attribute_name))
+        raise TagUnsupportedException("{} is not a supported tag attribute.".format(attribute_name))
 
     return TAGLIB_IDENTIFIER_LOOKUP[attribute_name]
 
@@ -194,7 +203,7 @@ def getDisplayNameByTaglibIdentifier(taglib_identifier: str) -> str:
     :return: The display name
     """
     if taglib_identifier not in TAGLIB_DISPLAY_NAMES:
-        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(taglib_identifier))
+        raise TagUnsupportedException("{} is not a supported tag attribute.".format(taglib_identifier))
 
     return TAGLIB_DISPLAY_NAMES[taglib_identifier]
 
@@ -208,7 +217,7 @@ def getDisplayNameByInternalName(attribute_name: str) -> str:
     :return: The display name
     """
     if attribute_name not in TAGLIB_INTERNAL_NAMES:
-        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(attribute_name))
+        raise TagUnsupportedException("{} is not a supported tag attribute.".format(attribute_name))
 
     return TAGLIB_DISPLAY_NAMES[TAGLIB_IDENTIFIER_LOOKUP[attribute_name]]
 
@@ -243,7 +252,7 @@ def getType(attribute_name: str) -> TagType:
     :return: The type of the attribute
     """
     if not isSupported(attribute_name):
-        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(attribute_name))
+        raise TagUnsupportedException("{} is not a supported tag attribute.".format(attribute_name))
 
     return ALL_TYPES[attribute_name]
 
@@ -257,7 +266,7 @@ def getPrimitiveType(attribute_name: str) -> TagType:
     :return: The primitive type of the tag attribute
     """
     if not isSupported(attribute_name):
-        raise TagUnsupportedException("{} is not a supported ID3 tag attribute.".format(attribute_name))
+        raise TagUnsupportedException("{} is not a supported tag attribute.".format(attribute_name))
 
     attribute_type = getType(attribute_name)
 

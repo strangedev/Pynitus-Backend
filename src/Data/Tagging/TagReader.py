@@ -19,12 +19,14 @@
 """
 
 import taglib
-from typing import Dict, List, Any
+from typing import Dict, List, Any, TypeVar
 
 from src.Data.Tagging import TagSupport
 
+Strings = TypeVar("Strings", str, List[str], None)
 
-def __cleanAttribute(tag_name: str, tag_value: Any) -> TagSupport.TagValue:
+
+def __cleanAttribute(tag_name: str, tag_value: Any) -> TagSupport.TagValue:  # TODO: refactor for readability
     """
     Performs strong type checking on a previously read attribute and tries to convert it's type
     into the desired type according to TagSupport.
@@ -35,55 +37,60 @@ def __cleanAttribute(tag_name: str, tag_value: Any) -> TagSupport.TagValue:
     :param tag_value: The attribute's value
     :return: The safe-to-use tag_value of the right type
     """
+
+    def __cleanStrings(strings_or_string):
+        """
+        TODO
+        :param strings_or_string:
+        :return:
+        """
+
+        def __cleanString(string):
+            if string in TagSupport.EMPTY_SYNONYMS:
+                return None
+            return string
+
+        if type(strings_or_string) == str:
+            return __cleanString(strings_or_string)
+        else:
+            return [__cleanString(s) for s in strings_or_string]
+
     tag_primitive_type = TagSupport.getPrimitiveType(tag_name)
 
     if TagSupport.isListType(tag_name):  # Should this attribute be represented as a list?
 
         if type(tag_value) is list:  # Is it actually a list?
-
-            if all(type(value) is tag_primitive_type for value in tag_value):  # are all entries of the right type?
-                return tag_value
-
-            else:  # Some entries have the wrong type
+            if not all(type(value) is tag_primitive_type for value in tag_value):  # Some entries have the wrong type
                 try:
-                    tag_value = [tag_primitive_type(e) for e in tag_value] # Try to fix those entries naively
+                    tag_value = [tag_primitive_type(e) for e in tag_value]  # Try to fix those entries naively
                 except Exception:  # The entries couldn't be fixed
                     tag_value = []  # Throw the corrupted data away.
-                finally:
-                    return tag_value  # Return the data, fixed or emptied
 
         elif tag_value is not None:  # The tag wasn't a list, but maybe it's still of the right type...
-            if type(tag_value) is tag_primitive_type:
-                return [tag_value]
-
-            else:  # Even the type is wrong, try to cast the type naively, maybe there's something to save...
+            if type(tag_value) is not tag_primitive_type:  # The type is wrong, try to cast the type naively...
                 try:
                     tag_value = [tag_primitive_type(tag_value)]
                 except Exception:
                     tag_value = []
-                finally:
-                    return tag_value
-
         else:  # tag_value is None, but list-types should be [] if no data is given
-            return []
+            tag_value = []
 
     else:  # attribute shouldn't be a list.
-
         if type(tag_value) is list:  # if it's a list though (taglib does this...)...
             if len(tag_value) > 0:  # ... then maybe the first element is usable.
                 tag_value = tag_value[0]
 
         # check the type
-        if type(tag_value) is tag_primitive_type:
-            return tag_value
-
-        else:  # The type is wrong, try to cast the type naively, maybe there's something to save...
+        if not type(tag_value) is tag_primitive_type: # The type is wrong, try to cast the type naively...
             try:
                 tag_value = tag_primitive_type(tag_value)
             except Exception:
                 tag_value = None
-            finally:
-                return tag_value
+
+    if tag_primitive_type is str:
+        tag_value = __cleanStrings(tag_value)
+
+    return tag_value
 
 
 def writeTag(file_path: str, tags: Dict[str, List[str]]) -> None:
@@ -108,13 +115,13 @@ def readTag(file_path: str) -> Dict[str, any]:
     audio_file = taglib.File(file_path)
 
     tags = dict(audio_file.tags)
-    tags["LENGTH"] = [audio_file.length]  # Fix to make taglib behave consistently with TagSupport
-    writeTag(file_path, tags)
+    tags["LENGTH"] = [str(audio_file.length)]  # Fix to make taglib behave consistently with TagSupport
+    # writeTag(file_path, tags)
 
     clean_tags = dict({})
 
     for tag_name in TagSupport.TAGLIB_IDENTIFIERS:  # Fill all supported attribute fields
         # Strong type checking to avoid data corruption, this stuff will end up in the db!
-        clean_tags[TagSupport.getInternalName(tag_name)] = __cleanAttribute(tag_name, audio_file.tags.get(tag_name))
+        clean_tags[TagSupport.getInternalName(tag_name)] = __cleanAttribute(tag_name, tags.get(tag_name))
 
     return clean_tags
