@@ -20,6 +20,8 @@
 
 from typing import Dict, List, Any
 
+from src.Data.Tagging.TagSupport import TagValue
+
 
 class IDatabaseAdapter(object):
     """
@@ -36,11 +38,8 @@ class IDatabaseAdapter(object):
     def addTrack(
             self,
             location: str,
-            title: str=None,
-            artist: str=None,
-            album: str=None,
-            track_type: str=None,
-            **kwargs: Dict[str, Any]
+            track_type: str,
+            tag_info: Dict[str, TagValue]
     ) -> None:
         """
         Adds a new track to the Database.
@@ -65,12 +64,9 @@ class IDatabaseAdapter(object):
         information of appropriate type that should be stored in the Database
         as values.
 
-        :param title: The title of the track
-        :param artist: The main artist of the track (Add. artist are placed in meta info)
-        :param album: The title of the album containing this track (Same as title, if single release)
         :param track_type: The class name of the corresponding track class (e.g. FileTrack)
         :param location: A file path or url pointing to the media resource
-        :param kwargs: A dictionary containing meta information as described above (optional)
+        :param tag_info: A dictionary containing meta information as described above (optional)
         :return: None
         """
         return NotImplemented

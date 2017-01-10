@@ -18,10 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import List
+from typing import List, Dict
 
 from src.Config.ConfigLoader import ConfigLoader
 from src.Data.Tagging import TagReader
+from src.Data.Tagging.TagSupport import TagValue
 from src.Data.Track.Track import Track
 from src.Data.Track.TrackFactory import TrackFactory
 from src.Database.IDatabaseAdapter import IDatabaseAdapter
@@ -38,7 +39,7 @@ class Database(object):
 
     def __init__(self, config: ConfigLoader):
         self.config = config
-        self.db = Database.adapter(self.config.get("db_path"))
+        self.db = Database.adapter(self.config.get("db_path"))  # type: IDatabaseAdapter
         self.trackFactory = TrackFactory(self.db)
 
         self.refreshDB()
@@ -61,11 +62,8 @@ class Database(object):
             if add_track:
                 self.addTrack(
                     file_path,
-                    tag_info["title"],
-                    tag_info["artist"],
-                    tag_info["album"],
                     "FileTrack",
-                    **tag_info
+                    tag_info
                 )
 
             self.db.setTrackIsAvailable(tag_info["title"], tag_info["artist"], tag_info["album"])
@@ -80,13 +78,10 @@ class Database(object):
     def addTrack(
             self,
             location: str,
-            title: str=None,
-            artist: str=None,
-            album: str=None,
-            track_type: str=None,
-            **kwargs
+            track_type: str,
+            tag_info: Dict[str, TagValue]
     ) -> None:
-        self.db.addTrack(location, title, artist, album, track_type, **kwargs)
+        self.db.addTrack(location, track_type, tag_info)
 
     def getTracks(self) -> List[Track]:
         track_dicts = self.db.getTracks()
