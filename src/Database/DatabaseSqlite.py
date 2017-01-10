@@ -68,6 +68,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param location: Track Location
         :return: None
         """
+        if not tag_dict:
+            return None
         tag_informations = [location]
         for i in range(1, 19):
             if not tag_dict.get(self._tag_information[i]):  # TODO: Wrong membership test, use more readable style
