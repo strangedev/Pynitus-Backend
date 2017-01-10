@@ -23,6 +23,7 @@ import sqlite3
 
 from src.Data.Tagging.TagSupport import TagValue
 from src.Database.IDatabaseAdapter import IDatabaseAdapter
+from src.Utilities.TypingFixes import Maybe
 
 
 class DatabaseSqlite(IDatabaseAdapter):
@@ -71,7 +72,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         if not track_tag:
             return None
-        tag_informations = [location]
+        tag_informations = [location]  # type: List[Maybe(str)]
         for i in range(1, 19):
             if not track_tag.get(self._tag_information[i]):  # TODO: Wrong membership test, use more readable style
                 tag_informations.append(None)
