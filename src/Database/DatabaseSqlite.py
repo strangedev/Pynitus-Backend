@@ -21,6 +21,7 @@
 from typing import List, Dict
 import sqlite3
 
+from src.Data.Tagging.TagSupport import TagValue
 from src.Database.IDatabaseAdapter import IDatabaseAdapter
 
 
@@ -62,20 +63,20 @@ class DatabaseSqlite(IDatabaseAdapter):
         return self.db.execute("SELECT location FROM track where title = ? AND artist = ? AND album = ?",
                                [title, artist, album]).fetchone()[0]
 
-    def __addTag(self, tag_dict: dict, location: str) -> None:
+    def __addTag(self, track_tag: Dict[str, TagValue], location: str) -> None:
         """
-        :param tag_dict: Additional Track Metainformation
+        :param track_tag: Additional Track Metainformation
         :param location: Track Location
         :return: None
         """
-        if not tag_dict:
+        if not track_tag:
             return None
         tag_informations = [location]
         for i in range(1, 19):
-            if not tag_dict.get(self._tag_information[i]):  # TODO: Wrong membership test, use more readable style
+            if not track_tag.get(self._tag_information[i]):  # TODO: Wrong membership test, use more readable style
                 tag_informations.append(None)
             else:
-                tag_informations.append(tag_dict.get(self._tag_information[i]))
+                tag_informations.append(track_tag.get(self._tag_information[i]))
         try:
             self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             tag_informations)
@@ -85,20 +86,20 @@ class DatabaseSqlite(IDatabaseAdapter):
                             mood = ?, length = ?, user_comment = ? WHERE location = ?",
                             tag_informations[1:] + [tag_informations[0]])
 
-        if tag_dict.get("genres") is None:
+        if track_tag.get("genres") is None:
             self.db.execute("INSERT INTO genres VALUES(?, ?)",
                             [location, None])
         else:
-            for gen in tag_dict["genres"]:
+            for gen in track_tag["genres"]:
                 try:
                     self.db.execute("INSERT INTO genres VALUES(?, ?)", [location, gen])
                 except sqlite3.IntegrityError:
                     pass  # Here is nothing to do, cause in this case row already exist
 
-        if tag_dict.get("involved") is None:
+        if track_tag.get("involved") is None:
             self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, None])
         else:
-            for inv in tag_dict["involved"]:
+            for inv in track_tag["involved"]:
                 try:
                     self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, inv])
                 except sqlite3.IntegrityError:
@@ -107,31 +108,27 @@ class DatabaseSqlite(IDatabaseAdapter):
         self.db.commit()
 
     def addTrack(self, location: str,
-                 title: str=None,
-                 artist: str=None,
-                 album: str=None,
-                 format_type: str=None,
-                 **kwargs) -> None:
+                 track_type: str,
+                 track_tag: Dict[str, TagValue]) -> None:
         """
-        :param title: Track Title
-        :param artist: Track Artist
-        :param album: Track Album
-        :param format_type: Track Type
-        :param location: Track Location
-        :param kwargs: Additional Track Metainformation
+        :param location: Location of Track
+        :param track_type: TrackType if its a Local File or for example a Youtube File
+        :param track_tag: Track Metainformation
         :return: None
         """
         # FIXME: escape input strings
         try:
             self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                            [title, artist, album, location, False, False, format_type, False])
+                            [track_tag["title"], track_tag["artist"], track_tag["album"],
+                             location, False, False, track_type, False])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         except sqlite3.IntegrityError:
             self.db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
-            init = ? where location = ?", [title, artist, album, False, False, format_type, False, location])
+            init = ? where location = ?", [track_tag["title"], track_tag["artist"], track_tag["album"],
+                                           location, False, False, track_type, False, location])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         self.db.commit()
-        self.__addTag(kwargs, location)
+        self.__addTag(track_tag, location)
 
     def setAllUninitialized(self) -> None:
         """
