@@ -1,6 +1,6 @@
 """
     Pynitus - A free and democratic music playlist
-    Copyright (C) 2017  Vivian Franz
+    Copyright (C) 2017  Vivian Franz, Noah Hummel
 
     This file is part of the Pynitus program, see <https://github.com/strangedev/Pynitus>.
 
@@ -19,9 +19,11 @@
 """
 
 import taglib
-from typing import Dict, List
+from typing import Dict, List, TypeVar
 
-from src.Data.Tagging import TagSupport
+from src.Data.Tagging import TagSanitizer
+
+Strings = TypeVar("Strings", str, List[str], None)
 
 
 def writeTag(file_path: str, tags: Dict[str, List[str]]) -> None:
@@ -33,7 +35,7 @@ def writeTag(file_path: str, tags: Dict[str, List[str]]) -> None:
     """
     audio_file = taglib.File(file_path)
     audio_file.tags.update(tags)
-    audio_file.save()
+    audio_file.save()  # FIXME: Not working!
     audio_file.close()
 
 
@@ -46,7 +48,7 @@ def readTag(file_path: str) -> Dict[str, any]:
     audio_file = taglib.File(file_path)
 
     tags = dict(audio_file.tags)
-    tags["LENGTH"] = audio_file.length  # Fix to make taglib behave consistently with TagSupport
-    writeTag(file_path, tags)
+    tags["LENGTH"] = [str(audio_file.length)]  # Fix to make taglib behave consistently with TagSupport
+    # writeTag(file_path, tags)
 
-    return {TagSupport.getInternalName(k): audio_file.tags.get(k) for k in TagSupport.TAGLIB_INTERNAL_NAMES.keys()}
+    return TagSanitizer.sanitizeTags(tags)

@@ -18,41 +18,43 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import glob
-import os
-import mimetypes
+import typing
 
-SUPPORTED_EXTENSIONS = {
-    ".mp3",
-    ".ogg",
-    ".spx",
-    ".mpc",
-    ".ape",
-    ".flac",
-    ".wv",
-    ".tta",
-    ".wma",
-    ".m4a",
-    ".m4b",
-    ".m4p",
-    ".mp4",
-    ".3g2",
-    ".wav",
-    ".aif",
-    ".aiff",
-    ".opus",
-}
+# This allows someone to get the "str" part from List[str]
+# For example:
+#   >>> d = Dict[str, int]
+#   >>> d.containedTypes()
+#   (<class 'str'>, <class 'int'>)
+#
+# You can then test for things like:
+#   >>> d.containedTypes()[0] is str
+#   True
 
 
-def iterateAudioFiles(base_directory):
-    mimetypes.init()
-    p = base_directory + "**/*.*" if base_directory.endswith("/") else base_directory + "/**/*.*"
+def c(self):
+    return self.__args__
 
-    for filepath in glob.iglob(p, recursive=True):
-        guessed_type = mimetypes.guess_type(filepath)
+typing.GenericMeta.containedTypes = c
 
-        if not guessed_type or not guessed_type[0]:  # TODO: maybe allow other types to be handled elsewhere?
-            continue
 
-        if guessed_type[0].startswith("audio") and os.path.splitext(filepath)[1] in SUPPORTED_EXTENSIONS:
-            yield filepath
+def Either(*ts):
+    """
+    A type that can be any of the given types.
+    :param ts: Any number of types
+    :return: A type that can be any of the given types
+    """
+    name = "".join((str(t) for t in ts))
+    return typing.TypeVar(name, *ts)
+
+
+def Maybe(t: type):
+    """
+    A type that can either be t or None.
+    :param t: A type
+    :return: A type that can either be t or None
+    """
+    return Either(t, None)
+
+One = typing.TypeVar("One")
+
+Another = typing.TypeVar("Another")

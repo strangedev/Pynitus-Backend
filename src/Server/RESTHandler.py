@@ -22,6 +22,9 @@ import os
 from typing import NewType
 
 import cherrypy
+
+from src.Data.Track.TrackFactory import TrackFactory
+from src.Database.Database import Database
 from src.Server import SessionHandler, FloodProtection, HTMLBuilder, VoteHandler
 
 RESTHandlerType = NewType('RESTHandler', object)
@@ -33,11 +36,10 @@ def htmlRelPath(config, path):
 
 class RESTHandler(object):
 
-    def __init__(self, config, playback_queue, music_library, track_factory):
+    def __init__(self, config, playback_queue, database: Database):
         self.config = config
         self.playback_queue = playback_queue
-        self.music_library = music_library
-        self.track_factory = track_factory
+        self.db = database
         self.session_handler = SessionHandler.SessionHandler(self.config)
         self.vote_handler = VoteHandler.VoteHandler(
             self.config,
@@ -54,8 +56,7 @@ class RESTHandler(object):
             self.flood_protection,
             self.vote_handler,
             self.playback_queue,
-            self.music_library,
-            self.track_factory
+            self.db
             )
 
         self.__configure()
@@ -306,10 +307,8 @@ class RESTHandler(object):
 
     @cherrypy.expose
     @hasSession
-    def addByType(self, trackType=None):
-        uploadHandler = self.music_library\
-                            .trackFactory\
-                            .availableTrackTypes[trackType]\
+    def addByType(self, trackType=None):  # TODO: rewrite UploadHandler
+        uploadHandler = TrackFactory.track_types[trackType]\
                             .uploadHandler(self.config.get("musicDirectory"))
 
         self.__setForCurrentSession(
@@ -326,9 +325,9 @@ class RESTHandler(object):
     @hasSession
     def upload(self, **args):
         trackToAdd = self.__getForCurrentSession('uploadHandler')\
-            .trackFromUploadedAttributes(args)
-        self.music_library.addTrack(trackToAdd)
-        return self.artist(trackToAdd.artistName)
+            .trackFromUploadedAttributes(args)  # TODO: rewrite UploadHandler
+        self.db.addTrack(...)
+        return self.artist(self.db.getTrack(...).artist)
 
     @cherrypy.expose
     @hasSession
@@ -353,16 +352,15 @@ class RESTHandler(object):
     @floodProtected
     @returnsToLast
     def addToQueue(self, artist=None, album=None, track: str=None):
-        theTrack = self.music_library.entries[artist][album][track]
-        self.playback_queue.addToQueue(theTrack)
+        the_track = self.db.getTrack(artist, album, track)
+        self.playback_queue.addToQueue(the_track)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def addAlbumToQueue(self, artist=None, album=None):
-        for trackName in self.music_library\
-                .entries[artist][album].keys():
-            self.addToQueue(artist=artist, album=album, track=trackName)
+        for track in self.db.getTracksByAlbum(artist, album):
+            self.playback_queue.addToQueue(track)
 
     @cherrypy.expose
     @hasSession
@@ -373,27 +371,26 @@ class RESTHandler(object):
     @cherrypy.expose
     @returnsToLast
     def removeFromQueue(self, artist=None, album=None, track: str=None):
-        track = self.music_library.entries[artist][album][track]
+        track = self.db.getTrack(artist, album, track)
         self.playback_queue.removeFromQueueByTrack(track)
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def deleteTrack(self, track=None, artist=None, album=None):
-        theTrack = self.music_library.artists[
-            artist].albums[album].tracks[track]
-        self.music_library.deleteTrack(theTrack)
+        theTrack = self.db.getTrack(artist, album, track)
+        self.db.deleteTrack(theTrack)  # TODO: implement
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def deleteAlbum(self, artist=None, album=None):
-        theAlbum = self.music_library.artists[artist].albums[album]
-        self.music_library.deleteAlbum(theAlbum)
+        for track in self.db.getTracksByAlbum(artist, album):
+            self.db.deleteTrack(track)  # TODO: implement
 
     @cherrypy.expose
     @hasSession
     @returnsToLast
     def deleteArtist(self, artist=None,):
-        theArtist = self.music_library.artists[artist]
-        self.music_library.deleteArtist(theArtist)
+        for track in self.db.getTracksByArtist(artist):
+            self.db.deleteTrack(track)  # TODO: implement
