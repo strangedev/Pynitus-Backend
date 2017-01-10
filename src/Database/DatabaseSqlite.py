@@ -21,9 +21,8 @@
 from typing import List, Dict
 import sqlite3
 
-from src.Data.Tagging.TagSupport import TagValue
+from src.Data.Tagging.TagSupport import TagValue, INTERNAL_NAMES, isListType
 from src.Database.IDatabaseAdapter import IDatabaseAdapter
-from src.Utilities.TypingFixes import Maybe
 
 
 class DatabaseSqlite(IDatabaseAdapter):
@@ -33,18 +32,24 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         :param db_path: Location where to Store DB
         """
+        # TODO: Map Type in Database
         self.db = sqlite3.connect(db_path)  # type: sqlite3.Connection
-        self.db.execute("CREATE TABLE IF NOT EXISTS track (title text, artist text, album text, \
-                        location text primary key, imported bool, available bool, type text, init bool)")
-        self.db.execute("CREATE TABLE IF NOT EXISTS involved(location text, feature text)")
-        self.db.execute("CREATE TABLE IF NOT EXISTS genres(location text, genre text)")
-        self._tag_information = ["location", "subtitle", "album_artist", "conductor", "remixer", "composer",
-                                 "lyricist", "track_number", "label", "date", "bpm", "key", "mood", "length",
-                                 "user_comment"]
-        self.db.execute("CREATE TABLE IF NOT EXISTS trackTag(location text primary key, subtitle text, \
-                        album_artist text, conductor text, remixer text, composer text, lyricist text, \
-                        track_number text, label text, date text, bpm text, key text, mood text, length text, \
-                        user_comment text)")
+        table_start = "CREATE TABLE IF NOT EXISTS "
+        track_start = table_start + "track (location text primary key, type text,"
+        tag_start = table_start + "trackTag (location text primary key,"
+        for x in INTERNAL_NAMES:
+            if isListType(x):
+                self.db.execute(table_start + x + " (location text primary key, " + x + " text)")
+            elif x in ["title", "artist", "album", "type"]:
+                track_start += x + " text, "
+            elif x == "location":
+                continue
+            else:
+                tag_start += x + " text, "
+        tag_cmd = tag_start[:len(tag_start)-2] + ")"
+        track_cmd = track_start + "imported bool, available bool, init bool)"
+        self.db.execute(tag_cmd)
+        self.db.execute(track_cmd)
 
     def __fetchAllTracks(self) -> List[tuple]:
         """
@@ -72,40 +77,37 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         if not track_tag:
             return None
-        tag_informations = [location]  # type: List[Maybe(str)]
-        for i in range(1, 19):
-            if not track_tag.get(self._tag_information[i]):  # TODO: Wrong membership test, use more readable style
-                tag_informations.append(None)
+        sorted_tuple = []
+        list_attribute = []
+        for tag, value in track_tag.items():
+            if isListType(tag):
+                list_attribute.append(tag)
             else:
-                tag_informations.append(track_tag.get(self._tag_information[i]))
+                sorted_tuple.append(tag)
+        sorted_tuple = tuple(sorted_tuple)
+        sorted_list = []
+        question_mark = "?"
+        update_str = "UPDATE trackTag SET " + sorted_tuple[0] + " = " + track_tag[sorted_tuple[0]]
+        for i in range(0, len(sorted_tuple)+1):
+            sorted_list.append(track_tag[sorted_tuple[i]])
+            if i > 0:
+                question_mark += ", ?"
+                update_str += ", " + sorted_tuple[i] + " = " + track_tag[sorted_tuple[i]]
+        update_str += " WHERE location = " + track_tag["location"]
+
+        for attribute in list_attribute:
+            for tag in track_tag[attribute]:
+                try:
+                    self.db.execute("INSERT INTO " + attribute + "(location, " + attribute + ") VALUES(?,?)",
+                                    [location, tag])
+                except sqlite3.IntegrityError:
+                    self.db.execute("UPDATE " + attribute + " SET " + attribute + " = " + tag + " WHERE location = ?",
+                                    [location])
         try:
-            self.db.execute("INSERT INTO trackTag VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            tag_informations)
+            self.db.execute("INSERT INTO trackTag" + str(sorted_tuple) + " VALUES(" + question_mark + ")",
+                            sorted_list)
         except sqlite3.IntegrityError:
-            self.db.execute("UPDATE trackTag SET subtitle = ?, album_artist = ?, conductor = ?, remixer = ?, \
-                            composer = ?, lyricist = ?, track_number = ?, label = ?, date = ?, bpm = ?, key = ?, \
-                            mood = ?, length = ?, user_comment = ? WHERE location = ?",
-                            tag_informations[1:] + [tag_informations[0]])
-
-        if track_tag.get("genres") is None:
-            self.db.execute("INSERT INTO genres VALUES(?, ?)",
-                            [location, None])
-        else:
-            for gen in track_tag["genres"]:
-                try:
-                    self.db.execute("INSERT INTO genres VALUES(?, ?)", [location, gen])
-                except sqlite3.IntegrityError:
-                    pass  # Here is nothing to do, cause in this case row already exist
-
-        if track_tag.get("involved") is None:
-            self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, None])
-        else:
-            for inv in track_tag["involved"]:
-                try:
-                    self.db.execute("INSERT INTO involved VALUES(?, ?)", [location, inv])
-                except sqlite3.IntegrityError:
-                    pass  # Here is nothing to do, cause in this case row already exist
-
+            self.db.execute(update_str)
         self.db.commit()
 
     def addTrack(self, location: str,
@@ -119,14 +121,15 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         # FIXME: escape input strings
         try:
-            self.db.execute("INSERT INTO track VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+            self.db.execute("INSERT INTO track(title, artist, album, location, init, available, type, imported) \
+                            VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                             [track_tag["title"], track_tag["artist"], track_tag["album"],
-                             location, False, False, track_type, False])
+                             location, False, False, track_type, True])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         except sqlite3.IntegrityError:
             self.db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
             init = ? where location = ?", [track_tag["title"], track_tag["artist"], track_tag["album"],
-                                           location, False, False, track_type, False, location])
+                                           False, False, track_type, False, location])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         self.db.commit()
         self.__addTag(track_tag, location)
@@ -382,8 +385,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         track_tuple = self.db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
         t = track_tuple.fetchone()
         track = {}
-        for i in range(0, len(self._tag_information)):
-            track[self._tag_information[i]] = t[i]
+        for tag in INTERNAL_NAMES:
+            track[tag] = t[tag]
 
         genres = self.db.execute("SELECT genre FROM genres WHERE location = ?", [location]).fetchall()
         genre_of_track = []
