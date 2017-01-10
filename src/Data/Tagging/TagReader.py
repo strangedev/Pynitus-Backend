@@ -22,6 +22,7 @@ import taglib
 from typing import Dict, List, TypeVar
 
 from src.Data.Tagging import TagSanitizer
+from src.Data.Tagging.TagSupport import TagValue
 
 Strings = TypeVar("Strings", str, List[str], None)
 
@@ -39,7 +40,7 @@ def writeTag(file_path: str, tags: Dict[str, List[str]]) -> None:
     audio_file.close()
 
 
-def readTag(file_path: str) -> Dict[str, any]:
+def readTag(file_path: str) -> Dict[str, TagValue]:
     """
     Returns selected Tag Information defined in TagSupport
     :param file_path: Path to Media File to read Tags of
