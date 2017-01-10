@@ -1,5 +1,7 @@
 # *TODO*
 
+# -> Document program architecture
+
 # -> New UploadHandler architecture
 
 * Should incorporate new TagReader
@@ -7,6 +9,8 @@
 * User may change automatically generated tag info
 
 ## Design user story to define structural goals
+
+
 
 ## Design HTML views
 

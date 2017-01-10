@@ -47,26 +47,23 @@ class Database(object):
         self.db.setAllUninitialized()
         self.db.setAllUnavailable()
 
-        # TODO: Baustelle
-
         # Get all local files
-        for filepath in MediaScanner.iterateAudioFiles(self.config.get("musicDirectory")):
-            add_track = False
-            tag_info = TagReader.readTag(filepath)
+        for file_path in MediaScanner.iterateAudioFiles(self.config.get("musicDirectory")):
+            add_track = True
+            tag_info = TagReader.readTag(file_path)
+            required_metadata_present = all([bool(tag_info[key]) for key in ["title", "artist", "album"]])
 
-            # Check if exists in db
-            if not all([x in tag_info for x in ["title", "artist", "album"]]):
-                add_track = True
-
-            if not self.db.getTrack(tag_info["title"], tag_info["artist"], tag_info["album"]):
-                add_track = True
+            if required_metadata_present:
+                # Check if exists in db
+                if self.db.getTrack(tag_info["title"], tag_info["artist"], tag_info["album"]) is not None:
+                    add_track = False
 
             if add_track:
                 self.addTrack(
-                    filepath,
-                    tag_info.get("title"),
-                    tag_info.get("artist"),
-                    tag_info.get("album"),
+                    file_path,
+                    tag_info["title"],
+                    tag_info["artist"],
+                    tag_info["album"],
                     "FileTrack",
                     **tag_info
                 )
@@ -75,7 +72,7 @@ class Database(object):
             self.db.setTrackIsInitialized(tag_info["title"], tag_info["artist"], tag_info["album"])
 
         # Check remaining uninitialized tracks
-        for track in [self.trackFactory.getTrack(**td) for td in self.db.getUninitialized()]:
+        for track in (self.trackFactory.getTrack(**td) for td in self.db.getUninitialized()):
             if track.available():
                 self.db.setTrackIsAvailable(track.title, track.artist, track.album)
             self.db.setTrackIsInitialized(track.title, track.artist, track.album)
