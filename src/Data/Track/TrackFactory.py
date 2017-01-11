@@ -15,6 +15,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import Dict
 
 from src.Data.Tagging import TagSupport
 from src.Data.Track.Track import Track
@@ -24,7 +25,7 @@ from src.Database.IDatabaseAdapter import IDatabaseAdapter
 
 class TrackFactory(UniqueFactory):
 
-    track_types = dict({})
+    track_types = dict({})  # type:Dict[str, Track.__class__]
 
     @classmethod
     def register(cls, track_type, constructor):

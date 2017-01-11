@@ -10,7 +10,15 @@
 
 ## Design user story to define structural goals
 
+1. User is presented with track types
+2. User is presented with view for entering location attribute (type sensitive: text field, file upload...)
+3. Tag Info is extracted automatically and presented to user (all info can be edited in this view)
+4. When Info is submitted, 
+    - the track is added and imported when required metadata was given
+    - the view and an error message is presented again if required metadata is missing
+5. The added track is shown in a detailed track view after upload
 
+## Define Interface class
 
 ## Design HTML views
 
