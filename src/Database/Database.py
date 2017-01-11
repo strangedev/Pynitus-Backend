@@ -22,6 +22,7 @@ from typing import List, Dict
 
 from src.Config.ConfigLoader import ConfigLoader
 from src.Data.Tagging import TagReader
+from src.Data.Tagging import TagSupport
 from src.Data.Tagging.TagSupport import TagValue
 from src.Data.Track.Track import Track
 from src.Data.Track.TrackFactory import TrackFactory
@@ -52,7 +53,7 @@ class Database(object):
         for file_path in MediaScanner.iterateAudioFiles(self.config.get("musicDirectory")):
             add_track = True
             tag_info = TagReader.readTag(file_path)
-            required_metadata_present = all([bool(tag_info[key]) for key in ["title", "artist", "album"]])
+            required_metadata_present = all([bool(tag_info[key]) for key in TagSupport.REQUIRED_TAGS])
 
             if required_metadata_present:
                 # Check if exists in db

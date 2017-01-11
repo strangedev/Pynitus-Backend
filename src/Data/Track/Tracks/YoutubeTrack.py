@@ -22,7 +22,7 @@ import os
 
 from src.Data import Track
 from src.Data.Track.PlaybackHandlers import YoutubePlaybackHandler
-from src.Data.Track.UploadHandlers import YoutubeUploadHandler
+from src.Data.Upload.UploadHandlers import YoutubeUploadHandler
 
 
 class YoutubeTrack(Track):

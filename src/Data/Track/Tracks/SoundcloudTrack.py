@@ -20,9 +20,9 @@
 
 import os
 
-from src.Data.Track.Track import Track
-from src.Data.Track.UploadHandlers import SoundcloudUploadHandler
 from src.Data.Track.PlaybackHandlers.SoundcloudPlaybackHandler import SoundcloudPlaybackHandler
+from src.Data.Track.Track import Track
+from src.Data.Upload.UploadHandlers import SoundcloudUploadHandler
 
 
 class SoundcloudTrack(Track):

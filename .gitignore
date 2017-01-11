@@ -10,3 +10,4 @@ src/Data/Foundation/__pycache__/
 src/Database/__pycache__/
 src/Server/__pycache__/
 *.pyc
+*.db

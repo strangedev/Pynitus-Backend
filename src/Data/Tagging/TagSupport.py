@@ -138,6 +138,12 @@ TAGLIB_INTERNAL_NAMES_TYPES = {
     "comment": str,  # type: TagType
 }
 
+REQUIRED_TAGS = {
+    "artist",
+    "album",
+    "title"
+}
+
 EMPTY_SYNONYMS = {  # TODO: expand
     "",
     "N/A",
