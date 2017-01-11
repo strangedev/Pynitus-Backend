@@ -101,12 +101,14 @@ class DatabaseSqlite(IDatabaseAdapter):
 
         for attribute in list_attribute:
             for tag in track_tag[attribute]:
+                print(attribute)
+                print(tag)
                 try:
                     self.db.execute("INSERT INTO {} (location, {}) VALUES(?,?)".format(attribute, attribute),
                                     [location, tag])
                 except sqlite3.IntegrityError:
-                    self.db.execute("UPDATE {} SET {} = {} WHERE location = ?".format(attribute, attribute, tag),
-                                    [location])
+                    self.db.execute("UPDATE {} SET {} = ? WHERE location = ?".format(attribute, attribute),
+                                    [tag, location])
         try:
             self.db.execute("INSERT INTO trackTag {} VALUES({})".format(sorted_tuple, question_mark),
                             sorted_list)
