@@ -52,6 +52,14 @@ class Upload(object):
         return self.__upload_handler.argument_type
 
     @property
+    def display_name(self) -> str:
+        return self.__upload_handler.display_name
+
+    @property
+    def description(self) -> str:
+        return self.__upload_handler.description
+
+    @property
     def location(self) -> str:
         return self.__location
 

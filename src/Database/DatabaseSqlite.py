@@ -33,13 +33,14 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param db_path: Location where to Store DB
         """
         # TODO: Map Type in Database
-        self.db = sqlite3.connect(db_path)  # type: sqlite3.Connection
+        self.db_path = db_path
+        db = sqlite3.connect(db_path)
         table_start = "CREATE TABLE IF NOT EXISTS "
         track_start = table_start + "track (location text primary key, type text,"
         tag_start = table_start + "trackTag (location text primary key,"
         for x in INTERNAL_NAMES:
             if isListType(x):
-                self.db.execute(table_start + x + " (location text primary key, " + x + " text)")
+                db.execute(table_start + x + " (location text primary key, " + x + " text)")
             elif x in ["title", "artist", "album", "type"]:
                 track_start += x + " text, "
             elif x == "location":
@@ -48,15 +49,16 @@ class DatabaseSqlite(IDatabaseAdapter):
                 tag_start += x + " text, "
         tag_cmd = tag_start[:len(tag_start)-2] + ")"
         track_cmd = track_start + "imported bool, available bool, init bool)"
-        self.db.execute(tag_cmd)
-        self.db.execute(track_cmd)
+        db.execute(tag_cmd)
+        db.execute(track_cmd)
 
     def __fetchAllTracks(self) -> List[tuple]:
         """
         Returns all stored Information from track
         :return: All stored Information from track in a List within Tuples
         """
-        return self.db.execute("SELECT * FROM track").fetchall()
+        db = sqlite3.connect(self.db_path)
+        return db.execute("SELECT * FROM track").fetchall()
 
     def __getLocation(self, title: str, artist: str, album: str) -> str:
         """
@@ -66,7 +68,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: album of location
         :return: Location as String for given information
         """
-        return self.db.execute("SELECT location FROM track where title = ? AND artist = ? AND album = ?",
+        db = sqlite3.connect(self.db_path)
+        return db.execute("SELECT location FROM track where title = ? AND artist = ? AND album = ?",
                                [title, artist, album]).fetchone()[0]
 
     def __addTag(self, track_tag: Dict[str, TagValue], location: str) -> None:
@@ -75,6 +78,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param location: Track Location
         :return: None
         """
+        db = sqlite3.connect(self.db_path)
+
         if not track_tag:
             return None
         sorted_tuple = []
@@ -98,17 +103,17 @@ class DatabaseSqlite(IDatabaseAdapter):
         for attribute in list_attribute:
             for tag in track_tag[attribute]:
                 try:
-                    self.db.execute("INSERT INTO " + attribute + "(location, " + attribute + ") VALUES(?,?)",
+                    db.execute("INSERT INTO " + attribute + "(location, " + attribute + ") VALUES(?,?)",
                                     [location, tag])
                 except sqlite3.IntegrityError:
-                    self.db.execute("UPDATE " + attribute + " SET " + attribute + " = " + tag + " WHERE location = ?",
+                    db.execute("UPDATE " + attribute + " SET " + attribute + " = " + tag + " WHERE location = ?",
                                     [location])
         try:
-            self.db.execute("INSERT INTO trackTag" + str(sorted_tuple) + " VALUES(" + question_mark + ")",
+            db.execute("INSERT INTO trackTag" + str(sorted_tuple) + " VALUES(" + question_mark + ")",
                             sorted_list)
         except sqlite3.IntegrityError:
-            self.db.execute(update_str)
-        self.db.commit()
+            db.execute(update_str)
+        db.commit()
 
     def addTrack(self, location: str,
                  track_type: str,
@@ -120,18 +125,19 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: None
         """
         # FIXME: escape input strings
+        db = sqlite3.connect(self.db_path)
         try:
-            self.db.execute("INSERT INTO track(title, artist, album, location, init, available, type, imported) \
+            db.execute("INSERT INTO track(title, artist, album, location, init, available, type, imported) \
                             VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                             [track_tag["title"], track_tag["artist"], track_tag["album"],
                              location, False, False, track_type, True])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         except sqlite3.IntegrityError:
-            self.db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
+            db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
             init = ? where location = ?", [track_tag["title"], track_tag["artist"], track_tag["album"],
                                            False, False, track_type, False, location])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
-        self.db.commit()
+        db.commit()
         self.__addTag(track_tag, location)
 
     def setAllUninitialized(self) -> None:
@@ -139,24 +145,27 @@ class DatabaseSqlite(IDatabaseAdapter):
         sets all Data in Tracks marked as uninitialized
         :return: None
         """
-        self.db.execute("UPDATE track set init = 0")
-        self.db.commit()
+        db = sqlite3.connect(self.db_path)
+        db.execute("UPDATE track set init = 0")
+        db.commit()
 
     def setAllUnimported(self) -> None:
         """
         sets all Data in Tracks marked as unimported
         :return: None
         """
-        self.db.execute("UPDATE track set imported = 0")
-        self.db.commit()
+        db = sqlite3.connect(self.db_path)
+        db.execute("UPDATE track set imported = 0")
+        db.commit()
 
     def setAllUnavailable(self) -> None:
         """
         sets all Data in Tracks marked as unavailable
         :return: None
         """
-        self.db.execute("UPDATE track set available = 0")
-        self.db.commit()
+        db = sqlite3.connect(self.db_path)
+        db.execute("UPDATE track set available = 0")
+        db.commit()
 
     def setTrackIsImported(self, title: str, artist: str, album: str) -> None:
         """
@@ -166,9 +175,10 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET imported = ? WHERE location = ?",
+        db = sqlite3.connect(self.db_path)
+        db.execute("UPDATE track SET imported = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
-        self.db.commit()
+        db.commit()
 
     def setTrackIsInitialized(self, title: str, artist: str, album: str) -> None:
         """
@@ -178,9 +188,10 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET init = ? WHERE location = ?",
+        db = sqlite3.connect(self.db_path)
+        db.execute("UPDATE track SET init = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
-        self.db.commit()
+        db.commit()
 
     def setTrackIsAvailable(self, title: str, artist: str, album: str) -> None:
         """
@@ -190,17 +201,19 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album of Track
         :return: None
         """
-        self.db.execute("UPDATE track SET available = ? WHERE location = ?",
+        db = sqlite3.connect(self.db_path)
+        db.execute("UPDATE track SET available = ? WHERE location = ?",
                         [True, self.__getLocation(title, artist, album)])
-        self.db.commit()
+        db.commit()
 
     def getTracks(self) -> List[Dict[str, any]]:
         """
         Returns all Tracks in a List of Dictionary
         :return: List of Dictionary with information for Tracks stored in DB
         """
+        db = sqlite3.connect(self.db_path)
         result = []
-        for track in self.db.execute("SELECT * FROM track").fetchall():
+        for track in db.execute("SELECT * FROM track").fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -218,8 +231,9 @@ class DatabaseSqlite(IDatabaseAdapter):
 
         :return: All stored Artists in DB
         """
+        db = sqlite3.connect(self.db_path)
         artists = []
-        artist_tuple = self.db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
+        artist_tuple = db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
         for artist in artist_tuple:
             artists.append(artist[0])
         return artists
@@ -229,8 +243,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         Returns all stored Albums
         :return: All stored Albums in DB
         """
+        db = sqlite3.connect(self.db_path)
         albums = []
-        albums_tuple = self.db.execute("SELECT album FROM track GROUP BY album").fetchall()
+        albums_tuple = db.execute("SELECT album FROM track GROUP BY album").fetchall()
         for album in albums_tuple:
             albums.append(album[0])
         return albums
@@ -240,8 +255,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         Returns all stored Albums from given Artist
         :return: All stored Albums from given Artist
         """
+        db = sqlite3.connect(self.db_path)
         albums = []
-        albums_tuple = self.db.execute("SELECT album FROM track WHERE artist = ? GROUP BY album", [artist]).fetchall()
+        albums_tuple = db.execute("SELECT album FROM track WHERE artist = ? GROUP BY album", [artist]).fetchall()
         for album in albums_tuple:
             albums.append(album[0])
         return albums
@@ -251,8 +267,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
                 where imported is False
         """
+        db = sqlite3.connect(self.db_path)
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE imported = ?", [False]):
+        for track in db.execute("SELECT * FROM track WHERE imported = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -270,8 +287,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
                     where available is False
         """
+        db = sqlite3.connect(self.db_path)
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE available = ?", [False]):
+        for track in db.execute("SELECT * FROM track WHERE available = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -289,8 +307,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: List of Dictionary with Keys: Title, Artits, Album, Location, imported, available and type
                     where init is False
         """
+        db = sqlite3.connect(self.db_path)
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE init = ?", [False]):
+        for track in db.execute("SELECT * FROM track WHERE init = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -311,7 +330,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: Dictionary with Keys: Title, Artist, Album, Location, imported, available and type
         """
         # FIXME: escape input strings
-        track_tuple = self.db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ? \
+        db = sqlite3.connect(self.db_path)
+        track_tuple = db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ? \
                                       AND imported = ? AND available = ? AND init = ?",
                                       [title, artist, album, True, True, True])
         track = track_tuple.fetchone()
@@ -332,8 +352,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param artist: Artist to get Tracks from
         :return: List of Dictionary based on given Artist
         """
+        db = sqlite3.connect(self.db_path)
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND imported = ? AND available = ? \
+        for track in db.execute("SELECT * FROM track WHERE artist = ? AND imported = ? AND available = ? \
                                      AND init = ?", [artist, True, True, True]):
             result.append(
                 {"title": track[0],
@@ -356,8 +377,9 @@ class DatabaseSqlite(IDatabaseAdapter):
                     based on given Artist and Album
         """
         # FIXME: escape input strings
+        db = sqlite3.connect(self.db_path)
         result = []
-        for track in self.db.execute("SELECT * FROM track WHERE artist = ? AND album = ? AND imported = ? AND \
+        for track in db.execute("SELECT * FROM track WHERE artist = ? AND album = ? AND imported = ? AND \
                                      available = ? AND init = ?", [artist, album, True, True, True]):
             result.append(
                 {"title": track[0],
@@ -378,17 +400,18 @@ class DatabaseSqlite(IDatabaseAdapter):
         :param album: Album to get Metainformation from
         :return: Dictionary with Metainformation based on given Artist, Title and Album
         """
+        db = sqlite3.connect(self.db_path)
         location = self.__getLocation(title, artist, album)
         if location is None:
             return None
 
-        track_tuple = self.db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
+        track_tuple = db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
         t = track_tuple.fetchone()
         track = {}
         for tag in INTERNAL_NAMES:
             track[tag] = t[tag]
 
-        genres = self.db.execute("SELECT genre FROM genres WHERE location = ?", [location]).fetchall()
+        genres = db.execute("SELECT genre FROM genres WHERE location = ?", [location]).fetchall()
         genre_of_track = []
         if not genres:
             track["genres"] = None
@@ -397,7 +420,7 @@ class DatabaseSqlite(IDatabaseAdapter):
                 genre_of_track.append(genre[0])
             track["genres"] = genre_of_track
 
-        involved = self.db.execute("SELECT feature FROM involved WHERE location = ?", [location]).fetchall()
+        involved = db.execute("SELECT feature FROM involved WHERE location = ?", [location]).fetchall()
         names = []
         if not involved:
             track["involved"] = None

@@ -19,9 +19,8 @@
 """
 from typing import Dict
 from typing import Set
-from typing import Tuple, List
 
-from src.Data.Upload import UploadHandlerDescription
+from src.Data.Upload.UploadHandlerDescription import UploadHandlerDescription
 from src.Data.Upload.Upload import Upload
 from src.Data.Upload.UploadHandlers.AUploadHandler import AUploadHandler
 from src.Database.Database import Database
@@ -45,12 +44,13 @@ class UploadInvalidException(Exception):
 
 class UploadBroker(object):
 
-    __upload_handlers = {}  # type: Dict[str, UploadHandlerDescription]
+    __upload_handlers = {}  # type: Dict[str, AUploadHandler]
     __database = None  # type: Database
 
     @classmethod
-    def getUploadHandlers(cls) -> Set[UploadHandlerDescription]:
-        return set(UploadBroker.__upload_handlers.values())
+    def getUploadHandlerDescriptions(cls) -> Set[UploadHandlerDescription]:
+        return sorted(set([UploadHandlerDescription(name, handler.display_name, handler.description)
+                           for name, handler in UploadBroker.__upload_handlers.items()]))
 
     @classmethod
     def registerUploadHandler(cls, upload_handler: AUploadHandler.__class__) -> None:
@@ -65,7 +65,7 @@ class UploadBroker(object):
         if upload_internal_handler_name not in UploadBroker.__upload_handlers:
             raise NoUploadHandlerException("No UploadHandler was registered for {}, but an Upload was requested."
                                            .format(upload_internal_handler_name))
-        return Upload(UploadBroker.__upload_handlers[upload_internal_handler_name].__new__())
+        return Upload(UploadBroker.__upload_handlers[upload_internal_handler_name])
 
     @staticmethod
     def importIntoDatabase(upload: Upload) -> None:

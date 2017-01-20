@@ -69,7 +69,8 @@ class AUploadHandler(object):
     """
     description = "An abstract UploadHandler. If you see this, someone screwed up the code."
 
-    def handle(self, upload_argument: Upload.UploadArgument) -> Tuple[str, str, Dict[str, TagValue]]:
+    @classmethod
+    def handle(cls, upload_argument: Upload.UploadArgument) -> Tuple[str, str, Dict[str, TagValue]]:
         """
         Handles the data the user entered as the tracks upload_argument.(e.g. URL string, uploaded file, etc.)
         The type of the argument is given by argument_type.

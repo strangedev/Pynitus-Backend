@@ -1,4 +1,4 @@
-class UploadHandler(object):
+class UploadHandlerDescription(object):
 
     def __init__(self, internal_name, display_name, description):
         self.__internal_name = internal_name

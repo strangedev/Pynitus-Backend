@@ -21,11 +21,9 @@
 import os
 import sys
 
-from src.Config.ConfigLoader import ConfigLoader
-from src.Data.MusicLibrary import MusicLibrary
-from src.Data.PlaybackQueue import PlaybackQueue
-from src.Data.Track.TrackFactory import TrackFactory
-from src.Server.RESTHandler import RESTHandler
+from src.Database.Database import Database
+from src.Database.DatabaseSqlite import DatabaseSqlite
+from src.Server.Management import Management
 
 
 def __main__(args):
@@ -38,24 +36,7 @@ def __main__(args):
     if not os.path.isdir(working_dir):
         raise Exception("Working directory is not a directory.")
 
-    config = ConfigLoader(working_dir)
-    music_library = MusicLibrary(config)
-    playback_queue = PlaybackQueue()
-    track_factory = TrackFactory()
-    RESTHandler(
-        config, playback_queue, music_library, track_factory
-    )
-
-    print("Artists:")
-    print(music_library.getArtists())
-    print("\n")
-
-    print("Albums:")
-    print(music_library.getAlbums())
-    print("\n")
-
-    print("Tracks:")
-    print(music_library.getTracks())
-    print("\n")
+    Database.setDatabaseAdapter(DatabaseSqlite)
+    management = Management(working_dir)
 
 __main__(sys.argv)
