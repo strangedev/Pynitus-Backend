@@ -67,8 +67,9 @@ class ApiRoute(object):
     def swallowParameters(self, vpath, params):
         for i in range(len(self.__crumbs)):
             crumb = self.__crumbs[i]
+            vcomponent = vpath.pop(0)
             if crumb.startswith("$"):
-                params[crumb.replace("$", "")] = vpath[i]
+                params[crumb.replace("$", "")] = vcomponent
 
     @property
     def view(self):

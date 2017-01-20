@@ -237,9 +237,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         artists = []
-        artist_tuple = self.db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
-        if not artist_tuple:
-            return None
+        artist_tuple = db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
         for artist in artist_tuple:
             artists.append(artist[0])
         return artists
@@ -252,8 +250,6 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         albums = []
         albums_tuple = db.execute("SELECT album FROM track GROUP BY album").fetchall()
-        if not albums_tuple:
-            return None
 
         for album in albums_tuple:
             albums.append(album[0])
@@ -267,8 +263,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         albums = []
         albums_tuple = db.execute("SELECT album FROM track WHERE artist = ? GROUP BY album", [artist]).fetchall()
-        if not albums_tuple:
-            return None
+
         for album in albums_tuple:
             albums.append(album[0])
         return albums

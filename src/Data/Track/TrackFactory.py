@@ -25,7 +25,7 @@ from src.Database.IDatabaseAdapter import IDatabaseAdapter
 
 class TrackFactory(UniqueFactory):
 
-    track_types = dict({})  # type:Dict[str, Track.__class__]
+    track_types = dict({"FileTrack": Track})  # type:Dict[str, Track.__class__]
 
     @classmethod
     def register(cls, track_type, constructor):
