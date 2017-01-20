@@ -69,8 +69,11 @@ class DatabaseSqlite(IDatabaseAdapter):
         :return: Location as String for given information
         """
         db = sqlite3.connect(self.db_path)
-        return db.execute("SELECT location FROM track where title = ? AND artist = ? AND album = ?",
-                               [title, artist, album]).fetchone()[0]
+        row = db.execute("SELECT location FROM track where title = ? AND artist = ? AND album = ?",
+                              [title, artist, album]).fetchone()
+        if not row:
+            return None
+        return row[0]
 
     def __addTag(self, track_tag: Dict[str, TagValue], location: str) -> None:
         """
@@ -88,28 +91,29 @@ class DatabaseSqlite(IDatabaseAdapter):
             if isListType(tag):
                 list_attribute.append(tag)
             else:
-                sorted_tuple.append(tag)
+                if tag not in ["album", "artist", "title", "type"]:
+                    sorted_tuple.append(tag)
         sorted_tuple = tuple(sorted_tuple)
         sorted_list = []
         question_mark = "?"
-        update_str = "UPDATE trackTag SET " + sorted_tuple[0] + " = " + track_tag[sorted_tuple[0]]
-        for i in range(0, len(sorted_tuple)+1):
+        update_str = "UPDATE trackTag SET {} = {}".format(sorted_tuple[0], track_tag[sorted_tuple[0]])
+        for i in range(0, len(sorted_tuple)):
             sorted_list.append(track_tag[sorted_tuple[i]])
             if i > 0:
                 question_mark += ", ?"
-                update_str += ", " + sorted_tuple[i] + " = " + track_tag[sorted_tuple[i]]
-        update_str += " WHERE location = " + track_tag["location"]
+                update_str += ", {} = {}".format(sorted_tuple[i], track_tag[sorted_tuple[i]])
+        update_str += " WHERE location = " + location
 
         for attribute in list_attribute:
             for tag in track_tag[attribute]:
                 try:
-                    db.execute("INSERT INTO " + attribute + "(location, " + attribute + ") VALUES(?,?)",
+                    db.execute("INSERT INTO {} (location, {}) VALUES(?,?)".format(attribute, attribute),
                                     [location, tag])
                 except sqlite3.IntegrityError:
-                    db.execute("UPDATE " + attribute + " SET " + attribute + " = " + tag + " WHERE location = ?",
-                                    [location])
+                    db.execute("UPDATE {} SET {} = ? WHERE location = ?".format(attribute, attribute),
+                                    [tag, location])
         try:
-            db.execute("INSERT INTO trackTag" + str(sorted_tuple) + " VALUES(" + question_mark + ")",
+            db.execute("INSERT INTO trackTag {} VALUES({})".format(sorted_tuple, question_mark),
                             sorted_list)
         except sqlite3.IntegrityError:
             db.execute(update_str)
@@ -233,7 +237,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         artists = []
-        artist_tuple = db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
+        artist_tuple = self.db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
+        if not artist_tuple:
+            return None
         for artist in artist_tuple:
             artists.append(artist[0])
         return artists
@@ -246,6 +252,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         albums = []
         albums_tuple = db.execute("SELECT album FROM track GROUP BY album").fetchall()
+        if not albums_tuple:
+            return None
+
         for album in albums_tuple:
             albums.append(album[0])
         return albums
@@ -258,6 +267,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         albums = []
         albums_tuple = db.execute("SELECT album FROM track WHERE artist = ? GROUP BY album", [artist]).fetchall()
+        if not albums_tuple:
+            return None
         for album in albums_tuple:
             albums.append(album[0])
         return albums
