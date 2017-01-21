@@ -44,177 +44,217 @@ class Track(object):
         self.__meta_info_loaded = False
         self.__meta_info_load_hook = None
 
-        self.title = title
-        self.artist = artist
-        self.album = album
+        self.__title = title
+        self.__artist = artist
+        self.__album = album
+        self.__subtitle = None
+        self.__album_artist = None
+        self.__conductor = None
+        self.__remixer = None
+        self.__composer = None
+        self.__lyricist = None
+        self.__features = None
+        self.__track_number = None
+        self.__label = None
+        self.__genres = None
+        self.__date = None
+        self.__bpm = None
+        self.__key = None
+        self.__mood = None
+        self.__length = None
+        self.__comment = None
+
+    @property
+    def meta_info_load_hook(self):
+        return None
+
+    @meta_info_load_hook.setter
+    def meta_info_load_hook(self, hook):
+        self.__meta_info_load_hook = hook
 
     @property
     def title(self):
-        return self.title
+        return self.__title
 
     @title.setter
     def title(self, title):
-        self.title = title
+        self.__title = title
 
     @property
     def artist(self):
-        return self.artist
+        return self.__artist
 
     @artist.setter
     def artist(self, artist):
-        self.artist = artist
+        self.__artist = artist
 
     @property
     def album(self):
-        return self.album
+        return self.__album
 
     @album.setter
     def album(self, album):
-        self.album = album
+        self.__album = album
 
     @property
-    @lazy_metadata
     def subtitle(self):
-        return self.subtitle
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__subtitle
 
     @subtitle.setter
     def subtitle(self, subtitle):
-        self.subtitle = subtitle
+        self.__subtitle = subtitle
 
     @property
-    @lazy_metadata
     def album_artist(self):
-        return self.album_artist
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__album_artist
 
     @album_artist.setter
     def album_artist(self, album_artist):
-        self.album_artist = album_artist
+        self.__album_artist = album_artist
 
     @property
-    @lazy_metadata
     def conductor(self):
-        return self.conductor
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__conductor
 
     @conductor.setter
     def conductor(self, conductor):
-        self.conductor = conductor
+        self.__conductor = conductor
 
     @property
-    @lazy_metadata
     def remixer(self):
-        return self.remixer
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__remixer
 
     @remixer.setter
     def remixer(self, remixer):
-        self.remixer = remixer
+        self.__remixer = remixer
 
     @property
-    @lazy_metadata
     def composer(self):
-        return self.composer
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__composer
 
     @composer.setter
     def composer(self, composer):
-        self.composer = composer
+        self.__composer = composer
 
     @property
-    @lazy_metadata
     def lyricist(self):
-        return self.lyricist
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__lyricist
 
     @lyricist.setter
     def lyricist(self, lyricist):
-        self.lyricist = lyricist
+        self.__lyricist = lyricist
 
     @property
-    @lazy_metadata
     def features(self):
-        return self.features
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__features
 
     @features.setter
     def features(self, features):
-        self.features = features
+        self.__features = features
 
     @property
-    @lazy_metadata
     def track_number(self):
-        return self.track_number
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__track_number
 
     @track_number.setter
     def track_number(self, track_number):
-        self.track_number = track_number
+        self.__track_number = track_number
 
     @property
-    @lazy_metadata
     def label(self):
-        return self.label
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__label
 
     @label.setter
     def label(self, label):
-        self.label = label
+        self.__label = label
 
     @property
-    @lazy_metadata
     def genres(self):
-        return self.genres
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__genres
 
     @genres.setter
     def genres(self, genres):
-        self.genres = genres
+        self.__genres = genres
 
     @property
-    @lazy_metadata
     def date(self):
-        return self.date
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__date
 
     @date.setter
     def date(self, date):
-        self.date = date
+        self.__date = date
 
     @property
-    @lazy_metadata
     def bpm(self):
-        return self.bpm
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__bpm
 
     @bpm.setter
     def bpm(self, bpm):
-        self.bpm = bpm
+        self.__bpm = bpm
 
     @property
-    @lazy_metadata
     def key(self):
-        return self.key
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__key
 
     @key.setter
     def key(self, key):
-        self.key = key
+        self.__key = key
 
     @property
-    @lazy_metadata
     def mood(self):
-        return self.mood
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__mood
 
     @mood.setter
     def mood(self, mood):
-        self.mood = mood
+        self.__mood = mood
 
     @property
-    @lazy_metadata
     def length(self):
-        return self.length
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__length
 
     @length.setter
     def length(self, length):
-        self.length = length
+        self.__length = length
 
     @property
-    @lazy_metadata
     def comment(self):
-        return self.comment
+        if not self.__meta_info_loaded:
+            self.__meta_info_load_hook(self)
+        return self.__comment
 
     @comment.setter
     def comment(self, comment):
-        self.comment = comment
+        self.__comment = comment
 
     def play(self, delegate: object):
         """
@@ -254,4 +294,4 @@ class Track(object):
 
         :return: A bool indicating whether the track can be played.
         """
-        return NotImplemented
+        return False
