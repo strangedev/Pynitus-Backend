@@ -70,7 +70,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         row = db.execute("SELECT location FROM track where title = ? AND artist = ? AND album = ?",
-                              [title, artist, album]).fetchone()
+                         [title, artist, album]).fetchone()
         if not row:
             return None
         return row[0]
@@ -108,13 +108,13 @@ class DatabaseSqlite(IDatabaseAdapter):
             for tag in track_tag[attribute]:
                 try:
                     db.execute("INSERT INTO {} (location, {}) VALUES(?,?)".format(attribute, attribute),
-                                    [location, tag])
+                               [location, tag])
                 except sqlite3.IntegrityError:
                     db.execute("UPDATE {} SET {} = ? WHERE location = ?".format(attribute, attribute),
-                                    [tag, location])
+                               [tag, location])
         try:
             db.execute("INSERT INTO trackTag {} VALUES({})".format(sorted_tuple, question_mark),
-                            sorted_list)
+                       sorted_list)
         except sqlite3.IntegrityError:
             db.execute(update_str)
         db.commit()
@@ -132,9 +132,11 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         try:
             db.execute("INSERT INTO track(title, artist, album, location, init, available, type, imported) \
-                            VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                            [track_tag["title"], track_tag["artist"], track_tag["album"],
-                             location, False, False, track_type, True])
+                        VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                       [
+                           track_tag["title"], track_tag["artist"], track_tag["album"],
+                           location, False, False, track_type, True
+                       ])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         except sqlite3.IntegrityError:
             db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
@@ -181,7 +183,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         db.execute("UPDATE track SET imported = ? WHERE location = ?",
-                        [True, self.__getLocation(title, artist, album)])
+                   [True, self.__getLocation(title, artist, album)])
         db.commit()
 
     def setTrackIsInitialized(self, title: str, artist: str, album: str) -> None:
@@ -194,7 +196,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         db.execute("UPDATE track SET init = ? WHERE location = ?",
-                        [True, self.__getLocation(title, artist, album)])
+                   [True, self.__getLocation(title, artist, album)])
         db.commit()
 
     def setTrackIsAvailable(self, title: str, artist: str, album: str) -> None:
@@ -207,7 +209,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         db.execute("UPDATE track SET available = ? WHERE location = ?",
-                        [True, self.__getLocation(title, artist, album)])
+                   [True, self.__getLocation(title, artist, album)])
         db.commit()
 
     def getTracks(self) -> List[Dict[str, any]]:
@@ -217,7 +219,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         result = []
-        for track in db.execute("SELECT * FROM track").fetchall():
+        for track in db.execute("SELECT title, artist, album, location, imported, available, type, init \
+                                FROM track").fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -275,7 +278,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         result = []
-        for track in db.execute("SELECT * FROM track WHERE imported = ?", [False]):
+        for track in db.execute("SELECT title, artist, album, location, imported, available, type, init FROM track \
+                                WHERE imported = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -337,9 +341,10 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         # FIXME: escape input strings
         db = sqlite3.connect(self.db_path)
-        track_tuple = db.execute("SELECT * FROM track WHERE title = ? AND artist = ? AND album = ? \
-                                      AND imported = ? AND available = ? AND init = ?",
-                                      [title, artist, album, True, True, True])
+        track_tuple = db.execute(
+                            "SELECT * FROM track WHERE title = ? AND artist = ? AND album = ? AND imported = ? \
+                            AND available = ? AND init = ?",
+                            [title, artist, album, True, True, True])
         track = track_tuple.fetchone()
         if track is None:
             return None
@@ -360,7 +365,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         result = []
-        for track in db.execute("SELECT * FROM track WHERE artist = ? AND imported = ? AND available = ? \
+        for track in db.execute("SELECT title, artist, album, location, imported, available, type, init\
+                                FROM track WHERE artist = ? AND imported = ? AND available = ? \
                                      AND init = ?", [artist, True, True, True]):
             result.append(
                 {"title": track[0],
@@ -385,8 +391,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         # FIXME: escape input strings
         db = sqlite3.connect(self.db_path)
         result = []
-        for track in db.execute("SELECT * FROM track WHERE artist = ? AND album = ? AND imported = ? AND \
-                                     available = ? AND init = ?", [artist, album, True, True, True]):
+        for track in db.execute("SELECT title, artist, album, location, imported, available, type, init \
+                                FROM track WHERE artist = ? AND album = ? AND imported = ? AND \
+                                available = ? AND init = ?", [artist, album, True, True, True]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -411,11 +418,13 @@ class DatabaseSqlite(IDatabaseAdapter):
         if location is None:
             return None
 
-        track_tuple = db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
-        t = track_tuple.fetchone()
+        # track_tuple = db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
+        # t = track_tuple.fetchone()
         track = {}
         for tag in INTERNAL_NAMES:
-            track[tag] = t[tag]
+            track[tag] = db.execute("SELECT ? FROM trackTag WHERE location = ?", [tag, location])
+            # TODO: Think of a better way...
+            # track[tag] = t[tag]         # I Don't Think that this will work :\
 
         genres = db.execute("SELECT genre FROM genres WHERE location = ?", [location]).fetchall()
         genre_of_track = []
