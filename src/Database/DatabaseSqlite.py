@@ -430,7 +430,7 @@ class DatabaseSqlite(IDatabaseAdapter):
             # TODO: Think of a better way...
             # track[tag] = t[tag]         # I Don't Think that this will work :\
 
-        genres = db.execute("SELECT genre FROM genres WHERE location = ?", [location]).fetchall()
+        genres = db.execute("SELECT genres FROM genres WHERE location = ?", [location]).fetchall()
         genre_of_track = []
         if not genres:
             track["genres"] = None
@@ -439,7 +439,7 @@ class DatabaseSqlite(IDatabaseAdapter):
                 genre_of_track.append(genre[0])
             track["genres"] = genre_of_track
 
-        involved = db.execute("SELECT feature FROM involved WHERE location = ?", [location]).fetchall()
+        involved = db.execute("SELECT features FROM features WHERE location = ?", [location]).fetchall()
         names = []
         if not involved:
             track["involved"] = None

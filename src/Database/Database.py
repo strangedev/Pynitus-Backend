@@ -71,10 +71,11 @@ class Database(object):
             self.db.setTrackIsInitialized(tag_info["title"], tag_info["artist"], tag_info["album"])
 
         # Check remaining uninitialized tracks
-        for track in (self.trackFactory.getTrack(**td) for td in self.db.getUninitialized()):
-            if track.available():
-                self.db.setTrackIsAvailable(track.title, track.artist, track.album)
-            self.db.setTrackIsInitialized(track.title, track.artist, track.album)
+        #for track in (self.trackFactory.getTrack(**td) for td in self.db.getUninitialized()):
+         #   print(track)
+         #   if track.available():
+         #       self.db.setTrackIsAvailable(track.title, track.artist, track.album)
+         #   self.db.setTrackIsInitialized(track.title, track.artist, track.album)
 
     def addTrack(
             self,

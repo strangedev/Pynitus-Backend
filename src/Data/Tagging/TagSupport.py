@@ -138,11 +138,11 @@ TAGLIB_INTERNAL_NAMES_TYPES = {
     "comment": str,  # type: TagType
 }
 
-REQUIRED_TAGS = {
+REQUIRED_TAGS = sorted({
     "artist",
     "album",
     "title"
-}
+})
 
 EMPTY_SYNONYMS = {  # TODO: expand
     "",
@@ -161,13 +161,13 @@ USED_LIST_TYPES = {List[t] for t in USED_PRIMITIVE_TYPES}  # type: Set[TagType]
 
 ALL_TYPEVARS = USED_PRIMITIVE_TYPES.union(USED_LIST_TYPES)   # type: Set[TagType]
 
-INTERNAL_NAMES = set(TAGLIB_INTERNAL_NAMES.values())
+INTERNAL_NAMES = sorted(set(TAGLIB_INTERNAL_NAMES.values()))
 
-TAGLIB_IDENTIFIERS = set(TAGLIB_INTERNAL_NAMES.keys())
+TAGLIB_IDENTIFIERS = sorted(set(TAGLIB_INTERNAL_NAMES.keys()))
 
-DISPLAY_NAMES = set(TAGLIB_DISPLAY_NAMES.values())
+DISPLAY_NAMES = sorted(set(TAGLIB_DISPLAY_NAMES.values()))
 
-ALL_SUPPORTED_IDENTIFIERS = INTERNAL_NAMES.union(TAGLIB_IDENTIFIERS)
+ALL_SUPPORTED_IDENTIFIERS = sorted(INTERNAL_NAMES + TAGLIB_IDENTIFIERS)
 
 TagValue = TypeVar("TagValue", *ALL_TYPEVARS)
 
