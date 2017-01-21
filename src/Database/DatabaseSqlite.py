@@ -279,7 +279,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         result = []
         for track in db.execute("SELECT title, artist, album, location, imported, available, type, init FROM track \
-                                WHERE imported = ?", [False]):
+                                WHERE imported = ?", [False]).fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -300,7 +300,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         result = []
         for track in db.execute("SELECT title, artist, album, location, imported, available, type, init\
-                                FROM track WHERE available = ?", [False]):
+                                FROM track WHERE available = ?", [False]).fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -321,7 +321,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         result = []
         for track in db.execute("SELECT title, artist, album, location, imported, available, type, init\
-                                FROM track WHERE init = ?", [False]):
+                                FROM track WHERE init = ?", [False]).fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -344,7 +344,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         # FIXME: escape input strings
         db = sqlite3.connect(self.db_path)
         track_tuple = db.execute(
-                            "SELECT * FROM track WHERE title = ? AND artist = ? AND album = ? AND imported = ? \
+                            "SELECT title, artist, album, location, imported, available, type, init \
+                            FROM track WHERE title = ? AND artist = ? AND album = ? AND imported = ? \
                             AND available = ? AND init = ?",
                             [title, artist, album, True, True, True])
         track = track_tuple.fetchone()
@@ -369,7 +370,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         result = []
         for track in db.execute("SELECT title, artist, album, location, imported, available, type, init\
                                 FROM track WHERE artist = ? AND imported = ? AND available = ? \
-                                     AND init = ?", [artist, True, True, True]):
+                                     AND init = ?", [artist, True, True, True]).fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -395,7 +396,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         result = []
         for track in db.execute("SELECT title, artist, album, location, imported, available, type, init \
                                 FROM track WHERE artist = ? AND album = ? AND imported = ? AND \
-                                available = ? AND init = ?", [artist, album, True, True, True]):
+                                available = ? AND init = ?", [artist, album, True, True, True]).fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -424,7 +425,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         # t = track_tuple.fetchone()
         track = {}
         for tag in INTERNAL_NAMES:
-            track[tag] = db.execute("SELECT ? FROM trackTag WHERE location = ?", [tag, location])
+            if (tag not in ["artist", "location", "title", "album"]) and (not isListType(tag)):
+                track[tag] = db.execute("SELECT ? FROM trackTag WHERE location = ?", [tag, location]).fetchone()
             # TODO: Think of a better way...
             # track[tag] = t[tag]         # I Don't Think that this will work :\
 
