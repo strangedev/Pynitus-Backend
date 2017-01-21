@@ -299,7 +299,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         result = []
-        for track in db.execute("SELECT * FROM track WHERE available = ?", [False]):
+        for track in db.execute("SELECT title, artist, album, location, imported, available, type, init\
+                                FROM track WHERE available = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -319,7 +320,8 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         result = []
-        for track in db.execute("SELECT * FROM track WHERE init = ?", [False]):
+        for track in db.execute("SELECT title, artist, album, location, imported, available, type, init\
+                                FROM track WHERE init = ?", [False]):
             result.append(
                 {"title": track[0],
                  "artist": track[1],
