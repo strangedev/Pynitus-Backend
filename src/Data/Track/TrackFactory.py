@@ -49,18 +49,18 @@ class TrackFactory(UniqueFactory):
         for key in set(kwargs) - {"type", "title", "artist", "album"}:
             setattr(track, key, kwargs[key])
 
-        track.__metadata_load_hook = self.loadMetadata
-
+        self.generateMetadataHook(track)
         return track
 
-    def loadMetadata(self, track):
+    def generateMetadataHook(self, track):
 
         meta_data = self.db.getMetainformation(track.title, track.artist, track.album)
 
         for key in TagSupport.TAGLIB_INTERNAL_NAMES.values():
-            setattr(track, key, None)
+            setattr(track, "__" + key, None)
+
+        if meta_data is None:
+            return
 
         for key in meta_data:
-            setattr(track, key, meta_data[key])
-
-        return track
+            setattr(track, "__" + key, meta_data[key])

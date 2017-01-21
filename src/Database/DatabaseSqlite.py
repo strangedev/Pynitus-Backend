@@ -135,7 +135,7 @@ class DatabaseSqlite(IDatabaseAdapter):
                         VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                        [
                            track_tag["title"], track_tag["artist"], track_tag["album"],
-                           location, False, False, track_type, True
+                           location, False, False, track_type, False
                        ])
             # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
         except sqlite3.IntegrityError:
@@ -220,7 +220,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         db = sqlite3.connect(self.db_path)
         result = []
         for track in db.execute("SELECT title, artist, album, location, imported, available, type, init \
-                                FROM track").fetchall():
+                                FROM track  WHERE imported = ? ", [True]).fetchall():
             result.append(
                 {"title": track[0],
                  "artist": track[1],
@@ -240,7 +240,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         artists = []
-        artist_tuple = db.execute("SELECT artist FROM track GROUP BY artist").fetchall()
+        artist_tuple = db.execute("SELECT artist FROM track WHERE imported = ? GROUP BY artist", [True]).fetchall()
         for artist in artist_tuple:
             artists.append(artist[0])
         return artists
@@ -252,7 +252,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         albums = []
-        albums_tuple = db.execute("SELECT album FROM track GROUP BY album").fetchall()
+        albums_tuple = db.execute("SELECT album FROM track WHERE imported = ? GROUP BY album", [True]).fetchall()
 
         for album in albums_tuple:
             albums.append(album[0])
@@ -265,7 +265,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         db = sqlite3.connect(self.db_path)
         albums = []
-        albums_tuple = db.execute("SELECT album FROM track WHERE artist = ? GROUP BY album", [artist]).fetchall()
+        albums_tuple = db.execute("SELECT album FROM track WHERE imported = ? AND artist = ? GROUP BY album", [True, artist]).fetchall()
 
         for album in albums_tuple:
             albums.append(album[0])
