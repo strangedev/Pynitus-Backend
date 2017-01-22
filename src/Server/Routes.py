@@ -5,6 +5,7 @@ from src.Views.TestViews import TestViews
 
 from src.Views.Admin.AdminViews import AdminViews
 from src.Views.Library.LibraryViews import LibraryViews
+from src.Views.Upload.UploadViews import NewUploadView, UploadProcessViews
 
 
 class Routes(object):
@@ -33,3 +34,5 @@ class Routes(object):
 Routes.register("/admin", AdminViews)
 Routes.register("/library", LibraryViews)
 Routes.register("/test/$arg", TestViews)
+Routes.register("/upload/new", NewUploadView)
+Routes.register("/upload/handler/$track_type", UploadProcessViews)

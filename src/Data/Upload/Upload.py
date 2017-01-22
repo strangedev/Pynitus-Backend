@@ -25,14 +25,13 @@ from typing import TypeVar, Type
 from src.Data.Tagging import TagSanitizer
 from src.Data.Tagging import TagSupport
 from src.Data.Tagging.TagSupport import TagValue
-from src.Data.Upload.UploadHandlers.AUploadHandler import AUploadHandler
 from src.Utilities.TypingFixes import Either
 
 
 class Upload(object):
 
-    UrlArgument = TypeVar("UrlArgument", str)
-    FileArgument = TypeVar("FileArgument", io.RawIOBase)
+    UrlArgument = TypeVar("UrlArgument", str, None)
+    FileArgument = TypeVar("FileArgument", io.RawIOBase, None)
 
     argument_types = {
         UrlArgument,
@@ -41,7 +40,7 @@ class Upload(object):
 
     UploadArgument = Either(*argument_types)
 
-    def __init__(self, upload_handler: AUploadHandler):
+    def __init__(self, upload_handler):
         self.__upload_handler = upload_handler
         self.__location = None
         self.__track_type = None

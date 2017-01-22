@@ -9,14 +9,14 @@
   </table>
 
   <table class="table table-responsive">
-    {% for trackType, trackDesc in trackTypesAndDescs %}
+    {% for upload_handler_description in upload_handler_descriptions %}
     <tr>
-      <td>{{trackType}}</td>
-      <td>{{trackDesc}}</td>
+      <td>{{upload_handler_description.display_name}}</td>
+      <td>{{upload_handler_description.description}}</td>
       <td>
-        <form action="addByType" method="get">
-          <button type="submit" class="btn btn-success" name="trackType" value="{{trackType}}">Add {{trackType}}</button>
-        </form>
+        <a href="/upload/handler/{{upload_handler_description.internal_name}}">
+          <button type="button" class="btn btn-info">Add {{upload_handler_description.display_name}}</button>
+        </a>
       </td>
     </tr>
     {% endfor %}

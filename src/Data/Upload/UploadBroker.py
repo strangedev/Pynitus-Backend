@@ -23,6 +23,7 @@ from typing import Set
 from src.Data.Upload.UploadHandlerDescription import UploadHandlerDescription
 from src.Data.Upload.Upload import Upload
 from src.Data.Upload.UploadHandlers.AUploadHandler import AUploadHandler
+from src.Data.Upload.UploadHandlers.YoutubeUploadHandler import YoutubeUploadHandler
 from src.Database.Database import Database
 
 
@@ -75,3 +76,5 @@ class UploadBroker(object):
             raise UploadInvalidException()
 
         UploadBroker.__database.addTrack(upload.location, upload.track_type, upload.tag_info)
+
+UploadBroker.registerUploadHandler(YoutubeUploadHandler)
