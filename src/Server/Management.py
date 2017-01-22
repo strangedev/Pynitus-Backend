@@ -1,11 +1,11 @@
 from src.Config.ConfigLoader import ConfigLoader
-from src.Data.PlaybackQueue import PlaybackQueue
 from src.Database.Database import Database
-from src.Server.FloodProtection import FloodProtection
-from src.Server.HtmlBuilder import HtmlBuilder
-from src.Server.Router import Router
-from src.Server.SessionHandler import SessionHandler
-from src.Server.VoteHandler import VoteHandler
+from src.Player.PlaybackQueue import PlaybackQueue
+from src.Server.Components.FloodProtection import FloodProtection
+from src.Server.Components.HtmlBuilder import HtmlBuilder
+from src.Server.Components.SessionHandler import SessionHandler
+from src.Server.Components.VoteHandler import VoteHandler
+from src.Server.Routing.Router import Router
 
 
 class Management(object):

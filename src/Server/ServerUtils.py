@@ -13,6 +13,14 @@ def getForCurrentSession(management, attr):
     return getCurrentSession(management).get(attr)
 
 
+def existsForCurrentSession(management, attr):
+    return getCurrentSession(management).exists(attr)
+
+
+def removeForCurrentSession(management, attr):
+    getCurrentSession(management).remove(attr)
+
+
 def returnToLastPage(view, management):
     if getCurrentSession(management).exists('lastpage'):
 

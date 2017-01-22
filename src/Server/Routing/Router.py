@@ -1,7 +1,8 @@
 import cherrypy
 
 from src.Server import CherryPyConfig
-from src.Server.Routes import Routes
+from src.Server import ServerUtils
+from src.Server.Routing.Routes import Routes
 
 
 class Router(object):
@@ -23,9 +24,13 @@ class Router(object):
         )
 
     def _cp_dispatch(self, vpath):
+        try:
+            self.__management.session_handler.activity(ServerUtils.getClientIp())
+        except Exception as e:
+            print(e)
         route = Routes.getRoute(vpath, self.__management, cherrypy.request.params)
         return route if route is not None else vpath
 
     @cherrypy.expose
     def index(self):
-        return "No routes were found."
+        return Routes.getDefaultRoute(self.__management).index()

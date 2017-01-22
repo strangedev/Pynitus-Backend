@@ -1,7 +1,7 @@
 import cherrypy
 
 from src.Server import ServerUtils
-from src.Server.HtmlBuilder import HtmlBuilder
+from src.Server.Components.HtmlBuilder import HtmlBuilder
 
 
 class AdminViews(object):
@@ -12,10 +12,4 @@ class AdminViews(object):
     # TODO: session activity
     @cherrypy.expose
     def index(self):
-        self.__management.session_handler.activity(ServerUtils.getClientIp())
-        return HtmlBuilder.render(
-            "unimported.html",
-            ServerUtils.getClientIp(),
-            tracks=[(track.title, track.album, track.artist)
-                    for track in self.__management.database.getUnimported()]
-        )
+        return "Magic here"

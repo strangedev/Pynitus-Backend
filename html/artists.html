@@ -1,5 +1,13 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
+<div class="panel-heading">
+  <ol class="breadcrumb" style="background-color:#375a7f">
+    <li class="breadcrumb-item"><a href="/"><b>Pynitus</b></a></li>
+    <li class="breadcrumb-item"><a href="/library">Library</a></li>
+    <li class="breadcrumb-item active">Artists</li>
+  </ol>
+</div>
+<div class="panel-body">
     <table class="table table-hover" id="artistTable">
       <tr>
         <th>Artist</th>
@@ -22,4 +30,5 @@
       </tr>
       {% endfor %}
     </table>
+</div>
 {% endblock %}

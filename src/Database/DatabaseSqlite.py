@@ -26,6 +26,7 @@ from src.Database.IDatabaseAdapter import IDatabaseAdapter
 
 
 class DatabaseSqlite(IDatabaseAdapter):
+
     def __init__(
             self,
             db_path: str):
@@ -173,44 +174,55 @@ class DatabaseSqlite(IDatabaseAdapter):
         db.execute("UPDATE track set available = 0")
         db.commit()
 
-    def setTrackIsImported(self, title: str, artist: str, album: str) -> None:
+    def setTrackIsImported(self, location: str) -> None:
         """
         Sets Tracks imported Attribute to True
-        :param title: Title of Track
-        :param artist: Artist of Track
-        :param album: Album of Track
+        :param location: The tracks location
         :return: None
         """
         db = sqlite3.connect(self.db_path)
         db.execute("UPDATE track SET imported = ? WHERE location = ?",
-                   [True, self.__getLocation(title, artist, album)])
+                   [True, location])
         db.commit()
 
-    def setTrackIsInitialized(self, title: str, artist: str, album: str) -> None:
+    def setTrackIsInitialized(self, location: str) -> None:
         """
         Sets Tracks init Attribute to True
-        :param title: Title of Track
-        :param artist: Artist of Track
-        :param album: Album of Track
+        :param location The tracks location
         :return: None
         """
         db = sqlite3.connect(self.db_path)
         db.execute("UPDATE track SET init = ? WHERE location = ?",
-                   [True, self.__getLocation(title, artist, album)])
+                   [True, location])
         db.commit()
 
-    def setTrackIsAvailable(self, title: str, artist: str, album: str) -> None:
+    def setTrackIsAvailable(self, location: str) -> None:
         """
         Sets Tracks available Attribute to True
-        :param title: Title of Track
-        :param artist: Artist of Track
-        :param album: Album of Track
+        :param location The tracks location
         :return: None
         """
         db = sqlite3.connect(self.db_path)
         db.execute("UPDATE track SET available = ? WHERE location = ?",
-                   [True, self.__getLocation(title, artist, album)])
+                   [True, location])
         db.commit()
+
+    def getByLocation(self, location: str):
+        db = sqlite3.connect(self.db_path)
+        result = None
+        for track in db.execute("SELECT title, artist, album, location, imported, available, type, init\
+                                        FROM track WHERE location = ?", [location]).fetchall():
+            result = {
+                "title": track[0],
+                 "artist": track[1],
+                 "album": track[2],
+                 "location": track[3],
+                 "imported": track[4],
+                 "available": track[5],
+                 "type": track[6],
+                 "initialized": track[7]
+            }
+        return result
 
     def getTracks(self) -> List[Dict[str, any]]:
         """
@@ -334,20 +346,18 @@ class DatabaseSqlite(IDatabaseAdapter):
             )
         return result
 
-    def getTrack(self, title: str, artist: str, album: str) -> Dict[str, any]:
+    def getTrack(self, location: str) -> Dict[str, any]:
         """
-        :param title: Title from Track to get
-        :param artist: Artist from Track to get
-        :param album: Album from Track to get
+        :param location: The tracks location
         :return: Dictionary with Keys: Title, Artist, Album, Location, imported, available and type
         """
         # FIXME: escape input strings
         db = sqlite3.connect(self.db_path)
         track_tuple = db.execute(
                             "SELECT title, artist, album, location, imported, available, type, init \
-                            FROM track WHERE title = ? AND artist = ? AND album = ? AND imported = ? \
+                            FROM track WHERE location = ? AND imported = ? \
                             AND available = ? AND init = ?",
-                            [title, artist, album, True, True, True])
+                            [location, True, True, True])
         track = track_tuple.fetchone()
         if track is None:
             return None
@@ -409,15 +419,12 @@ class DatabaseSqlite(IDatabaseAdapter):
             )
         return result
 
-    def getMetainformation(self, title: str, artist: str, album: str) -> Dict[str, any]:
+    def getMetainformation(self, location: str) -> Dict[str, any]:
         """
-        :param title: Title to get Metainformation from
-        :param artist: Artist to get Metainformation from
-        :param album: Album to get Metainformation from
-        :return: Dictionary with Metainformation based on given Artist, Title and Album
+        :param location Location of track to get Metainformation from
+        :return: Dictionary with Metainformation based on given location
         """
         db = sqlite3.connect(self.db_path)
-        location = self.__getLocation(title, artist, album)
         if location is None:
             return None
 
@@ -448,3 +455,6 @@ class DatabaseSqlite(IDatabaseAdapter):
                 names.append(feature[0])
             track["involved"] = names
         return track
+
+    def updateTrack(self, location: str, tag_info: Dict[str, TagValue]) -> None:
+        return NotImplemented  # TODO

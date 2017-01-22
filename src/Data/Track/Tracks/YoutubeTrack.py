@@ -18,48 +18,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-
-from src.Data import Track
-from src.Data.Track.PlaybackHandlers import YoutubePlaybackHandler
-from src.Data.Upload.UploadHandlers import YoutubeUploadHandler
+from src.Data.Track.Track import Track
 
 
 class YoutubeTrack(Track):
 
-    description = "A Youtube URL"
-    uploadHandler = YoutubeUploadHandler
+    description = "A Track from YouTube"
 
-    def isTrackOfType(path_to_record):
+    def __init__(self, location, title: str, artist: str, album: str):
+        super().__init__("", title, artist, album)
 
-        if not os.path.isdir(path_to_record):
-            return False
+        self.playback_handler_class # = PlaybackHandler
+        self.playback_handler_instance = None  # TODO: Move to central PlaybackHandler
+        self.delegate = None
 
-        for item in os.listdir(path_to_record):
-
-            item_name, item_extension = os.path.splitext(item)
-
-            if item_extension == ".yturl":
-                return True
-
-        return False
-
-    def __init__(self, artist_name, album_title, title):
-
-        super().__init__(artist_name, album_title, title)
-
-        self.playbackHandlerClass = YoutubePlaybackHandler
-        self.url = None
-
-    def restoreFromLocalRecord(self, path_to_record):
-
-        super().restoreFromLocalRecord(path_to_record)
-
-        for item in os.listdir(path_to_record):
-
-            item_name, item_extension = os.path.splitext(item)
-
-            if item_extension == ".yturl":
-
-                self.url = open(os.path.join(path_to_record, item)).read()
-                break
+    def available(self):
+        return True  # TODO

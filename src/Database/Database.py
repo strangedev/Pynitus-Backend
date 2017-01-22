@@ -28,6 +28,7 @@ from src.Data.Track.Track import Track
 from src.Data.Track.TrackFactory import TrackFactory
 from src.Database.IDatabaseAdapter import IDatabaseAdapter
 from src.Utilities import MediaScanner
+from src.Utilities.TypingFixes import Maybe
 
 
 class Database(object):
@@ -57,7 +58,7 @@ class Database(object):
 
             if required_metadata_present:
                 # Check if exists in db
-                if self.db.getTrack(tag_info["title"], tag_info["artist"], tag_info["album"]) is not None:
+                if self.db.getByLocation(file_path) is not None:
                     add_track = False
 
             if add_track:
@@ -67,15 +68,15 @@ class Database(object):
                     tag_info
                 )
 
-            self.db.setTrackIsAvailable(tag_info["title"], tag_info["artist"], tag_info["album"])
-            self.db.setTrackIsInitialized(tag_info["title"], tag_info["artist"], tag_info["album"])
+            self.db.setTrackIsAvailable(file_path)
+            self.db.setTrackIsInitialized(file_path)
 
         # Check remaining uninitialized tracks
-        #for track in (self.trackFactory.getTrack(**td) for td in self.db.getUninitialized()):
-         #   print(track)
-         #   if track.available():
-         #       self.db.setTrackIsAvailable(track.title, track.artist, track.album)
-         #   self.db.setTrackIsInitialized(track.title, track.artist, track.album)
+        for track in (self.trackFactory.getTrack(**td) for td in self.db.getUninitialized()):
+            print(track)
+            if track.available():
+                self.db.setTrackIsAvailable(track.location)
+            self.db.setTrackIsInitialized(track.location)
 
     def addTrack(
             self,
@@ -84,6 +85,17 @@ class Database(object):
             tag_info: Dict[str, TagValue]
     ) -> None:
         self.db.addTrack(location, track_type, tag_info)
+
+    def getByLocation(self, location: str) -> Maybe(Track):
+        """
+        Returns a track by it's location, doesn't mind whether it's imported or not.
+        :param location: The tracks location
+        :return: The track if found, None otherwise
+        """
+        track_dict = self.db.getByLocation(location)
+        if track_dict is None:
+            return None
+        return self.trackFactory.getTrack(**track_dict)
 
     def getTracks(self) -> List[Track]:
         track_dicts = self.db.getTracks()
@@ -116,4 +128,18 @@ class Database(object):
     def getUnavailable(self) -> List[Track]:
         track_dicts = self.db.getUnavailable()
         return [self.trackFactory.getTrack(**track_dict) for track_dict in track_dicts]
+
+    def updateTrack(self, track) -> None:
+        for internal_name in TagSupport.REQUIRED_TAGS:
+            if internal_name not in track.tag_info:
+                return
+            if track.tag_info[internal_name] is None or track.tag_info[internal_name] == []:
+                return
+
+        self.db.updateTrack(track.location, track.tag_info)
+
+    def importTrack(self, track):
+        self.db.setTrackIsImported(track.location)
+        self.db.setTrackIsAvailable(track.available())
+        self.db.setTrackIsInitialized(track.location)
 

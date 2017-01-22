@@ -17,22 +17,23 @@
 """
 from typing import Dict
 
-from src.Data.Tagging import TagSupport
 from src.Data.Track.Track import Track
 from src.Data.Foundation.UniqueFactory import UniqueFactory
+from src.Data.Track.Tracks.FileTrack import FileTrack
+from src.Data.Track.Tracks.YoutubeTrack import YoutubeTrack
 from src.Database.IDatabaseAdapter import IDatabaseAdapter
 
 
 class TrackFactory(UniqueFactory):
 
-    track_types = dict({"FileTrack": Track})  # type:Dict[str, Track.__class__]
+    track_types = dict({})  # type:Dict[str, Track.__class__]
 
     @classmethod
-    def register(cls, track_type, constructor):
-        cls.track_types[track_type] = constructor
+    def register(cls, constructor: Track.__class__):
+        cls.track_types[constructor.__name__] = constructor
 
     def __init__(self, database: IDatabaseAdapter):
-        super(TrackFactory, self).__init__(Track, "title", "artist", "album")
+        super(TrackFactory, self).__init__(Track, "location", "title", "artist", "album")
 
         self.db = database
 
@@ -41,26 +42,17 @@ class TrackFactory(UniqueFactory):
         self.setConstructor(TrackFactory.track_types[kwargs["type"]])
 
         track = self.new(
+            location=kwargs["location"],
             title=kwargs["title"],
             artist=kwargs["artist"],
             album=kwargs["album"]
         )
 
-        for key in set(kwargs) - {"type", "title", "artist", "album"}:
-            setattr(track, key, kwargs[key])
+        meta_data = self.db.getMetainformation(track.location)
+        track.tag_info = meta_data
 
-        self.generateMetadataHook(track)
         return track
 
-    def generateMetadataHook(self, track):
+TrackFactory.register(YoutubeTrack)
+TrackFactory.register(FileTrack)
 
-        meta_data = self.db.getMetainformation(track.title, track.artist, track.album)
-
-        for key in TagSupport.TAGLIB_INTERNAL_NAMES.values():
-            setattr(track, "__" + key, None)
-
-        if meta_data is None:
-            return
-
-        for key in meta_data:
-            setattr(track, "__" + key, meta_data[key])

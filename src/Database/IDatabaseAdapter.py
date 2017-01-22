@@ -71,7 +71,14 @@ class IDatabaseAdapter(object):
         """
         return NotImplemented
 
-    def getTracks(self) -> List[Dict[str, any]]:
+    def getByLocation(self, location: str) -> Dict[str, Any]:
+        """
+        Returns a dict representing a track by it's location.
+        :return: A dict representing a track by it's location or None if not found.
+        """
+        return NotImplemented
+
+    def getTracks(self) -> List[Dict[str, Any]]:  # TODO: preserve artist and album
         """
         Returns all stored Track_Information as Dictionary
         :return: List of Dictionary based on all Tracks in Database
@@ -85,7 +92,7 @@ class IDatabaseAdapter(object):
         """
         return NotImplemented
 
-    def getAlbums(self) -> List[str]:
+    def getAlbums(self) -> List[str]:  # TODO: preserve artist
         """
         Returns all album titles in the Database as strings.
         :return: A list of strings containing all album titles
@@ -125,18 +132,13 @@ class IDatabaseAdapter(object):
         """
         return NotImplemented
 
-    def getTrack(self,
-                 title: str,
-                 artist: str,
-                 album: str) -> Dict[str, str]:
+    def getTrack(self, location: str) -> Dict[str, str]:
         """
         Returns a tracks by title of a given album of a given artist.
 
         Tracks are returned as dictionaries of their basic attributes as
         specified in addTrack.
-        :param title: The track title
-        :param artist: The artist name
-        :param album: The album title
+        :param location: The tracks location
         :return: A dictionary containing the basic track information.
         """
         return NotImplemented
@@ -181,49 +183,39 @@ class IDatabaseAdapter(object):
 
     def getMetainformation(
             self,
-            title: str,
-            artist: str,
-            album: str) -> Dict[str, Any]:
+            location: str) -> Dict[str, Any]:
         """
         Returns a tracks meta information a specified in ID3Standard.ID3_ATTRIBUTES
         as a dictionary. The used dictionary keys are from ID3Standard.TAGLIB_INTERNAL_NAMES.
 
-        :param title: The track title
-        :param artist: The artist name
-        :param album: The album title
+        :param location: The tracks location
         :return: A dictionary of meta information
         """
         return NotImplemented
 
-    def setTrackIsImported(self, title: str, artist: str, album: str) -> None:
+    def setTrackIsImported(self, location: str) -> None:
         """
         Marks a track as imported and usable.
 
-        :param title: The track title
-        :param artist: The artist name
-        :param album: The album title
+        :param location: The tracks location
         :return: None
         """
         return NotImplemented
 
-    def setTrackIsInitialized(self, title: str, artist: str, album: str) -> None:
+    def setTrackIsInitialized(self, location: str) -> None:
         """
         Marks a track as initialized (startup check was performed)
 
-        :param title: The track title
-        :param artist: The artist name
-        :param album: The album name
+        :param location: The tracks location
         :return: None
         """
         return NotImplemented
 
-    def setTrackIsAvailable(self, title: str, artist: str, album: str) -> None:
+    def setTrackIsAvailable(self, location: str) -> None:
         """
         Marks a track as available (can be played back).
 
-        :param title: The track title
-        :param artist: The artist name
-        :param album: The album title
+        :param location: The tracks location
         :return: None
         """
         return NotImplemented
@@ -246,5 +238,14 @@ class IDatabaseAdapter(object):
         """
         sets all Data in Tracks marked as unavailable
         :return: None
+        """
+        return NotImplemented
+
+    def updateTrack(self, location: str, tag_info: Dict[str, TagValue]) -> None:
+        """
+
+        :param location:
+        :param tag_info:
+        :return:
         """
         return NotImplemented

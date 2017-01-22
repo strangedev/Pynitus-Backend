@@ -17,8 +17,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import Dict
 
-from src.Data.Track.PlaybackHandler import PlaybackHandler
+from src.Data.Tagging import TagSanitizer
+from src.Data.Tagging import TagSupport
+from src.Data.Tagging.TagSupport import TagValue
+from src.Player.PlaybackHandler import PlaybackHandler
 
 
 def lazy_metadata(func):
@@ -34,15 +38,16 @@ class Track(object):
     Superclass for all playable and manageable Tracks.
     """
 
+    name = "Track"
     description = "A Track"
 
-    def __init__(self, title: str, artist: str, album: str):
+    def __init__(self, location: str, title: str, artist: str, album: str):
 
         self.playback_handler_class = PlaybackHandler
         self.playback_handler_instance = None  # TODO: Move to central PlaybackHandler
         self.delegate = None
-        self.__meta_info_loaded = False
-        self.__meta_info_load_hook = None
+
+        self.location = location
 
         self.__title = title
         self.__artist = artist
@@ -63,14 +68,44 @@ class Track(object):
         self.__mood = None
         self.__length = None
         self.__comment = None
+        self.__tag_info = None
 
     @property
-    def meta_info_load_hook(self):
-        return None
+    def tag_info(self):
+        if self.__tag_info is None:
+            self.__tag_info = dict({})
+            self.__tag_info["title"] = self.title
+            self.__tag_info["artist"] = self.artist
+            self.__tag_info["album"] = self.album
+            self.__tag_info["subtitle"] = self.subtitle
+            self.__tag_info["album_artist"] = self.album_artist
+            self.__tag_info["conductor"] = self.conductor
+            self.__tag_info["remixer"] = self.remixer
+            self.__tag_info["composer"] = self.composer
+            self.__tag_info["lyricist"] = self.lyricist
+            self.__tag_info["features"] = self.features
+            self.__tag_info["track_number"] = self.track_number
+            self.__tag_info["label"] = self.label
+            self.__tag_info["genres"] = self.genres
+            self.__tag_info["date"] = self.date
+            self.__tag_info["bpm"] = self.bpm
+            self.__tag_info["key"] = self.key
+            self.__tag_info["mood"] = self.mood
+            self.__tag_info["length"] = self.length
+            self.__tag_info["comment"] = self.comment
 
-    @meta_info_load_hook.setter
-    def meta_info_load_hook(self, hook):
-        self.__meta_info_load_hook = hook
+        return self.__tag_info
+
+    @tag_info.setter
+    def tag_info(self, tag_info: Dict[str, TagValue]):
+
+        tag_info = TagSanitizer.sanitizeTags(tag_info)
+
+        for key in TagSupport.TAGLIB_INTERNAL_NAMES.values():
+            setattr(self, "__" + key, None)
+        if tag_info is not None:
+            for key in tag_info:
+                setattr(self, "__" + key, tag_info[key])
 
     @property
     def title(self):
@@ -98,8 +133,6 @@ class Track(object):
 
     @property
     def subtitle(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__subtitle
 
     @subtitle.setter
@@ -108,8 +141,6 @@ class Track(object):
 
     @property
     def album_artist(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__album_artist
 
     @album_artist.setter
@@ -118,8 +149,6 @@ class Track(object):
 
     @property
     def conductor(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__conductor
 
     @conductor.setter
@@ -128,8 +157,6 @@ class Track(object):
 
     @property
     def remixer(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__remixer
 
     @remixer.setter
@@ -138,8 +165,6 @@ class Track(object):
 
     @property
     def composer(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__composer
 
     @composer.setter
@@ -148,8 +173,6 @@ class Track(object):
 
     @property
     def lyricist(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__lyricist
 
     @lyricist.setter
@@ -158,8 +181,6 @@ class Track(object):
 
     @property
     def features(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__features
 
     @features.setter
@@ -168,8 +189,6 @@ class Track(object):
 
     @property
     def track_number(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__track_number
 
     @track_number.setter
@@ -178,8 +197,6 @@ class Track(object):
 
     @property
     def label(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__label
 
     @label.setter
@@ -188,8 +205,6 @@ class Track(object):
 
     @property
     def genres(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__genres
 
     @genres.setter
@@ -198,8 +213,6 @@ class Track(object):
 
     @property
     def date(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__date
 
     @date.setter
@@ -208,8 +221,6 @@ class Track(object):
 
     @property
     def bpm(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__bpm
 
     @bpm.setter
@@ -218,8 +229,6 @@ class Track(object):
 
     @property
     def key(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__key
 
     @key.setter
@@ -228,8 +237,6 @@ class Track(object):
 
     @property
     def mood(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__mood
 
     @mood.setter
@@ -238,8 +245,6 @@ class Track(object):
 
     @property
     def length(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__length
 
     @length.setter
@@ -248,8 +253,6 @@ class Track(object):
 
     @property
     def comment(self):
-        if not self.__meta_info_loaded:
-            self.__meta_info_load_hook(self)
         return self.__comment
 
     @comment.setter

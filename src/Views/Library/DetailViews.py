@@ -4,17 +4,13 @@ from src.Server import ServerUtils
 from src.Server.Components.HtmlBuilder import HtmlBuilder
 
 
-class LibraryViews(object):
+class DetailViews(object):
 
     def __init__(self, management):
         self.__management = management
 
     @cherrypy.expose
-    def index(self):
-        return self.artists()
-
-    @cherrypy.expose
-    def artists(self):
+    def artist(self, artist: str=""):
         self.__management.session_handler.activity(ServerUtils.getClientIp())
         return HtmlBuilder.render(
             "artists.html",
@@ -23,7 +19,7 @@ class LibraryViews(object):
         )
 
     @cherrypy.expose
-    def albums(self):
+    def album(self, artist: str="", album: str=""):
         self.__management.session_handler.activity(ServerUtils.getClientIp())
         return HtmlBuilder.render(
             "albums.html",
@@ -32,7 +28,7 @@ class LibraryViews(object):
         )
 
     @cherrypy.expose
-    def tracks(self):
+    def tracks(self, track: str="", artist: str="", album: str=""):
         self.__management.session_handler.activity(ServerUtils.getClientIp())
         return HtmlBuilder.render(
             "tracks.html",

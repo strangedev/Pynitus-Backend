@@ -18,13 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from src.Data.Track import PlaybackHandler
+from src.Player import PlaybackHandler
 
 
-class FilePlaybackHandler(PlaybackHandler):
+class SoundcloudPlaybackHandler(PlaybackHandler):
     """
-    A PlaybackHandler capable of playing back local
-    audio files.
+    A PlaybackHandler capable of playing back sound
+    from youtube videos.
     """
 
     def __init__(self):
@@ -34,6 +34,6 @@ class FilePlaybackHandler(PlaybackHandler):
         if self.isPlaying():
             return
 
-        player_command = ["mplayer", track.filepath]
+        player_command = ["mpv", track.url]
 
         super().play(player_command, delegate)

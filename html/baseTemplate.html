@@ -9,6 +9,7 @@
 
     <!-- Bootstrap -->
     <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/pynitus.css" rel="stylesheet"/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32">
 
@@ -65,12 +66,12 @@
         </tr>
       </table>
 
-      <div class="well well-lg">
+      <div class="panel panel-default">
         <table class="table table-striped">
           <tr>
             <th class=""><span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> Now playing</th>
+            <th class=""><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> {{actionsLeft}} / {{maxActions}} queue tickets left
             <th class=""><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> {{voteCount}} / {{votesRequired}} votes required to skip</th>
-            <th class=""><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> {{actionsLeft}} / {{maxActions}} queue tickets left</th>
           </tr>
           <tr>
             <td>
@@ -81,20 +82,11 @@
               {% endif %}
             </td>
             <td>
+            </td>
+            <td>
               <a href="voteSkip">
                 <button type="button" class="btn btn-warning {% if not playing%}disabled{% endif %}"><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span> vote to skip</button>
               </a>
-            </td>
-            <td>
-              {% if playing %}
-                <a href="stopPlaying">
-                  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span> stop playback</button>
-                </a>
-              {% else %}
-                <a href="startPlaying">
-                  <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> start playback</button>
-                </a>
-              {% endif %}
             </td>
           </tr>
         </table>
@@ -103,9 +95,10 @@
       <br/>
       <br/>
 
-      <div class=" well well-lg">
-        {% block content %}{% endblock %}
+      <div class="panel panel-primary">
+          {% block content %}{% endblock %}
       </div>
+
 
     <!--table class="table bg-primary">
       <tr>

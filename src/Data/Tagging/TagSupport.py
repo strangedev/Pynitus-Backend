@@ -222,7 +222,7 @@ def getDisplayNameByInternalName(attribute_name: str) -> str:
     :param attribute_name: The internal attribute name
     :return: The display name
     """
-    if attribute_name not in TAGLIB_INTERNAL_NAMES:
+    if attribute_name not in TAGLIB_INTERNAL_NAMES.values():
         raise TagUnsupportedException("{} is not a supported tag attribute.".format(attribute_name))
 
     return TAGLIB_DISPLAY_NAMES[TAGLIB_IDENTIFIER_LOOKUP[attribute_name]]

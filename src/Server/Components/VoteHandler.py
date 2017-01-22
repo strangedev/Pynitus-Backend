@@ -22,7 +22,7 @@ import math
 from typing import List
 
 from src.Config.ConfigLoader import ConfigLoader
-from src.Server.SessionHandler import SessionHandler
+from src.Server.Components.SessionHandler import SessionHandler
 
 
 class VoteHandler(object):

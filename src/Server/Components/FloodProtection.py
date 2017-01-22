@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Dict
 
 from src.Config.ConfigLoader import ConfigLoader
-from src.Server.SessionHandler import SessionHandler
+from src.Server.Components.SessionHandler import SessionHandler
 
 
 class ActionRecord(object):
