@@ -10,12 +10,12 @@
       <tr>
         <td>{{artistName}}</td>
         <td>
-          <form action="artist" method="get">
+          <form action="/library/artist" method="get">
             <button class="btn btn-default" name="artist" type="submit" value="{{artistName}}">view {{artistName}}'s Albums and Tracks</button>
           </form>
         </td>
         <td>
-          <form action="deleteArtist" method="get">
+          <form action="/library/deleteArtist" method="get">
             <button class="btn btn-danger" name="artist" type="submit" value="{{artistName}}"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> remove</button>
           </form>
         </td>

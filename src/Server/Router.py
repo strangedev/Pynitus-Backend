@@ -1,10 +1,7 @@
-from typing import Set
-
 import cherrypy
 
 from src.Server import CherryPyConfig
-import src.Views
-from src.Views import ROUTES
+from src.Server.Routes import Routes
 
 
 class Router(object):
@@ -26,16 +23,8 @@ class Router(object):
         )
 
     def _cp_dispatch(self, vpath):
-
-        print(vpath)
-        print(ROUTES)
-
-        for route in ROUTES:
-            if route.matchesVpath(vpath):
-                route.swallowParameters(vpath, cherrypy.request.params)
-                return route.view(self.__management)
-
-        # No route found, do something.
+        route = Routes.getRoute(vpath, self.__management, cherrypy.request.params)
+        return route if route is not None else vpath
 
     @cherrypy.expose
     def index(self):
