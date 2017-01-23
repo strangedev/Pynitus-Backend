@@ -33,7 +33,7 @@ class TrackFactory(UniqueFactory):
         cls.track_types[constructor.__name__] = constructor
 
     def __init__(self, database: IDatabaseAdapter):
-        super(TrackFactory, self).__init__(Track, "location", "title", "artist", "album")
+        super(TrackFactory, self).__init__(Track, "location")
 
         self.db = database
 
@@ -42,13 +42,13 @@ class TrackFactory(UniqueFactory):
         self.setConstructor(TrackFactory.track_types[kwargs["type"]])
 
         track = self.new(
-            location=kwargs["location"],
-            title=kwargs["title"],
-            artist=kwargs["artist"],
-            album=kwargs["album"]
+            location=kwargs["location"]
         )
 
         meta_data = self.db.getMetainformation(track.location)
+        meta_data["title"] = kwargs["title"]
+        meta_data["artist"] = kwargs["artist"]
+        meta_data["album"] = kwargs["album"]
         track.tag_info = meta_data
 
         return track

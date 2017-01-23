@@ -1,10 +1,12 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/">Pynitus</a></li>
+<div class="panel-heading">
+  <ol class="breadcrumb" style="background-color:#375a7f">
+    <li class="breadcrumb-item"><a href="/"><b>Pynitus</b></a></li>
     <li class="breadcrumb-item active">Upload</li>
   </ol>
-  <hr/>
+</div>
+<div class="panel-body">
   <table class="table table-striped">
     <tr>
       <th><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Add a new Track</th>
@@ -26,4 +28,5 @@
     </tr>
     {% endfor %}
   </table>
+<div>
 {% endblock %}

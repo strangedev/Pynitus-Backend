@@ -3,6 +3,7 @@ from typing import Dict
 import cherrypy
 
 from src.Data.Tagging import TagSupport
+from src.Data.Track.Track import Track
 from src.Server import ServerUtils
 from src.Server.Components.HtmlBuilder import HtmlBuilder
 from src.Data.Tagging.TagSupport import TagValue
@@ -24,12 +25,26 @@ class UnimportedViews(object):
 
             if TagSupport.isListType(internal_name):
                 display_name += " (separated by commas)"
-                if value is not None:
+                if value is not None and value != []:
                     value = "".join(value)
+                else:
+                    value = None
 
             tuples.append((display_name, internal_name, value, required))
 
         return sorted(tuples)
+
+    @staticmethod
+    def paramsToTagInfo(tag_info: Dict[str, str]):
+
+        for key, value in tag_info.items():
+            if TagSupport.isListType(key):
+                tag_info[key] = [i.lstrip() for i in value.split(",")]
+
+            if value is "None":
+                tag_info[key] = None
+
+        return tag_info
 
     # TODO: session activity
     @cherrypy.expose
@@ -57,14 +72,14 @@ class UnimportedViews(object):
         )
 
     @cherrypy.expose
-    def edit(self, location: str=""):
+    def edit(self, location: str="", previous_track: Track=None):
         edited_track = self.__management.database.getByLocation(location)  # TODO: implement
 
         if edited_track is None:
             return ":("
 
-        if ServerUtils.existsForCurrentSession(self.__management, "edited_track"):
-            edited_track = ServerUtils.getForCurrentSession(self.__management, "edited_track")
+        if previous_track is not None:
+            edited_track = previous_track
 
         ServerUtils.setForCurrentSession(self.__management, "edited_track", edited_track)
 
@@ -79,12 +94,12 @@ class UnimportedViews(object):
     @cherrypy.expose
     def verify(self, location="", **tag_info: Dict[str, str]):
         edited_track = ServerUtils.getForCurrentSession(self.__management, "edited_track")
-        edited_track.tag_info = tag_info
+        edited_track.tag_info = UnimportedViews.paramsToTagInfo(tag_info)
 
         for internal_name in TagSupport.REQUIRED_TAGS:
             value = edited_track.tag_info[internal_name]
             if value is None or value == []:
-                return self.edit(location)
+                return self.edit(location, edited_track)
 
         ServerUtils.removeForCurrentSession(self.__management, "edited_track")
         self.__management.database.updateTrack(edited_track)

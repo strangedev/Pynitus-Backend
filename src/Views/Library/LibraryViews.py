@@ -11,7 +11,10 @@ class LibraryViews(object):
 
     @cherrypy.expose
     def index(self):
-        return self.artists()
+        return HtmlBuilder.render(
+            "library.html",
+            ServerUtils.getClientIp()
+        )
 
     @cherrypy.expose
     def artists(self):
