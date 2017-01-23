@@ -18,7 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import sqlite3
 
 from src.Data.Tagging.TagSupport import TagValue, INTERNAL_NAMES, isListType
@@ -114,19 +114,12 @@ class DatabaseSqlite(IDatabaseAdapter):
         """
         # FIXME: escape input strings
         db = sqlite3.connect(self.db_path)
-        try:
-            db.execute("INSERT INTO track(title, artist, album, location, init, available, type, imported) \
-                        VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                       [
-                           track_tag["title"], track_tag["artist"], track_tag["album"],
-                           location, False, False, track_type, False
-                       ])
-            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
-        except sqlite3.IntegrityError:
-            db.execute("UPDATE track SET title = ?, artist = ?, album = ?, imported = ?, available = ?, type = ?, \
-            init = ? where location = ?", [track_tag["title"], track_tag["artist"], track_tag["album"],
-                                           False, False, track_type, False, location])
-            # Will set Import True, Available False, initialized False   # FIXME: SQL-Inj. possible
+        db.execute("INSERT OR REPLACE INTO track(title, artist, album, location, init, available, type, imported) \
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                   [
+                       track_tag["title"], track_tag["artist"], track_tag["album"],
+                       location, False, False, track_type, False
+                   ])
         db.commit()
         self.__addTag(track_tag, location)
 
@@ -240,17 +233,19 @@ class DatabaseSqlite(IDatabaseAdapter):
             artists.append(artist[0])
         return artists
 
-    def getAlbums(self) -> List[str]:
+    def getAlbums(self) -> List[Tuple(str)]:
         """
         Returns all stored Albums
         :return: All stored Albums in DB
         """
         db = sqlite3.connect(self.db_path)
         albums = []
-        albums_tuple = db.execute("SELECT album FROM track WHERE imported = ? GROUP BY album", [True]).fetchall()
+        albums_tuple = db.execute(
+            "SELECT artist, album FROM track WHERE imported = ? GROUP BY album", [True]
+        ).fetchall()
 
         for album in albums_tuple:
-            albums.append(album[0])
+            albums.append(album[0], album[1])
         return albums
 
     def getAlbumsByArtist(self, artist: str) -> List[str]:
