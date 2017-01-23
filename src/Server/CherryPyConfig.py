@@ -48,6 +48,30 @@ def getConfig(config):
                 {
                 'tools.staticfile.on': True,
                 'tools.staticfile.filename': htmlRelPath(config, "img/pynitus_32x32.png")
+            },
+
+            '/img/artist.jpeg':
+            {
+                'tools.staticfile.on': True,
+                'tools.staticfile.filename': htmlRelPath(config, "img/artist.jpeg")
+            },
+
+            '/img/album.jpeg':
+            {
+                'tools.staticfile.on': True,
+                'tools.staticfile.filename': htmlRelPath(config, "img/album.jpeg")
+            },
+
+            '/img/cd.jpg':
+            {
+                'tools.staticfile.on': True,
+                'tools.staticfile.filename': htmlRelPath(config, "img/cd.jpg")
+            },
+
+            '/img/search.jpg':
+            {
+                'tools.staticfile.on': True,
+                'tools.staticfile.filename': htmlRelPath(config, "img/search.jpg")
             }
 
         }

@@ -76,7 +76,7 @@ class DatabaseSqlite(IDatabaseAdapter):
             return None
         return row[0]
 
-    def __addTag(self, track_tag: Dict[str, TagValue], location: str) -> None:
+    def __addTag(self, track_tag: Dict[str, TagValue], location: str) -> None:  # FIXME: location not inserted!
         """
         :param track_tag: Additional Track Metainformation
         :param location: Track Location
@@ -457,4 +457,9 @@ class DatabaseSqlite(IDatabaseAdapter):
         return track
 
     def updateTrack(self, location: str, tag_info: Dict[str, TagValue]) -> None:
-        return NotImplemented  # TODO
+        self.__addTag(tag_info, location)
+
+        db = sqlite3.connect(self.db_path)
+        db.execute("UPDATE track set title = ?,  artist = ?, album = ? WHERE location = ?",
+                   [tag_info["title"], tag_info["artist"], tag_info["album"], location])
+        db.commit()

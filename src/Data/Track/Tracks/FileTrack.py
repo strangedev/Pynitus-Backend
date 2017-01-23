@@ -28,8 +28,8 @@ class FileTrack(Track):
 
     description = "A Local File"
 
-    def __init__(self, location, title: str, artist: str, album: str):
-        super().__init__(location, title, artist, album)
+    def __init__(self, location: str):
+        super().__init__(location)
 
         self.playback_handler_class  # = PlaybackHandler
         self.playback_handler_instance = None  # TODO: Move to central PlaybackHandler

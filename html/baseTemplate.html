@@ -23,48 +23,81 @@
       <meta name="msapplication-TileImage" content="/mstile-144x144.png"-->
   </head>
 
-  <body bgcolor="#1a1a1a">
+  <body bgcolor="#1a1a1a" style="background-color:#090909; padding-top: 90px;">
     <div class="container">
 
-      <table class="table bg-primary">
-        <tr>
-          <th>
-            <a href="/queue">
-              <button type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue &nbsp;<span class="badge">{{playbackQueue.getQueueLength()}}</span>
-              </button>
-            </a>
-          </th>
-          <th>
-            <a href="/library/artists">
-              <button type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Artists
-              </button>
-            </a>
-          </th>
-          <th>
-            <a href="/library/albums">
-              <button type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-cd" aria-hidden="true"></span> Albums
-              </button>
-            </a>
-          </th>
-          <th>
-            <a href="/library/tracks">
-              <button type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-music" aria-hidden="true"></span> Tracks
-              </button>
-            </a>
-          </th>
-          <th>
-            <a href="/upload/new">
-              <button type="button" class="btn btn-success">
-                <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload
-              </button>
-            </a>
-          </th>
-        </tr>
-      </table>
+      <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <div class="container-fluid">
+            <ul class="nav navbar-nav" style="display:table; width:100%; margin: 0; padding: 0;">
+              <li>
+                <a href="/queue">
+                  <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue &nbsp;<span class="badge">{{playbackQueue.getQueueLength()}}</span>
+                </a>
+              </li>
+              <li style="float:none;display:table-cell;text-align:left;">
+                <a href="/library" style="text-align: left;">
+                  <span class="glyphicon glyphicon-cd" aria-hidden="true"></span> Library
+                </a>
+              </li>
+              <li style="float:none;display:table-cell;text-align:center;">
+                <a href="/library/artists" style="text-align: left;">
+                  <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Playlists
+                </a>
+              </li>
+              <li style="float:none;display:table-cell;text-align:center;">
+                <a href="/admin" style="text-align: left;">
+                  <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Gated Community
+                </a>
+              </li>
+              <li style="float:none;display:table-cell;text-align:center;">
+                <a href="/upload/new" style="text-align: right;">
+                  <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload
+                </a>
+              </li>
+            </ul>
+          </div>
+          <!--table class="table bg-primary">
+            <tr>
+              <th>
+                <a href="/queue">
+                  <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Queue &nbsp;<span class="badge">{{playbackQueue.getQueueLength()}}</span>
+                  </button>
+                </a>
+              </th>
+              <th>
+                <a href="/library/artists">
+                  <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Artists
+                  </button>
+                </a>
+              </th>
+              <th>
+                <a href="/library/albums">
+                  <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-cd" aria-hidden="true"></span> Albums
+                  </button>
+                </a>
+              </th>
+              <th>
+                <a href="/library/tracks">
+                  <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-music" aria-hidden="true"></span> Tracks
+                  </button>
+                </a>
+              </th>
+              <th>
+                <a href="/upload/new">
+                  <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload
+                  </button>
+                </a>
+              </th>
+            </tr>
+          </table-->
+        </div>
+      </nav>
 
       <div class="panel panel-default">
         <table class="table table-striped">

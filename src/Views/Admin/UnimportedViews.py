@@ -24,12 +24,26 @@ class UnimportedViews(object):
 
             if TagSupport.isListType(internal_name):
                 display_name += " (separated by commas)"
-                if value is not None:
+                if value is not None and value != []:
                     value = "".join(value)
+                else:
+                    value = None
 
             tuples.append((display_name, internal_name, value, required))
 
         return sorted(tuples)
+
+    @staticmethod
+    def paramsToTagInfo(tag_info: Dict[str, str]):
+
+        for key, value in tag_info.items():
+            if TagSupport.isListType(key):
+                tag_info[key] = [i.lstrip() for i in value.split(",")]
+
+            if value is "None":
+                tag_info[key] = None
+
+        return tag_info
 
     # TODO: session activity
     @cherrypy.expose
@@ -79,7 +93,7 @@ class UnimportedViews(object):
     @cherrypy.expose
     def verify(self, location="", **tag_info: Dict[str, str]):
         edited_track = ServerUtils.getForCurrentSession(self.__management, "edited_track")
-        edited_track.tag_info = tag_info
+        edited_track.tag_info = UnimportedViews.paramsToTagInfo(tag_info)
 
         for internal_name in TagSupport.REQUIRED_TAGS:
             value = edited_track.tag_info[internal_name]
