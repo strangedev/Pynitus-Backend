@@ -90,7 +90,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         tag_end = "VALUES (?"
         tag_values = [location]
 
-        for key, value in track_tag:
+        for key, value in track_tag.items():
             if isListType(key):
                 for v in value:
                     db.execute("INSERT OR REPLACE INTO {} (location, {}) VALUES(?,?)".format(key, key), [location, v])
@@ -100,7 +100,7 @@ class DatabaseSqlite(IDatabaseAdapter):
                 tag_values.append(value)
 
         tag_str = tag_begin + ") " + tag_end + ")"
-        db.execute(tag_str)
+        db.execute(tag_str, tag_values)
         db.commit()
 
     def addTrack(self, location: str,
