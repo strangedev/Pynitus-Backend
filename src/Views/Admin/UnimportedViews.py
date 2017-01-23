@@ -3,6 +3,7 @@ from typing import Dict
 import cherrypy
 
 from src.Data.Tagging import TagSupport
+from src.Data.Track.Track import Track
 from src.Server import ServerUtils
 from src.Server.Components.HtmlBuilder import HtmlBuilder
 from src.Data.Tagging.TagSupport import TagValue
@@ -71,14 +72,14 @@ class UnimportedViews(object):
         )
 
     @cherrypy.expose
-    def edit(self, location: str=""):
+    def edit(self, location: str="", previous_track: Track=None):
         edited_track = self.__management.database.getByLocation(location)  # TODO: implement
 
         if edited_track is None:
             return ":("
 
-        if ServerUtils.existsForCurrentSession(self.__management, "edited_track"):
-            edited_track = ServerUtils.getForCurrentSession(self.__management, "edited_track")
+        if previous_track is not None:
+            edited_track = previous_track
 
         ServerUtils.setForCurrentSession(self.__management, "edited_track", edited_track)
 
@@ -98,7 +99,7 @@ class UnimportedViews(object):
         for internal_name in TagSupport.REQUIRED_TAGS:
             value = edited_track.tag_info[internal_name]
             if value is None or value == []:
-                return self.edit(location)
+                return self.edit(location, edited_track)
 
         ServerUtils.removeForCurrentSession(self.__management, "edited_track")
         self.__management.database.updateTrack(edited_track)
