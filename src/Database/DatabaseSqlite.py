@@ -87,6 +87,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         if not track_tag:
             return None
         sorted_tuple = []
+        track_tag["location"] = location
         list_attribute = []
         for tag, value in track_tag.items():
             if isListType(tag):
