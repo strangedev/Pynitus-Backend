@@ -54,11 +54,8 @@ class Database(object):
         for file_path in MediaScanner.iterateAudioFiles(self.config.get("musicDirectory")):
             add_track = True
             tag_info = TagReader.readTag(file_path)
-            required_metadata_present = all([bool(tag_info[key]) for key in TagSupport.REQUIRED_TAGS])
 
-            if required_metadata_present:
-                # Check if exists in db
-                if self.db.getByLocation(file_path) is not None:
+            if self.db.getByLocation(file_path) is not None:
                     add_track = False
 
             if add_track:
