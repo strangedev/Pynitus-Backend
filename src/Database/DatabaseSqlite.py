@@ -233,7 +233,7 @@ class DatabaseSqlite(IDatabaseAdapter):
             artists.append(artist[0])
         return artists
 
-    def getAlbums(self) -> List[Tuple(str)]:
+    def getAlbums(self) -> List[Tuple[str, str]]:
         """
         Returns all stored Albums
         :return: All stored Albums in DB
@@ -245,7 +245,7 @@ class DatabaseSqlite(IDatabaseAdapter):
         ).fetchall()
 
         for album in albums_tuple:
-            albums.append(album[0], album[1])
+            albums.append((album[0], album[1]))
         return albums
 
     def getAlbumsByArtist(self, artist: str) -> List[str]:

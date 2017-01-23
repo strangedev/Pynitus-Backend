@@ -51,7 +51,7 @@ class LibraryViews(object):
         return HtmlBuilder.render(
             "albums.html",
             ServerUtils.getClientIp(),
-            albums=sorted(set([(t.album, t.artist) for t in self.__management.database.getTracks()]))  # TODO: add db feature
+            albums=self.__management.database.getAlbums()
         )
 
     @cherrypy.expose
@@ -60,6 +60,6 @@ class LibraryViews(object):
         return HtmlBuilder.render(
             "tracks.html",
             ServerUtils.getClientIp(),
-            tracks=sorted(set([(t.title, t.album, t.artist) for t in self.__management.database.getTracks()]))  # TODO: add db feature
+            tracks=sorted(set([(t.title, t.album, t.artist) for t in self.__management.database.getTracks()]))
 
         )
