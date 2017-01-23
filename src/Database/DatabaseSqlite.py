@@ -86,39 +86,21 @@ class DatabaseSqlite(IDatabaseAdapter):
 
         if not track_tag:
             return None
-        sorted_tuple = []
-        track_tag["location"] = location
-        list_attribute = []
-        for tag, value in track_tag.items():
-            if isListType(tag):
-                list_attribute.append(tag)
-            else:
-                if tag not in ["album", "artist", "title", "type"]:
-                    sorted_tuple.append(tag)
-        sorted_tuple = tuple(sorted_tuple)
-        sorted_list = []
-        question_mark = "?"
-        update_str = "UPDATE trackTag SET {} = {}".format(sorted_tuple[0], track_tag[sorted_tuple[0]])
-        for i in range(0, len(sorted_tuple)):
-            sorted_list.append(track_tag[sorted_tuple[i]])
-            if i > 0:
-                question_mark += ", ?"
-                update_str += ", {} = {}".format(sorted_tuple[i], track_tag[sorted_tuple[i]])
-        update_str += " WHERE location = " + location
+        tag_begin = "INSERT OR REPLACE INTO trackTag (location"
+        tag_end = "VALUES (?"
+        tag_values = [location]
 
-        for attribute in list_attribute:
-            for tag in track_tag[attribute]:
-                try:
-                    db.execute("INSERT INTO {} (location, {}) VALUES(?,?)".format(attribute, attribute),
-                               [location, tag])
-                except sqlite3.IntegrityError:
-                    db.execute("UPDATE {} SET {} = ? WHERE location = ?".format(attribute, attribute),
-                               [tag, location])
-        try:
-            db.execute("INSERT INTO trackTag {} VALUES({})".format(sorted_tuple, question_mark),
-                       sorted_list)
-        except sqlite3.IntegrityError:
-            db.execute(update_str)
+        for key, value in track_tag:
+            if isListType(key):
+                for v in value:
+                    db.execute("INSERT OR REPLACE INTO {} (location, {}) VALUES(?,?)".format(key, key), [location, v])
+            elif key not in ["title", "type", "artist", "album"]:
+                tag_begin += ", " + key
+                tag_end += ", ?"
+                tag_values.append(value)
+
+        tag_str = tag_begin + ") " + tag_end + ")"
+        db.execute(tag_str)
         db.commit()
 
     def addTrack(self, location: str,
@@ -431,10 +413,10 @@ class DatabaseSqlite(IDatabaseAdapter):
 
         # track_tuple = db.execute("SELECT * FROM trackTag WHERE location = ?", [location])
         # t = track_tuple.fetchone()
-        track = {}
+        track = {"location": location}
         for tag in INTERNAL_NAMES:
             if (tag not in ["artist", "location", "title", "album"]) and (not isListType(tag)):
-                track[tag] = db.execute("SELECT ? FROM trackTag WHERE location = ?", [tag, location]).fetchone()
+                track[tag] = db.execute("SELECT {} FROM trackTag WHERE location = ?".format(tag), [location]).fetchone()[0]
             # TODO: Think of a better way...
             # track[tag] = t[tag]         # I Don't Think that this will work :\
 
