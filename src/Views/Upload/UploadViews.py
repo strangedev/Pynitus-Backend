@@ -68,7 +68,7 @@ class UploadHandlerViews(object):
     def verify(self, track_type, **tag_info):
         upload = ServerUtils.getForCurrentSession(self.__management, "upload")
         upload.tag_info = tag_info
-        if upload.required_metadata_resent:
+        if upload.required_metadata_present:
             UploadBroker.importIntoDatabase(upload)
             return DetailViews.artist(upload.tag_info["artist"])
         else:
