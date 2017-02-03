@@ -72,7 +72,7 @@ class UploadBroker(object):
     def importIntoDatabase(upload: Upload) -> None:
         if UploadBroker.__database is None:
             raise DatabaseNotConnectedException()
-        if not upload.required_metadata_resent:
+        if not upload.required_metadata_present:
             raise UploadInvalidException()
 
         UploadBroker.__database.addTrack(upload.location, upload.track_type, upload.tag_info)

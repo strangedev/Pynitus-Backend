@@ -79,5 +79,5 @@ class Upload(object):
         self.__location, self.__track_type, self.__tag_info = self.__upload_handler.handle(upload_argument)
 
     @property
-    def required_metadata_resent(self):
+    def required_metadata_present(self):
         return all([bool(self.__tag_info[x]) for x in TagSupport.REQUIRED_TAGS])
