@@ -1,3 +1,0 @@
-cherrypy==8.1.2
-jinja2==2.8
-pytaglib==1.4.0
