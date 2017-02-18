@@ -1,5 +1,5 @@
 import vlc
-from pubsub import pub
+from Pynitus.Pynitus.framework.pubsub import pub
 
 
 class Player(object):
@@ -8,8 +8,8 @@ class Player(object):
         self.__vlc_instance = vlc.Instance("--no-xlib")
         self.__player = self.__vlc_instance.media_player_new()
         self.__player.event_manager().event_attach(
-            vlc.EventType.MediaPlayerPlaying,
-            lambda instance: pub.sendMessage("track_ended")
+            vlc.EventType.MediaPlayerEndReached,
+            lambda instance: pub("track_ended")
         )
         self.__stopped = True
         self.__paused = False
@@ -22,7 +22,7 @@ class Player(object):
             self.__player.set_mrl(mrl)
             self.__player.play()
             if not self.__player.will_play():
-                pub.sendMessage("track_ended")
+                pub("track_ended")
                 self.__player.stop()
                 return
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Boolean, String, ForeignKey
+from sqlalchemy import Column, Integer, Boolean, LargeBinary, String, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -19,6 +19,12 @@ class Album(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(256))
+
+
+class TagInfo(Base):
+    __tablename__ = "taginfo"
+
+    id = Column(Integer, primary_key=True)
 
 
 class Status(Base):
@@ -42,3 +48,30 @@ class Track(Base):
     album = relationship(Album, backref=backref('tracks', uselist=True))
     title = Column(String(256))
     mrl = Column(String(1024))
+
+
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    name_hash = Column(LargeBinary)
+    phrase_hash = Column(LargeBinary)
+    phrase_salt = Column(LargeBinary)
+
+
+class Playlist(Base):
+    __tablename__ = 'playlist'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User, backref=backref('playlists', uselist=True))
+    name = Column(String(1024))
+
+
+class PlaylistTracks(Base):
+    __tablename__ = 'playlist_tracks'
+
+    id = Column(Integer, primary_key=True)
+    playlist_id = Column(Integer, ForeignKey('playlist.id'))
+    playlist = relationship(Playlist, backref=backref('tracks', uselist=True))
+    track_id = Column(Integer, ForeignKey('track.id'))

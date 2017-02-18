@@ -7,6 +7,6 @@ setup(
     install_requires=[
         'flask',
         'sqlalchemy',
-        'pubsub',
+        'python-vlc',
     ],
 )

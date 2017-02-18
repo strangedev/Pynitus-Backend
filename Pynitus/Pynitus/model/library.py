@@ -1,9 +1,8 @@
 from typing import List
-
 from sqlalchemy import desc, asc
 
-from Pynitus.model.database import db_session
-from Pynitus.model.models import Artist, Album, Track
+from Pynitus.Pynitus.model.database import db_session
+from Pynitus.Pynitus.model.models import Artist, Album, Track
 
 
 def __non_hidden_tracks():
