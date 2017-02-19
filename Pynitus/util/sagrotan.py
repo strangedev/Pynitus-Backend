@@ -20,10 +20,10 @@
 
 from typing import Any, Callable, Dict
 
-from Pynitus.Pynitus.util.lists import justList, apply
-from Pynitus.Pynitus.util.extended_typing import Maybe, One
+from Pynituss.Pynitus.util import tag_support
+from Pynituss.Pynitus.util.lists import justList, apply
 
-from Pynitus.Pynitus.util import tag_support
+from Pynitus.util.extended_typing import Maybe, One
 
 
 def __sanitizeString(tag_name: str, string: str) -> Maybe(str):

@@ -1,4 +1,4 @@
-from Pynitus.Pynitus.framework.pubsub import pub, sub
+from Pynitus.framework.pubsub import pub, sub
 
 
 class Voting(object):

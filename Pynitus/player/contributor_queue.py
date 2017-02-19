@@ -1,7 +1,7 @@
 from typing import List
 from typing import Tuple
 
-from Pynitus.Pynitus.framework.pubsub import sub, pub
+from Pynitus.framework.pubsub import sub, pub
 
 
 class ContributorQueue(object):

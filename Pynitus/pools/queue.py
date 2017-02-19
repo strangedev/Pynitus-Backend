@@ -1,6 +1,6 @@
 from typing import List
 
-from Pynitus.Pynitus.framework.pubsub import sub
+from Pynitus.framework.pubsub import sub
 
 
 class Queue(object):

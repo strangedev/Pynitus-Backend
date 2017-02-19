@@ -19,8 +19,6 @@
 """
 from typing import List, TypeVar, GenericMeta, Set
 
-import Pynitus.Pynitus.util.extended_typing  # This import is not unused, rather, it is a dirty hack to be left alone
-
 
 class TagUnsupportedException(Exception):
     def __init__(self, message):

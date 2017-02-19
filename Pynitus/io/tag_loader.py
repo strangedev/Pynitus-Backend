@@ -21,8 +21,9 @@
 import taglib
 from typing import Dict, List, TypeVar
 
-from Pynitus.Pynitus.util import sagrotan
-from Pynitus.Pynitus.util.tag_support import TagValue
+from Pynitus.util import sagrotan
+
+from Pynitus.util.tag_support import TagValue
 
 Strings = TypeVar("Strings", str, List[str], None)
 

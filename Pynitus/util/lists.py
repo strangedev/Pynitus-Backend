@@ -20,7 +20,7 @@
 
 from typing import Callable, List, Iterable
 
-from Pynitus.Pynitus.util.extended_typing import Either, One, Another, Maybe
+from Pynitus.util.extended_typing import Either, One, Another, Maybe
 
 
 def apply(method: Callable[[One], Maybe(Another)], one_or_many: Either(One, List[One])):

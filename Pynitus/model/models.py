@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, Boolean, LargeBinary, String, ForeignKey
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+from Pynitus.model.database import Base
+
 
 # TODO: http://docs.sqlalchemy.org/en/latest/orm/cascades.html
 
@@ -19,23 +19,14 @@ class Album(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(256))
-
+    artist_id = Column(Integer, ForeignKey('artist.id'))
+    artist = relationship(Artist, backref=backref('albums', uselist=True))
 
 class TagInfo(Base):
     __tablename__ = "taginfo"
 
     id = Column(Integer, primary_key=True)
-
-
-class Status(Base):
-    __tablename__ = 'status'
-
-    id = Column(Integer, primary_key=True)
-    track_id = Column(Integer, ForeignKey('track.id'))
-    track = relationship('Track', backref=backref('status', uselist=False))
-    imported = Column(Boolean)
-    available = Column(Boolean)
-    resource_type = Column(String(128))
+    # TODO: add tag fields
 
 
 class Track(Base):
@@ -50,20 +41,37 @@ class Track(Base):
     mrl = Column(String(1024))
 
 
+class Status(Base):
+    __tablename__ = 'status'
+
+    id = Column(Integer, primary_key=True)
+    track_id = Column(Integer, ForeignKey('track.id'))
+    track = relationship(Track, backref=backref('status', uselist=False))
+    imported = Column(Boolean)
+    available = Column(Boolean)
+    resource_type = Column(String(128))
+
+    def __init__(self, track: Track):
+        self.imported = False
+        self.available = False
+        self.resource_type = "local"
+        self.track = track
+
+
 class User(Base):
     __tablename__ = 'user'
 
-    id = Column(Integer, primary_key=True)
-    name_hash = Column(LargeBinary)
-    phrase_hash = Column(LargeBinary)
-    phrase_salt = Column(LargeBinary)
+    username = Column(String(128), primary_key=True)
+    password_hash = Column(LargeBinary)
+    password_salt = Column(LargeBinary)
+    privilege_level = Column(Integer)
 
 
 class Playlist(Base):
     __tablename__ = 'playlist'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(String(128), ForeignKey('user.username'))
     user = relationship(User, backref=backref('playlists', uselist=True))
     name = Column(String(1024))
 

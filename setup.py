@@ -8,5 +8,6 @@ setup(
         'flask',
         'sqlalchemy',
         'python-vlc',
+        'argon2'
     ],
 )

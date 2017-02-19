@@ -1,5 +1,6 @@
 import vlc
-from Pynitus.Pynitus.framework.pubsub import pub
+
+from Pynitus.framework.pubsub import pub
 
 
 class Player(object):
