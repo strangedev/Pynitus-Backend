@@ -1,6 +1,5 @@
-from Pynitus import db_session
-from Pynitus.model.database import persistance
-from Pynitus.model.models import User
+from Pynitus.model.db.database import persistance, db_session
+from Pynitus.model.db.models import User
 
 
 def create(username: str, password_hashed: bytes, password_salt: bytes) -> User:

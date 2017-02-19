@@ -18,6 +18,7 @@ def init_db():
     # you will have to import them first before calling init_db()
 
     Base.metadata.create_all(bind=engine)
+    db_session.commit()
 
 
 @contextmanager

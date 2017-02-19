@@ -1,6 +1,6 @@
 import json
 
-from Pynitus.model.models import Track, Artist, Album
+from Pynitus.model.db.models import Track, Artist, Album
 
 
 class APIEncoder(json.JSONEncoder):

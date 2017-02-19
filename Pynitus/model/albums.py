@@ -1,11 +1,11 @@
 from typing import List
 
+from Pynitus.model.db.database import db_session, persistance
 from sqlalchemy import asc
 from sqlalchemy import desc
 
-from Pynitus.model.database import db_session, persistance
-from Pynitus.model.models import Album, Track, Status
 from Pynitus.model import artists
+from Pynitus.model.db.models import Album, Track, Status
 
 
 def all(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_order: str="asc") -> List[Album]:

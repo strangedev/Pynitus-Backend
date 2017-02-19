@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, Boolean, LargeBinary, String, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
-from Pynitus.model.database import Base
+from Pynitus.model.db.database import Base
 
 
 # TODO: http://docs.sqlalchemy.org/en/latest/orm/cascades.html
@@ -49,7 +49,7 @@ class Status(Base):
     track = relationship(Track, backref=backref('status', uselist=False))
     imported = Column(Boolean)
     available = Column(Boolean)
-    resource_type = Column(String(128))
+    backend = Column(String(128))
 
     def __init__(self, track: Track):
         self.imported = False

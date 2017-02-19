@@ -1,11 +1,12 @@
-import argon2
 import os
+
+import argon2
 
 from Pynitus.auth.cache import user_cache
 from Pynitus.framework.pubsub import pub
 from Pynitus.io.config_loader import config
 from Pynitus.model import users
-from Pynitus.model.database import persistance
+from Pynitus.model.db.database import persistance
 
 
 def authenticate(username: str, password: str) -> str:

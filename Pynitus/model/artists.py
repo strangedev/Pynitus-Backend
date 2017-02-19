@@ -1,6 +1,6 @@
-from Pynitus.model.database import db_session, persistance
+from Pynitus.model.db.database import db_session, persistance
 
-from Pynitus.model.models import Artist
+from Pynitus.model.db.models import Artist
 
 
 def get_or_create(name: str) -> Artist:
