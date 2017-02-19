@@ -8,6 +8,7 @@ setup(
     install_requires=[
         'flask',
         'sqlalchemy',
+        'python-memcached',
         'python-vlc',
         'argon2',
         'pytaglib'

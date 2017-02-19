@@ -21,10 +21,13 @@
 import json
 import os
 
-config = None
+from Pynitus import get_memcache
 
+
+def get_config():
+    return get_memcache().get("config")
 
 def init_config():
     with open(os.path.join("./pynitus.conf")) as f:
-        global config
         config = json.load(f)
+        get_memcache().set("config", config)

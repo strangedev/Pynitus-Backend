@@ -30,23 +30,24 @@ def init_plugins():
         is_importer = False
 
         try:
-            is_backend = hasattr(module, "init") and callable(getattr(module, "init"))
-            is_backend = is_backend and hasattr(module, "play") and callable(getattr(module, "play"))
-            is_backend = is_backend and hasattr(module, "pause") and callable(getattr(module, "pause"))
-            is_backend = is_backend and hasattr(module, "stop") and callable(getattr(module, "stop"))
+            is_backend =all([
+                hasattr(module, "init"), callable(getattr(module, "init")),
+                hasattr(module, "play"), callable(getattr(module, "play")),
+                hasattr(module, "pause"), callable(getattr(module, "pause")),
+                hasattr(module, "stop"), callable(getattr(module, "stop"))])
 
-        except Exception as e:
-            pass
+        except Exception: pass
 
         try:
-            is_importer = hasattr(module, "name")
-            is_importer = is_importer and hasattr(module, "description")
-            is_importer = is_importer and hasattr(module, "attributes")
-            is_importer = is_importer and hasattr(module, "backend")
-            is_importer = is_importer and hasattr(module, "transform") and callable(getattr(module, "transform"))
+            is_importer = all([
+                hasattr(module, "name"),
+                hasattr(module, "description"),
+                hasattr(module, "attributes"),
+                hasattr(module, "backend"),
+                hasattr(module, "transform") and callable(getattr(module, "transform"))
+            ])
 
-        except Exception as e:
-            pass
+        except Exception: pass
 
         if is_backend:
             backends[dirname] = module

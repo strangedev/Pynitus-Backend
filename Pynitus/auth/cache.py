@@ -1,25 +1,39 @@
 import time
 
+from Pynitus import get_memcache
 from Pynitus.framework.pubsub import sub
 
 
 class UserCache(object):
 
     def __init__(self):
-        self.__active = dict({})
+
+        if get_memcache().get("user_cache.active_users") is None:
+            get_memcache().set("user_cache.active_users", dict({}))
+
+    @property
+    def __active(self):
+        return get_memcache().get("user_cache.active_users")
+
+    @__active.setter
+    def __active(self, v):
+        get_memcache().set("user_cache.active_users", v)
 
     def activity(self, user_token: str) -> None:
 
-        record = self.__active.get(user_token)
+        active_users = self.__active
 
-        if record is None:
+        if active_users.get(user_token) is None:
             return
 
-        record['last_seen'] = time.time()
+        active_users[user_token]['last_seen'] = time.time()
+        self.__active = active_users
 
     def user_authenticated(self, user_token: str, username: str, privilege_level: int, ttl: int) -> None:
         print(username, "authenticated.")  # TODO: log event
-        self.__active[user_token] = {
+
+        active_users = self.__active
+        active_users[user_token] = {
             'last_seen': time.time(),
             'username': username,
             'privilege_level': privilege_level,
@@ -28,12 +42,14 @@ class UserCache(object):
 
         old_sessions = []
 
-        for token, record in self.__active.items():
+        for token, record in active_users.items():
             if record['username'] == username and token != user_token:
                 old_sessions.append(token)
 
         for token in old_sessions:
-            del self.__active[token]
+            del active_users[token]
+
+        self.__active = active_users
 
     def exists(self, user_token: str) -> bool:
         return self.__active.get(user_token) is not None
@@ -57,7 +73,9 @@ class UserCache(object):
             return False
 
         if time.time() - record['last_seen'] > record['ttl']:
-            del self.__active[user_token]
+            active_users = self.__active
+            del active_users[user_token]
+            self.__active = active_users
             return False
 
         return record['privilege_level'] >= required_privilege
