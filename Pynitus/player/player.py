@@ -33,3 +33,11 @@ def pause():
 def stop():
     with remote() as r:
         r.stop()
+
+
+def available(mrl, backend) -> bool:
+    available = True
+    with remote() as r:
+        available = r.available(mrl, backend)
+
+    return available != False

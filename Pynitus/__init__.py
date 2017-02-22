@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import g
 from flask import request
 
 from Pynitus.auth.user_cache import init_user_cache
@@ -35,7 +36,8 @@ def shutdown_session(exception=None):
 @app.before_request
 def refresh_user_session():
     user_token = request.args.get('token')
-    user_token = user_token if user_token is not None else ""
+    user_token = user_token if user_token is not None else request.remote_addr
+    g._user_token = user_token
     pub('user_activity', user_token)
 
 
