@@ -7,7 +7,7 @@ from Pynitus.model import tracks
 
 
 @app.route('/tracks/all', methods=['GET'])
-def all():
+def tracks_all():
     start = request.args.get('start')
     amount = request.args.get('amount')
 
@@ -21,7 +21,7 @@ def all():
 
 
 @app.route('/tracks/unimported', methods=['GET'])
-def unimported():
+def tracks_unimported():
     start = request.args.get('start')
     amount = request.args.get('amount')
 
@@ -35,7 +35,7 @@ def unimported():
 
 
 @app.route('/tracks/unavailable', methods=['GET'])
-def unavailable():
+def tracks_unavailable():
     start = request.args.get('start')
     amount = request.args.get('amount')
 
@@ -49,15 +49,15 @@ def unavailable():
 
 
 @app.route('/tracks/album/<int:album_id>', methods=['GET'])
-def album(album_id):
+def tracks_album(album_id):
     return TrackEncoder().encode(tracks.on_album(album_id))
 
 
 @app.route('/tracks/artist/<int:artist_id>', methods=['GET'])
-def artist(artist_id):
+def tracks_artist(artist_id):
     return TrackEncoder().encode(tracks.from_artist(artist_id))
 
 
 @app.route('/tracks/id/<int:track_id>', methods=['GET'])
-def id(track_id):
+def tracks_id(track_id):
     return TrackEncoder().encode(tracks.get(track_id))

@@ -45,7 +45,7 @@ class AlbumEncoder(APIEncoder):
     encodes_class = Album
 
     def encode_metadata(self, o):
-        return {'id': o.id, 'type': 'album', 'follow': '/album/id/' + str(o.id)}
+        return {'id': o.id, 'type': 'album', 'follow': '/albums/id/' + str(o.id)}
 
     def encode_data(self, o):
         return {
@@ -59,7 +59,7 @@ class TrackEncoder(APIEncoder):
     encodes_class = Track
 
     def encode_metadata(self, o):
-        return {'id': o.id, 'type': 'track', 'follow': '/track/id/' + str(o.id)}
+        return {'id': o.id, 'type': 'track', 'follow': '/tracks/id/' + str(o.id)}
 
     def encode_data(self, o):
         return {
