@@ -9,7 +9,7 @@ setup(
         'flask',
         'sqlalchemy',
         'python-memcached',
-        'python-vlc',
+        'tinnitus',
         'argon2',
         'pytaglib'
     ],

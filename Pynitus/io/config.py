@@ -20,14 +20,27 @@
 
 import json
 import os
+from typing import Any
 
-from Pynitus import get_memcache
+from Pynitus.framework import memcache
 
-
-def get_config():
-    return get_memcache().get("config")
 
 def init_config():
+    """
+    Should be called once on server startup.
+    Initializes the persistent cache and loads all config values from disk.
+    :return: None
+    """
     with open(os.path.join("./pynitus.conf")) as f:
         config = json.load(f)
-        get_memcache().set("config", config)
+
+    memcache.set("config", config)
+
+
+def get(key: str) -> Any:
+    """
+    Gets a value from the config by it's key.
+    :param key: The key of the value
+    :return: The value or None
+    """
+    return memcache.get("config").get(key)

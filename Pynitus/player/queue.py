@@ -1,28 +1,25 @@
-from typing import List
+from tinnitus import remote
 
-from Pynitus import get_memcache
+from Pynitus.model import tracks
 from Pynitus.framework.pubsub import sub
 
 
 def init_queue():
-    set_current(-1)
-    set_items([])
+
+    sub("queue_add", add)
+    sub("queue_remove", remove)
 
 
-def get_current():
-    return get_memcache().get("queue.current")
+def current():
+    with remote() as r:
+        current = r.current()
+    return current if current is not None else -1
 
 
-def get_items():
-    return get_memcache().get("queue.items")
-
-
-def set_current(item):
-    get_memcache().set("queue.current", item)
-
-
-def set_items(items):
-    get_memcache().set("queue.items", items)
+def queue():
+    with remote() as r:
+        queue = r.queue()
+    return queue
 
 
 def add(track_id: int, user_token: str) -> None:
@@ -33,9 +30,10 @@ def add(track_id: int, user_token: str) -> None:
     :param track_id: The track's id
     :return: None
     """
-    queue = get_items()
-    queue.append(track_id)
-    set_items(queue)
+    track = tracks.get(track_id)
+    with remote() as r:
+        r.add(track_id, track.mrl, track.status.backend)
+
 
 def remove(track_id: int) -> None:
     """
@@ -44,30 +42,5 @@ def remove(track_id: int) -> None:
     :param track_id: The track's id
     :return: None
     """
-
-    queue = get_items()
-
-    if track_id in queue:
-        queue.remove(track_id)
-
-    set_items(queue)
-
-def next():
-    """
-    » Subscribed to queue_next
-    Changes the current track by removing the oldest entry from the queue.
-    :return: None
-    """
-    queue = get_items()
-
-    if len(queue) > 0:
-        set_current(queue.pop(0))
-    else:
-        set_current(-1)
-
-    set_items(queue)
-
-
-sub("queue_add", add)
-sub("queue_remove", remove)
-sub("queue_next", next)
+    with remote() as r:
+        r.remove(track_id)

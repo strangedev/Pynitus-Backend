@@ -150,7 +150,9 @@ def get_or_create(title: str, artist: str, album: str) -> Track:
             db_session.add(t)
 
     if t.status is None:
-        s = Status(t)
+        with persistance():
+            s = Status(t)
+            db_session.add(s)
 
     return t
 

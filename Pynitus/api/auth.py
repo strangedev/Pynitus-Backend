@@ -3,7 +3,7 @@ from flask import request
 
 from Pynitus import app
 from Pynitus.auth import authtools
-from Pynitus.auth.cache import user_cache
+from Pynitus.auth import user_cache
 
 
 @app.route('/auth/register/<int:privilege>/<string:username>/<string:password>', methods=['POST'])
