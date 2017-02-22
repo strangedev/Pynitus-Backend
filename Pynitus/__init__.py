@@ -42,4 +42,5 @@ def refresh_user_session():
 import Pynitus.api.tracks
 import Pynitus.api.albums
 import Pynitus.api.artists
+import Pynitus.api.queue
 import Pynitus.api.auth
