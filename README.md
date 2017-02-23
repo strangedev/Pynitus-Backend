@@ -1,73 +1,77 @@
-### Pynitus is in alpha and might not be working as expected.
+Pynitus
+======
 
-## Listen to the people.
+_...who's doing the music?_
+Everyone is. Meet Pynitus, the collaborative music playlist, where anyone can join in.
 
-Pynitus is a music playlist by and for the people. Users may upload their own music from a plethora of online or local sources. Users decide on what's being played and what's being skipped.
+What is Pynitus?
+----------------------
 
-### Features
+With Pynitus, you can hook up your PC to any sound system, and let the crowd take control.
+Using the Mobile Web App, anyone in your network can upload their music to Pynitus, browse your Pynitus Library and vote on what's playing next.
 
-- An Html & CSS only (no JavaScript needed!) web interface any device can access
-- A playback queue which can be filled by any user
-- A voting system to skip unpopular songs
-- A flood protection system to prohibit spamming
-- A persistent library of music which can be added to by anyone
+> **Work in Progress!**
 
-Pynitus supports the following sources:
+> We're currently still building Pynitus. 
+> However, you can already get the Development version of it, [and here's how.](https://github.com/Pynitus-Universe/Pynitus-Backend#getting-pynitus)
 
-- Local files (MP3, MP4/AAC, OGG, WMA)
-- YouTube
-- SoundCloud
 
-And because it's easy to extend, more sources will follow.
+----------
 
-### Getting started
 
-Getting Pynitus up and running is easy. Just follow these steps:
+Easy to use
+---------------
 
-1. Download Pynitus as .tar.gz or .zip compressed archive
-2. Unpack Pynitus
-3. Install missing python dependencies by using:
+With the Mobile Web App, anyone can join.
 
-        pip install -r requirements.txt
+The Pynitus Mobile Web App runs in your browser and requires no installation. Just share your Pynitus URL with anyone you want to join in and sit back.
 
-4. Edit pynitus.conf to your liking
-5. Run it:
+With the Mobile Web App, your guests can browse your Pynitus Library, upload new Music to it, create their own playlists and vote to skip a track, if they don't like it.
 
-        python3 main.py ./
+Easy to set up
+------------------
 
-Prerequesites:
+Pynitus will be available as a container, possibly a snap package.
 
-- Python>=3.5
-- PIP (the python package manager)
-- mplayer
-- mpv
 
-## Contributing
 
-Contributions to Pynitus are welcome. However, it is still in alpha and there's not much of a codebase to build upon.
-If you'd still like to help out, see TODO.md in our Github repository for notes on planned features, fixes etc.
-Feel free to contact [strangedev](https://github.com/strangedev) if you've got any questions concerning contributing.
+Flexible
+----------
 
-If you are contributing to this project, make sure to include the license boilerplate in all files created by you:
+Pynitus is built on top of [tinnitus](https://github.com/strangedev/tinnitus), an extendable media player service.
+Because tinnitus is easy to extend, Pynitus can be extended to support _any_ source of music, from MP3s to streaming services and beyond.
 
-    
-    Pynitus - A free and democratic music playlist
-    Copyright (C) 2017  <Author(s)>
+With the built-in permission management, you can take control over what your guest are allowed to do, right within the App.
 
-    This file is part of the Pynitus program, see <https://github.com/strangedev/Pynitus>.
+----------
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published
-    by the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Getting Pynitus
+---------------------
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+To get Pynitus, you need to clone the [Pynitus_Backend](https://github.com/Pynitus-Universe/Pynitus-Backend) repository.
+The repository contains a bootstrapping script to get Pynitus up and running:
 
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```
+# Clone the repository
+git clone https://github.com/Pynitus-Universe/Pynitus-Backend.git
 
-Also make sure to credit all authors who contributed meaningful contributions to files created by you, by mentioning
-them as authors.
+cd Pynitus_Backend
+
+# Run the server
+./pynitus.sh
+```
+
+Also, make sure tinnitusd is running on your system:
+
+```
+# Pynitus installs itself and tinntius to a virtualenv.
+# Activate the virtualenv
+
+. .pynitus_venv/bin/activate
+
+# Run tinnitusd
+
+tinnitusd
+
+```
+
