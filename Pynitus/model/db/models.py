@@ -39,6 +39,7 @@ class Track(Base):
     album = relationship(Album, backref=backref('tracks', uselist=True))
     title = Column(String(256))
     mrl = Column(String(1024))
+    backend = Column(String(128))
 
 
 class Status(Base):
@@ -49,12 +50,10 @@ class Status(Base):
     track = relationship(Track, backref=backref('status', uselist=False))
     imported = Column(Boolean)
     available = Column(Boolean)
-    backend = Column(String(128))
 
     def __init__(self, track: Track):
         self.imported = False
         self.available = False
-        self.resource_type = "local"
         self.track = track
 
 

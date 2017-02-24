@@ -4,7 +4,7 @@ from Pynitus.model.db.database import db_session, persistance
 from sqlalchemy import desc, asc
 
 from Pynitus.model import albums, artists
-from Pynitus.model.db.models import Track, Status
+from Pynitus.model.db.models import Track, Album, Artist, Status
 
 
 def all(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_order: str="asc") -> List[Track]:
@@ -132,6 +132,19 @@ def get(track_id: int) -> Track:
     return db_session.query(Track).get(track_id)
 
 
+def exists(title: str, artist: str, album: str) -> bool:
+
+    t = db_session.query(Track) \
+        .join(Artist) \
+        .join(Album) \
+        .filter(Track.title == title) \
+        .filter(Album.title == album) \
+        .filter(Artist.name == artist) \
+        .first()
+
+    return t is not None
+
+
 def get_or_create(title: str, artist: str, album: str) -> Track:
 
     a = albums.get_or_create(album, artist)
@@ -155,4 +168,3 @@ def get_or_create(title: str, artist: str, album: str) -> Track:
             db_session.add(s)
 
     return t
-

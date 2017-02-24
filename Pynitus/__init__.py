@@ -6,11 +6,13 @@ from Pynitus.auth.user_cache import init_user_cache
 from Pynitus.framework import memcache
 from Pynitus.framework.pubsub import pub, init_pubsub
 from Pynitus.io.config import init_config
+from Pynitus.io.storage import init_storage
 from Pynitus.model.db.database import db_session, init_db
 from Pynitus.player.contributor_queue import init_contributor_queue
 from Pynitus.player.player import init_player
 from Pynitus.player.queue import init_queue
 from Pynitus.player.voting import init_voting
+from Pynitus.upload import init_upload
 
 app = Flask(__name__)
 
@@ -24,6 +26,8 @@ with app.app_context():
         init_queue()
         init_contributor_queue()
         init_voting()
+        init_storage()
+        init_upload()
         memcache.set("pynitus.initialized", True)
 
 
@@ -46,3 +50,4 @@ import Pynitus.api.albums
 import Pynitus.api.artists
 import Pynitus.api.queue
 import Pynitus.api.auth
+import Pynitus.api.upload

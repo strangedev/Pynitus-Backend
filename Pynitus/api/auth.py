@@ -7,7 +7,7 @@ from Pynitus.auth import user_cache
 
 
 @app.route('/auth/register', methods=['POST'])
-@expect([('username', str), ('password', str), ('privilege', int)])
+@expect([('username', str), ('password', str)])
 @expect_optional([('privilege', int)])
 def register(username="", password="", privilege=0):
 

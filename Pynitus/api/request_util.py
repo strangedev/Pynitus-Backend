@@ -20,6 +20,13 @@ class Response(IntEnum):
     TRACK_UNAVAILABLE = 200
     NOT_IN_QUEUE = 201
 
+    # Upload
+    TRACK_EXISTS = 300
+    PLUGIN_ERROR = 301
+    INVALID_PLUGIN = 302
+
+# TODO: user readable description for error enum
+
 
 def expect(arguments: List[Tuple[str, type]]):
 

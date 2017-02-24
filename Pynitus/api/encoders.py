@@ -67,3 +67,19 @@ class TrackEncoder(APIEncoder):
             'album': AlbumEncoder().default(o.album),
             'title': o.title
         }
+
+
+class DetailedTrackEncoder(APIEncoder):
+
+    encodes_class = Track
+
+    def encode_metadata(self, o):
+        return {'id': o.id, 'type': 'track', 'follow': '/tracks/id/' + str(o.id)}
+
+    def encode_data(self, o):
+        return {
+            'artist': ArtistEncoder().default(o.artist),
+            'album': AlbumEncoder().default(o.album),
+            'title': o.title
+            # TODO: tag info
+        }
