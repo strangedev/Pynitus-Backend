@@ -1,3 +1,4 @@
+from flask import g
 from flask import json
 
 from Pynitus import app
