@@ -33,6 +33,7 @@ def init_config():
     """
 
     # TODO: absolute poth for config path in bootstrap script
+    # TODO: log errors
     with open("./pynitus.yaml") as f:
         config = yaml.safe_load(f)
 
