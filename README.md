@@ -16,9 +16,6 @@ Using the Mobile Web App, anyone in your network can upload their music to Pynit
 > However, you can already get the Development version of it, [and here's how.](https://github.com/Pynitus-Universe/Pynitus-Backend#getting-pynitus)
 
 
-----------
-
-
 Easy to use
 ---------------
 
@@ -43,10 +40,34 @@ Because tinnitus is easy to extend, Pynitus can be extended to support _any_ sou
 
 With the built-in permission management, you can take control over what your guest are allowed to do, right within the App.
 
-----------
 
 Getting Pynitus
 ---------------------
+
+## Prerequisites
+
+Pynitus works on Unixoid Systems, like GNU/Linux, BSD and Mac OS. There is no support for Windows at the moment.
+
+First of all, you have to install the prerequisites _memcached_ and _taglib_.
+
+### Mac OS
+
+Get [homebrew](https://brew.sh/).
+
+```
+brew install memcached
+
+brew install taglib
+```
+
+### GNU/Linux
+
+[memcached installation instructions](https://github.com/memcached/memcached/wiki/Install)
+
+For installing taglib, please see the documentation for your OS's package management system. The source can be found [here.](https://github.com/taglib/taglib)
+
+
+## Installing Pynitus
 
 To get Pynitus, you need to clone the [Pynitus_Backend](https://github.com/Pynitus-Universe/Pynitus-Backend) repository.
 The repository contains a bootstrapping script to get Pynitus up and running:
