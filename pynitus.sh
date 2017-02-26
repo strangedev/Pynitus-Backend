@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "${0%/*}"
+
 if [ ! -f .pynitus_venv ]
 then
     virtualenv .pynitus_venv
