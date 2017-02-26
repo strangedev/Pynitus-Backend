@@ -4,7 +4,7 @@ cd "${0%/*}"
 
 if [ ! -f .pynitus_venv ]
 then
-    virtualenv .pynitus_venv
+    virtualenv -p python3 .pynitus_venv
 fi
 
 source .pynitus_venv/bin/activate
