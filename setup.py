@@ -7,12 +7,13 @@ setup(
     include_package_data=True,
     install_requires=[
         'flask',
+        'flask-cors',
         'sqlalchemy',
         'python-memcached',
         'tinnitus',
         'argon2',
         'pytaglib',
-        'PyYAML'
+        'PyYAML',
     ],
     author='strangedev, Pynitus Universe',
     author_email='strange.dev@gmail.com',

@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import g
 from flask import request
+from flask_cors import CORS, cross_origin
 
 from Pynitus.auth.user_cache import init_user_cache
 from Pynitus.framework import memcache
@@ -15,6 +16,9 @@ from Pynitus.player.voting import init_voting
 from Pynitus.upload import init_upload
 
 app = Flask(__name__)
+
+if app.debug:
+    CORS(app)
 
 with app.app_context():
     if memcache.get("pynitus.initialized") is None:
