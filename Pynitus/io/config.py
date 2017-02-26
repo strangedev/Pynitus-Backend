@@ -18,9 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import json
-import os
 from typing import Any
+
+import yaml
 
 from Pynitus.framework import memcache
 
@@ -31,8 +31,10 @@ def init_config():
     Initializes the persistent cache and loads all config values from disk.
     :return: None
     """
-    with open(os.path.join("./pynitus.conf")) as f:
-        config = json.load(f)
+
+    # TODO: absolute poth for config path in bootstrap script
+    with open("./pynitus.yaml") as f:
+        config = yaml.safe_load(f)
 
     memcache.set("config", config)
 

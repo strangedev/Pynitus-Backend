@@ -11,7 +11,8 @@ setup(
         'python-memcached',
         'tinnitus',
         'argon2',
-        'pytaglib'
+        'pytaglib',
+        'PyYAML'
     ],
     author='strangedev, Pynitus Universe',
     author_email='strange.dev@gmail.com',
