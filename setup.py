@@ -14,6 +14,7 @@ setup(
         'argon2',
         'pytaglib',
         'PyYAML',
+        'requests',
     ],
     author='strangedev, Pynitus Universe',
     author_email='strange.dev@gmail.com',
