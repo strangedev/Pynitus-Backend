@@ -1,3 +1,4 @@
+import copy
 from tinnitus import remote
 
 from Pynitus.model import tracks
@@ -17,9 +18,13 @@ def current():
 
 
 def queue():
+    ret = []
+
     with remote() as r:
-        queue = r.queue()
-    return queue
+        for item in r.queue():
+            ret.append(int(item))
+
+    return ret
 
 
 def add(track_id: int, user_token: str) -> None:
@@ -32,7 +37,7 @@ def add(track_id: int, user_token: str) -> None:
     """
     track = tracks.get(track_id)
     with remote() as r:
-        r.add(track_id, track.mrl, track.status.backend)
+        r.add(track_id, track.mrl, track.backend)
 
 
 def remove(track_id: int) -> None:

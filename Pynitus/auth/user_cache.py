@@ -65,7 +65,7 @@ def user_authenticated(user_token: str, username: str, privilege_level: int, ttl
     :param ttl: The ttl of the record
     :return: None
     """
-    print(username, "authenticated.")  # TODO: log event
+    # print(username, "authenticated.")  # TODO: log event
 
     active_users = memcache.get("user_cache.active_users")
     active_users[user_token] = {

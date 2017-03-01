@@ -21,6 +21,8 @@ def generate_sample_tracks(n: int=10000):
         with persistance():
             t.status.available = True
             t.status.imported = True
+            t.backend = "vlc_backend"
+            t.mrl = "test.mp3"
 
     db_session.close()
     db_session.remove()

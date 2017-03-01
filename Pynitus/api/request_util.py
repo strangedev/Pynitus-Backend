@@ -36,7 +36,7 @@ def expect(arguments: List[Tuple[str, type]]):
         def wrapped(*args, **kwargs):
 
             for arg_name, arg_type in arguments:
-                argument = request.args.get(arg_name)
+                argument = request.values.get(arg_name)
 
                 if argument is None:
                     return json.dumps({
@@ -70,7 +70,7 @@ def expect_optional(arguments: List[Tuple[str, type]]):
         def wrapped(*args, **kwargs):
 
             for arg_name, arg_type in arguments:
-                argument = request.args.get(arg_name)
+                argument = request.values.get(arg_name)
 
                 if argument is None: continue
 

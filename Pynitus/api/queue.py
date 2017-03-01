@@ -14,7 +14,8 @@ from Pynitus.player import queue
 
 @app.route('/queue/items', methods=['GET'])
 def queue_items():
-    return TrackEncoder().encode([tracks.get(i) for i in queue.queue()])
+    tracks_in_queue = [tracks.get(i) for i in queue.queue()]
+    return TrackEncoder().encode(tracks_in_queue)
 
 
 @app.route('/queue/current', methods=['GET'])
@@ -41,7 +42,7 @@ def queue_add(track_id=None):
         })
 
     with persistance():
-        track.status.available = player.available(track.mrl, track.status.backend)
+        track.status.available = player.available(track.mrl, track.backend)
 
     if not track.status.available:
         return json.dumps({

@@ -108,9 +108,6 @@ def on_album(album_id: int) -> List[Track]:
 
     album = albums.get(album_id)
 
-    print(album)
-    print(album.tracks[0].status.available)
-
     if album is None:
         return []
 

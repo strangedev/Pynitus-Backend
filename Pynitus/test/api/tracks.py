@@ -1,6 +1,8 @@
 import requests
 import unittest
 
+from Pynitus.api.request_util import Response
+
 
 class TestTracks(unittest.TestCase):
 
@@ -31,6 +33,24 @@ class TestTracks(unittest.TestCase):
         response = requests.get("http://127.0.0.1:5000/tracks/all", params=payload).json()
 
         self.assertLessEqual(len(response), self.pagination_limit)
+
+    def test_tracks_all_invalid_param_start(self):
+
+        payload = {"start": "invalid"}
+        response = requests.get("http://127.0.0.1:5000/tracks/all", params=payload).json()
+
+        self.assertEqual(response["success"], False)
+        self.assertEqual(response["reason"], Response.BAD_REQUEST)
+
+
+    def test_tracks_all_invalid_param_limit(self):
+
+        payload = {"amount": "invalid"}
+        response = requests.get("http://127.0.0.1:5000/tracks/all", params=payload).json()
+
+        self.assertEqual(response["success"], False)
+        self.assertEqual(response["reason"], Response.BAD_REQUEST)
+
 
     def test_tracks_artist(self):
 
