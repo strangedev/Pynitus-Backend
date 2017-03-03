@@ -7,12 +7,12 @@ from Pynitus.model import albums, artists
 from Pynitus.model.db.models import Track, Album, Artist, Status
 
 
-def all(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_order: str="asc") -> List[Track]:
+def all(offset: int=0, limit: int=0, sorted_by: str= "title", sort_order: str= "asc") -> List[Track]:
     """
     Returns all non hidden tracks in the database
     :param sort_order: Whether to sort "asc"ending or "desc"ending
     :param sorted_by: By which attribute to sort (title, artist, album)
-    :param starting_with: The id of the track to start from
+    :param offset: How many tracks to omit from the beginning of the result
     :param limit: The number of tracks to return
     :return: All non hidden tracks in the database
     """
@@ -22,15 +22,20 @@ def all(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_order: 
         .filter(Status.imported == True)\
         .filter(Status.available == True)
 
-    if starting_with > 0:
-        q = q.filter(Track.id >= starting_with)
-
-    order_by_column = Track.title if sorted_by == "title" else Track.artist if sorted_by == "artist" else Track.album
+    if sorted_by == "title":
+        order_by_column = Track.title
+    elif sorted_by == "artist":
+        order_by_column = Track.artist
+    else:
+        order_by_column = Track.album
 
     if sort_order == "desc":
         q = q.order_by(desc(order_by_column))
     else:
         q = q.order_by(asc(order_by_column))
+
+    if offset > 0:
+        q = q.offset(offset)
 
     if limit > 0:
         q = q.limit(limit)
@@ -38,12 +43,12 @@ def all(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_order: 
     return q.all()
 
 
-def unimported(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_order: str="asc") -> List[Track]:
+def unimported(offset: int=0, limit: int=0, sorted_by: str= "title", sort_order: str= "asc") -> List[Track]:
     """
     Returns all non hidden tracks in the database
     :param sort_order: Whether to sort "asc"ending or "desc"ending
     :param sorted_by: By which attribute to sort (title, artist, album)
-    :param starting_with: The id of the track to start from
+    :param offset: How many tracks to omit from the beginning of the result
     :param limit: The number of tracks to return
     :return: All non hidden tracks in the database
     """
@@ -52,15 +57,20 @@ def unimported(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_
         .join(Track.status)\
         .filter(Status.imported == False)
 
-    if starting_with > 0:
-        q = q.filter(Track.id >= starting_with)
-
-    order_by_column = Track.title if sorted_by == "title" else Track.artist if sorted_by == "artist" else Track.album
+    if sorted_by == "title":
+        order_by_column = Track.title
+    elif sorted_by == "artist":
+        order_by_column = Track.artist
+    else:
+        order_by_column = Track.album
 
     if sort_order == "desc":
         q = q.order_by(desc(order_by_column))
     else:
         q = q.order_by(asc(order_by_column))
+
+    if offset > 0:
+        q = q.offset(offset)
 
     if limit > 0:
         q = q.limit(limit)
@@ -68,12 +78,12 @@ def unimported(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_
     return q.all()
 
 
-def unavailable(starting_with: int=0, limit: int=0, sorted_by: str="title", sort_order: str="asc") -> List[Track]:
+def unavailable(offset: int=0, limit: int=0, sorted_by: str= "title", sort_order: str= "asc") -> List[Track]:
     """
     Returns all non hidden tracks in the database
     :param sort_order: Whether to sort "asc"ending or "desc"ending
     :param sorted_by: By which attribute to sort (title, artist, album)
-    :param starting_with: The id of the track to start from
+    :param offset: How many tracks to omit from the beginning of the result
     :param limit: The number of tracks to return
     :return: All non hidden tracks in the database
     """
@@ -83,15 +93,20 @@ def unavailable(starting_with: int=0, limit: int=0, sorted_by: str="title", sort
         .filter(Status.imported == True)\
         .filter(Status.available == False)
 
-    if starting_with > 0:
-        q = q.filter(Track.id >= starting_with)
-
-    order_by_column = Track.title if sorted_by == "title" else Track.artist if sorted_by == "artist" else Track.album
+    if sorted_by == "title":
+        order_by_column = Track.title
+    elif sorted_by == "artist":
+        order_by_column = Track.artist
+    else:
+        order_by_column = Track.album
 
     if sort_order == "desc":
         q = q.order_by(desc(order_by_column))
     else:
         q = q.order_by(asc(order_by_column))
+
+    if offset > 0:
+        q = q.offset(offset)
 
     if limit > 0:
         q = q.limit(limit)

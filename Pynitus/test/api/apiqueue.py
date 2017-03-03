@@ -76,10 +76,6 @@ class TestQueue(unittest.TestCase):
         self.assertEqual(response["success"], False)
         self.assertEqual(response["reason"], Response.NOT_IN_QUEUE)
 
-        with remote() as r:
-            r.clear()
-
-
 
 if __name__ == '__main__':
     unittest.main()

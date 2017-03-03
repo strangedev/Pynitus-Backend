@@ -7,12 +7,12 @@ from Pynitus.model.db.database import db_session, persistance
 from Pynitus.model.db.models import Artist, Track, Status
 
 
-def all(starting_with: int=0, limit: int=0, sorted_by: str="name", sort_order: str="asc") -> List[Artist]:
+def all(offset: int=0, limit: int=0, sorted_by: str= "name", sort_order: str= "asc") -> List[Artist]:
     """
     Returns all artists with one or more non hidden tracks in the database
     :param sort_order: Whether to sort "asc"ending or "desc"ending
     :param sorted_by: By which attribute to sort (title, artist)
-    :param starting_with: The id of the artist to start from
+    :param offset: How many artists to omit from the beginning of the result
     :param limit: The number of artists to return
     :return: All artists with one or more non hidden tracks in the database
     """
@@ -24,15 +24,15 @@ def all(starting_with: int=0, limit: int=0, sorted_by: str="name", sort_order: s
         .filter(Status.available == True) \
         .group_by(Artist.id)
 
-    if starting_with > 0:
-        q = q.filter(Artist.id >= starting_with)
-
     order_by_column = Artist.name if sorted_by == "name" else Artist.artist
 
     if sort_order == "desc":
         q = q.order_by(desc(order_by_column))
     else:
         q = q.order_by(asc(order_by_column))
+
+    if offset > 0:
+        q = q.offset(offset)
 
     if limit > 0:
         q = q.limit(limit)

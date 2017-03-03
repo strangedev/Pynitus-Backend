@@ -1,5 +1,3 @@
-import os
-
 from flask import json
 from flask import request
 from werkzeug.utils import secure_filename
