@@ -12,11 +12,11 @@ from Pynitus.model.db.models import Track
 
 @app.route('/upload/plugins', methods=['GET'])
 def upload_plugins():
-    upload_plugins = upload.get_plugins()
+    known_plugins = upload.get_plugins()
 
-    for name in upload_plugins.keys():
-        upload_plugins[name] = {k: v for k, v in upload_plugins[name].items() if k != "path"}
-    return json.dumps(upload_plugins)
+    for name in known_plugins.keys():
+        known_plugins[name] = {k: v for k, v in known_plugins[name].items() if k != "path"}
+    return json.dumps(known_plugins)
 
 
 @app.route('/upload/<plugin_name>', methods=['PUT'])

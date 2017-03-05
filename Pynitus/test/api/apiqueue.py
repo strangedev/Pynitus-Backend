@@ -15,6 +15,10 @@ class TestQueue(unittest.TestCase):
         698,
     ]
 
+    """
+    Tracks with available mrl: 14
+    Tracks with unavailable flag set: 1
+    """
 
     def setUp(self):
         pass
@@ -47,7 +51,7 @@ class TestQueue(unittest.TestCase):
 
     def test_queue_add_one_unavailable(self):
 
-        payload = {"track_id": str(self.sample_track_ids[0])}
+        payload = {"track_id": 1}
         response = requests.post("http://127.0.0.1:5000/queue/add", data=payload).json()
 
         self.assertEqual(response["success"], False)

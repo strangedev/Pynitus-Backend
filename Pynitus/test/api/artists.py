@@ -4,8 +4,8 @@ import unittest
 
 class TestArtists(unittest.TestCase):
 
-    artist_count = 1000
-    pagination_start = 111
+    artist_count = 995
+    pagination_offset = 111
     pagination_limit = 222
 
 
@@ -17,15 +17,14 @@ class TestArtists(unittest.TestCase):
         response = requests.get("http://127.0.0.1:5000/artists/all").json()
         self.assertEqual(len(response), self.artist_count)
 
-    def test_artist_all_pagination_start(self):
+    def test_artist_all_pagination_offset(self):
 
-        payload = {"start": self.pagination_start}
+        payload = {"offset": self.pagination_offset}
         response = requests.get("http://127.0.0.1:5000/artists/all", params=payload).json()
 
-        for api_object in response:
-            self.assertGreaterEqual(api_object["id"], self.pagination_start)
+        self.assertEqual(len(response), self.artist_count - self.pagination_offset)
 
-    def test_artist_all_pagination_limit(self):
+    def test_artist_all_pagination_amount(self):
 
         payload = {"amount": self.pagination_limit}
         response = requests.get("http://127.0.0.1:5000/artists/all", params=payload).json()

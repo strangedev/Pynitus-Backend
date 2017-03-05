@@ -8,21 +8,21 @@ from Pynitus.model import tracks
 
 
 @app.route('/tracks/all', methods=['GET'])
-@expect_optional([('start', int), ('amount', int)])
-def tracks_all(start=0, amount=0):
-    return TrackEncoder().encode(tracks.all(offset=start, limit=amount))
+@expect_optional([('offset', int), ('amount', int)])
+def tracks_all(offset=0, amount=0):
+    return TrackEncoder().encode(tracks.all(offset=offset, limit=amount))
 
 
 @app.route('/tracks/unimported', methods=['GET'])
-@expect_optional([('start', int), ('amount', int)])
-def tracks_unimported(start=0, amount=0):
-    return TrackEncoder().encode(tracks.unimported(offset=start, limit=amount))
+@expect_optional([('offset', int), ('amount', int)])
+def tracks_unimported(offset=0, amount=0):
+    return TrackEncoder().encode(tracks.unimported(offset=offset, limit=amount))
 
 
 @app.route('/tracks/unavailable', methods=['GET'])
-@expect_optional([('start', int), ('amount', int)])
-def tracks_unavailable(start=0, amount=0):
-    return TrackEncoder().encode(tracks.unavailable(offset=start, limit=amount))
+@expect_optional([('offset', int), ('amount', int)])
+def tracks_unavailable(offset=0, amount=0):
+    return TrackEncoder().encode(tracks.unavailable(offset=offset, limit=amount))
 
 
 @app.route('/tracks/album/<int:album_id>', methods=['GET'])
