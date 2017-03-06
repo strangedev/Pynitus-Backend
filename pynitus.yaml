@@ -6,7 +6,7 @@
 
 
 # Change these entries before starting the Pynitus Backend for the first time.
-upload_path: /home/torvalds/Music/Pynitus  # Path where new uploads are stored
+upload_path: /home/vivian/Music/Pynitus  # Path where new uploads are stored
 
 # These entries have safe defaults and may be left unchanged.
 user_ttl: 1800  # Time after which a user session is invalidated

@@ -82,3 +82,4 @@ class PlaylistTracks(Base):
     playlist_id = Column(Integer, ForeignKey('playlist.id'))
     playlist = relationship(Playlist, backref=backref('tracks', uselist=True))
     track_id = Column(Integer, ForeignKey('track.id'))
+    track = relationship(Track)
