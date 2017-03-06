@@ -4,7 +4,7 @@ from Pynitus.model.db.database import db_session, persistance
 from sqlalchemy import desc, asc
 
 from Pynitus.model import albums, artists
-from Pynitus.model.db.models import Track, Album, Artist, Status
+from Pynitus.model.db.models import Track, Album, Artist, Status, PlaylistTracks
 
 
 def all(offset: int=0, limit: int=0, sorted_by: str= "title", sort_order: str= "asc") -> List[Track]:
@@ -180,3 +180,16 @@ def get_or_create(title: str, artist: str, album: str) -> Track:
             db_session.add(s)
 
     return t
+
+
+def get_tracks_on_playlist(playlist_id: int) -> List[Track]:
+    """
+    gets List of Tracks to given playlist_id
+    :param playlist_id: int to identify Playlist to get Tracks of
+    :return: List of Tracks from Playlist
+    """
+    tracks = []
+    q = db_session.query(PlaylistTracks).filter(PlaylistTracks.playlist_id == playlist_id).all()
+    for p_track in q:
+        tracks.append(p_track.track)
+    return tracks
