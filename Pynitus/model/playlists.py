@@ -74,8 +74,7 @@ def from_user(username: str) -> List[Playlist]:
     :return: List of Playlist
     """
     # TODO switch to User_id
-    user_id = db_session.query(User).filter(User.username == username)
-    playlist = get(user_id)
+    playlist = db_session.query(Playlist).filter(Playlist.user_id == username).all()
 
     if playlist is None:
         return []
