@@ -70,12 +70,12 @@ class Playlist(Base):
     __tablename__ = 'playlist'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(String(128), ForeignKey('user.username'))
+    username = Column(String(128), ForeignKey('user.username'))
     user = relationship(User, backref=backref('playlists', uselist=True))
     name = Column(String(1024))
 
 
-class PlaylistTracks(Base):
+class PlaylistTrack(Base):
     __tablename__ = 'playlist_tracks'
 
     id = Column(Integer, primary_key=True)

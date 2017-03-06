@@ -21,14 +21,14 @@ from sqlalchemy import desc
 
 from Pynitus import db_session
 from Pynitus.model.db.database import persistance
-from Pynitus.model.db.models import Playlist, User, PlaylistTracks
+from Pynitus.model.db.models import Playlist, User, PlaylistTrack
 
 
 def all(offset: int = 0, limit: int = 0, sorted_by: str = "id", sort_order: str = "asc") -> List[Playlist]:
     """
     Returns all non hidden tracks in the database
     :param sort_order: Whether to sort "asc"ending or "desc"ending
-    :param sorted_by: By which attribute to sort (id, playlist_name, user_name, user_id)
+    :param sorted_by: By which attribute to sort (id, playlist_name, user_name, username)
     :param offset: The e.g. id of the track to start from
     :param limit: The number of tracks to return
     :return: All non hidden tracks in the database
@@ -42,7 +42,7 @@ def all(offset: int = 0, limit: int = 0, sorted_by: str = "id", sort_order: str 
     elif sorted_by == "user_name":
         col_order = Playlist.user
     else:
-        col_order = Playlist.user_id
+        col_order = Playlist.username
 
     if sort_order == "desc":
         q = q.order_by(desc(col_order))
@@ -73,8 +73,7 @@ def from_user(username: str) -> List[Playlist]:
     :param username: name of User to get List of Playlist from.
     :return: List of Playlist
     """
-    # TODO switch to User_id
-    playlist = db_session.query(Playlist).filter(Playlist.user_id == username).all()
+    playlist = db_session.query(Playlist).filter(Playlist.username == username).all()
 
     if playlist is None:
         return []
@@ -82,20 +81,15 @@ def from_user(username: str) -> List[Playlist]:
     return [p for p in playlist]
 
 
-def create(username: str, playlist_name: str, track_id: int) -> Playlist:
+def create(username: str, playlist_name: str) -> Playlist:
     """
-    Sollten
-    Die Playlist erstellen, add_track aufrufen.
-    add_track via PlaylistId?,
     :param username: String
     :param playlist_name: String
     :param track_id:
     :return:
     """
     with persistance():
-        playlist_track = PlaylistTracks(track_id=track_id)
         playlist = Playlist(user_id=username, name=playlist_name)
-        playlist_track.playlist = playlist
         db_session.add(playlist)
     return playlist
 
@@ -107,9 +101,10 @@ def add_track(playlist_id: int, track_id: int) -> Playlist:
     :param track_id:
     :return:
     """
+    # TODO: Return Value should be bool?
     playlist = get(playlist_id)
     with persistance():
-        playlist_tracks = PlaylistTracks(track_id=track_id)
+        playlist_tracks = PlaylistTrack(track_id=track_id)
         playlist_tracks.playlist = playlist
         db_session.add(playlist_tracks)
     return playlist_tracks.playlist
@@ -122,15 +117,15 @@ def remove_track(playlist_id: int, track_id: int) -> bool:
     :param track_id: unique int of track to remove
     :return: succeed?
     """
-    playlist_track = db_session.query(PlaylistTracks). \
-        filter(PlaylistTracks.playlist_id == playlist_id). \
-        filter(PlaylistTracks.track_id == track_id).first()
+    playlist_track = db_session.query(PlaylistTrack). \
+        filter(PlaylistTrack.playlist_id == playlist_id). \
+        filter(PlaylistTrack.track_id == track_id).first()
     if playlist_track is None:
         return False
 
     with persistance():
-        db_session.query(PlaylistTracks).filter(PlaylistTracks.id == playlist_track.id).\
-                filter(PlaylistTracks.track_id == track_id).delete()
+        db_session.query(PlaylistTrack).filter(PlaylistTrack.id == playlist_track.id).\
+                filter(PlaylistTrack.track_id == track_id).delete()
     return True
 
 
