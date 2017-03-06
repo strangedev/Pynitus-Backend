@@ -126,7 +126,6 @@ def remove_track(playlist_id: int, track_id: int) -> bool:
     playlist_track = db_session.query(PlaylistTracks). \
         filter(PlaylistTracks.playlist_id == playlist_id). \
         filter(PlaylistTracks.track_id == track_id).first()
-    print(playlist_track)
     if playlist_track is None:
         return False
 
