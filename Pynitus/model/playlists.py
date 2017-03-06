@@ -129,7 +129,8 @@ def remove_track(playlist_id: int, track_id: int) -> bool:
         return False
 
     with persistance():
-        db_session.query(PlaylistTracks).filter(PlaylistTracks.id == playlist_track.id).delete()
+        db_session.query(PlaylistTracks).filter(PlaylistTracks.id == playlist_track.id).\
+                filter(PlaylistTracks.track_id == track_id).delete()
     return True
 
 
@@ -139,6 +140,10 @@ def remove(playlist_id: int) -> bool:
     :param playlist_id: unique int of Playlist to remove
     :return: succeed?
     """
-    with persistance():
-        db_session.query(Playlist).filter(Playlist.id == playlist_id).delete()
-    return True
+    playlist = db_session.query(Playlist).filter(Playlist.id == playlist_id)
+    if playlist is None:
+        return False
+    else:
+        with persistance():
+            db_session.query(Playlist).filter(Playlist.id == playlist_id).delete()
+        return True
