@@ -144,36 +144,3 @@ def remove(playlist_id: int) -> bool:
     with persistance():
         db_session.query(Playlist).filter(Playlist.id == playlist_id).delete()
     return True
-
-
-def fusion(playlist_id_1: int, playlist_id_2: int, mode: str = "normal", name: str="mixed") -> Playlist:
-    """
-    creates new Playlist, based on given playlist_id_1, _id_2
-    :param playlist_id_1: starting playlist in normal mode
-    :param playlist_id_2: upcoming playlist in normal mode
-    :param mode: normal(default) returns a Playlist starting with playlist_id_1 then playlist_id_2,
-                merge_'x' returns Playlist merged by x, where x can be album, artist, id, title,
-                TODO: could be the same? randomized, shuffle
-    :return:
-    """
-    if mode == "normal":
-        playlist = db_session.query(PlaylistTracks) \
-            .filter((PlaylistTracks.playlist_id == playlist_id_1) \
-                    or (PlaylistTracks.playlist_id == playlist_id_2)).all()
-        temp = playlist.pop()
-        p = create(temp.playlist.user_id, name, temp.track_id)
-
-        for e in playlist:
-            add_track(p.id, e.track_id)
-        return p
-    elif mode.startswith("merge_"):
-        # TODO: implement
-        return None
-    elif mode == "randomize":
-        # TODO: implement
-        return None
-    elif mode == "shuffle":
-        # TODO: implement
-        return None
-    else:
-        return None
