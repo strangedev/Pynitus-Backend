@@ -182,7 +182,7 @@ def get_or_create(title: str, artist: str, album: str) -> Track:
     return t
 
 
-def get_tracks_on_playlist(playlist_id: int) -> List[Track]:
+def on_playlist(playlist_id: int) -> List[Track]:
     """
     gets List of Tracks to given playlist_id
     :param playlist_id: int to identify Playlist to get Tracks of

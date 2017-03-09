@@ -1,5 +1,3 @@
-from flask import request
-
 from Pynitus import app
 from Pynitus.api.encoders import TrackEncoder
 from Pynitus.api.request_util import expect_optional
