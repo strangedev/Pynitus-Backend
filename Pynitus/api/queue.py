@@ -50,11 +50,12 @@ def queue_add(track_id=None):
             'reason': Response.TRACK_UNAVAILABLE
         })
 
-    queue.add(track_id, g._user_token)
+    queue.add(track_id, g.user_token)
 
     return json.dumps({
         'success': True
     })
+
 
 @app.route('/queue/remove', methods=['POST'])
 @expect([('track_id', int)])

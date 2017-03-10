@@ -12,7 +12,7 @@ from Pynitus.auth import user_cache
 @expect_optional([('privilege', int)])
 def register(username="", password="", privilege=0):
 
-    if not user_cache.authorize(g._user_token, privilege):
+    if not user_cache.authorize(g.user_token, privilege):
 
         return json.dumps({
             'success': False,

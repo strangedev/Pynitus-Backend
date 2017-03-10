@@ -45,7 +45,7 @@ def shutdown_session(exception=None):
 def refresh_user_session():
     user_token = request.args.get('token')
     user_token = user_token if user_token is not None else request.remote_addr
-    g._user_token = user_token
+    g.user_token = user_token
     pub('user_activity', user_token)
 
 

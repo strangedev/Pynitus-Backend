@@ -94,20 +94,20 @@ def create(username: str, playlist_name: str) -> Playlist:
     return playlist
 
 
-def add_track(playlist_id: int, track_id: int) -> Playlist:
+def add_track(playlist_id: int, track_id: int) -> bool:
     """
     Add Track by id in Playlist by id
     :param playlist_id:
     :param track_id:
     :return:
     """
-    # TODO: Return Value should be bool?
+    # TODO: Check if get returns None
     playlist = get(playlist_id)
     with persistance():
         playlist_tracks = PlaylistTrack(track_id=track_id)
         playlist_tracks.playlist = playlist
         db_session.add(playlist_tracks)
-    return playlist_tracks.playlist
+    return True
 
 
 def remove_track(playlist_id: int, track_id: int) -> bool:
