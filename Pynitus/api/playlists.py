@@ -19,7 +19,7 @@ def playlists_get(playlist_id):
     return PlaylistEncoder().encode(playlists.get(playlist_id))
 
 
-@app.route('/playlists/user/<str:username>', methods=['GET'])
+@app.route('/playlists/user/<username>', methods=['GET'])
 def playlists_user(username):
     return PlaylistEncoder().encode(playlists.from_user(username))
 

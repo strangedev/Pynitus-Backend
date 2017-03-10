@@ -39,7 +39,7 @@ def all(offset: int = 0, limit: int = 0, sorted_by: str = "id", sort_order: str 
         col_order = Playlist.id
     elif sorted_by == "playlist_name":
         col_order = Playlist.name
-    elif sorted_by == "user_name":
+    elif sorted_by == "username":
         col_order = Playlist.user
     else:
         col_order = Playlist.username

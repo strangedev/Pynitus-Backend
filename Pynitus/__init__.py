@@ -55,3 +55,4 @@ import Pynitus.api.artists
 import Pynitus.api.queue
 import Pynitus.api.auth
 import Pynitus.api.upload
+import Pynitus.api.playlists

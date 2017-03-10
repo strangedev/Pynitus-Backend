@@ -90,7 +90,7 @@ class DetailedTrackEncoder(APIEncoder):
 
 class PlaylistEncoder(APIEncoder):
 
-    encode_class = Playlist
+    encodes_class = Playlist
 
     def encode_metadata(self, o):
         return {'id': o.id, 'type': 'playlist', 'follow': '/playlists/id/' + str(o.id)}
