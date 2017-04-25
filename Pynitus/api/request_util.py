@@ -28,7 +28,7 @@ class Response(IntEnum):
 # TODO: user readable description for error enum
 
 
-def expect(arguments: List[Tuple[str, type]]):
+def expect(*arguments: List[Tuple[str, type]]):
 
     def wrapper(function):
 
@@ -62,7 +62,7 @@ def expect(arguments: List[Tuple[str, type]]):
     return wrapper
 
 
-def expect_optional(arguments: List[Tuple[str, type]]):
+def expect_optional(*arguments: List[Tuple[str, type]]):
 
     def wrapper(function):
 

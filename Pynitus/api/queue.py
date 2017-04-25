@@ -24,7 +24,7 @@ def queue_current():
 
 
 @app.route('/queue/add', methods=['POST'])
-@expect([('track_id', int)])
+@expect(('track_id', int))
 def queue_add(track_id=None):
 
     track = tracks.get(track_id)
@@ -58,7 +58,7 @@ def queue_add(track_id=None):
 
 
 @app.route('/queue/remove', methods=['POST'])
-@expect([('track_id', int)])
+@expect(('track_id', int))
 def queue_remove(track_id=None):
 
     if track_id not in queue.queue():

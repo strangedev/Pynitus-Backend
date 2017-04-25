@@ -48,7 +48,7 @@ Getting Pynitus
 
 Pynitus works on Unixoid Systems, like GNU/Linux, BSD and Mac OS. There is no support for Windows at the moment.
 
-First of all, you have to install the prerequisites _memcached_ and _taglib_.
+First of all, you have to install the prerequisites _memcached_, _virtualenv_ and _taglib_.
 
 ### Mac OS
 

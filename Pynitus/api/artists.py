@@ -5,7 +5,7 @@ from Pynitus.model import artists
 
 
 @app.route('/artists/all', methods=['GET'])
-@expect_optional([('offset', int), ('amount', int)])
+@expect_optional(('offset', int), ('amount', int))
 def artists_all(offset=0, amount=0):
     return ArtistEncoder().encode(artists.all(offset=offset, limit=amount))
 

@@ -8,8 +8,8 @@ from Pynitus.auth import user_cache
 
 
 @app.route('/auth/register', methods=['POST'])
-@expect([('username', str), ('password', str)])
-@expect_optional([('privilege', int)])
+@expect(('username', str), ('password', str))
+@expect_optional(('privilege', int))
 def register(username="", password="", privilege=0):
 
     if not user_cache.authorize(g.user_token, privilege):
@@ -30,7 +30,7 @@ def register(username="", password="", privilege=0):
 
 
 @app.route('/auth/login', methods=['POST'])
-@expect([('username', str), ('password', str)])
+@expect(('username', str), ('password', str))
 def login(username="", password=""):
 
     success = False

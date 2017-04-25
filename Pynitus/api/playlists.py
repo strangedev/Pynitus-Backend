@@ -9,7 +9,7 @@ from Pynitus.model import playlists
 
 
 @app.route('/playlists/all', methods=['GET'])
-@expect_optional([('offset', int), ('amount', int)])
+@expect_optional(('offset', int), ('amount', int))
 def playlists_all(offset=0, amount=0):
     return PlaylistEncoder().encode(playlists.all(offset=offset, limit=amount))
 
@@ -25,7 +25,7 @@ def playlists_user(username):
 
 
 @app.route('/playlists/create', methods=['PUT'])
-@expect([('name', str)])
+@expect(('name', str))
 def playlists_create(name=None):
     if not user_cache.exists(g.user_token):
         return json.dumps({
@@ -40,7 +40,7 @@ def playlists_create(name=None):
 
 
 @app.route('/playlists/add', methods=['PUT'])
-@expect([('track_id', int), ('playlist_id', int)])
+@expect(('track_id', int), ('playlist_id', int))
 def playlists_add(track_id=0, playlist_id=0):
     # TODO: Make more beautiful
     if not user_cache.exists(g.user_token):
@@ -61,7 +61,7 @@ def playlists_add(track_id=0, playlist_id=0):
 
 
 @app.route('/playlists/remove_track', methods=['DELETE'])
-@expect([('track_id', int), ('playlist_id', int)])
+@expect(('track_id', int), ('playlist_id', int))
 def playlists_remove_track(track_id=0, playlist_id=0):
     # TODO: Make more beautiful
     if not user_cache.exists(g.user_token):
@@ -82,7 +82,7 @@ def playlists_remove_track(track_id=0, playlist_id=0):
 
 
 @app.route('/playlists/remove', methods=['DELETE'])
-@expect([('playlist_id', int)])
+@expect(('playlist_id', int))
 def playlists_remove(playlist_id=0):
     # TODO: Make more beautiful
     if not user_cache.exists(g.user_token):

@@ -7,7 +7,7 @@ from Pynitus.model import albums
 
 
 @app.route('/albums/all', methods=['GET'])
-@expect_optional([('offset', int), ('amount', int)])
+@expect_optional(('offset', int), ('amount', int))
 def albums_all(offset=0, amount=0):
     return AlbumEncoder().encode(albums.all(offset=offset, limit=amount))
 
